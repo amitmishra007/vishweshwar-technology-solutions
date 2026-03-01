@@ -18,14 +18,29 @@ export default function FancyButton({
 }: FancyButtonProps) {
   const content = (
     <>
-      {/* Sliding background */}
-      <span className="absolute inset-0 flex items-center justify-center w-full h-full text-white duration-300 -translate-x-full bg-blue-950 group-hover:translate-x-0 ease">
+      {/* 🌊 Animated Royal Gradient Background */}
+      <span className="absolute inset-0 rounded-full overflow-hidden">
+        <span className="absolute inset-0 bg-gradient-to-r from-blue-950 via-amber-700 to-yellow-500 animate-gradientMove" />
+        <span className="absolute inset-0 bg-gradient-to-r from-yellow-500 via-amber-700 to-blue-950 opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out" />
+      </span>
+
+      {/* ✨ Shine Sweep */}
+      <span className="absolute inset-0 overflow-hidden rounded-full">
+        <span className="absolute top-0 left-[-75%] w-1/2 h-full bg-white/20 skew-x-[-25deg] group-hover:left-[130%] transition-all duration-[1200ms] ease-out" />
+      </span>
+
+      {/* 🎬 Text Layer */}
+      <span className="absolute inset-0 flex items-center justify-center text-white font-semibold tracking-wide transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-10 group-hover:opacity-0">
+        {text}
+      </span>
+
+      {/* ➡ Arrow Layer */}
+      <span className="absolute inset-0 flex items-center justify-center text-white opacity-0 translate-y-10 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:opacity-100">
         <svg
-          className="w-6 h-6"
+          className="w-6 h-6 md:w-5 md:h-5 sm:w-4 sm:h-4"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
         >
           <path
             strokeLinecap="round"
@@ -36,46 +51,39 @@ export default function FancyButton({
         </svg>
       </span>
 
-      {/* Text */}
-      <span className="absolute flex items-center justify-center w-full h-full text-white bg-blue-950 transition-all duration-300 transform group-hover:translate-x-full ease">
-        {text}
-      </span>
-
-      {/* Invisible span for button size */}
+      {/* Invisible span for sizing */}
       <span className="relative invisible">{text}</span>
     </>
   );
 
+  const baseClasses = `
+    group relative inline-flex items-center justify-center
+    overflow-hidden
+    rounded-full
+    font-medium
+    transition-all duration-500
+
+    /* Responsive sizing */
+    px-8 py-3 text-base
+    md:px-7 md:py-2.5 md:text-sm
+    sm:px-6 sm:py-2 sm:text-sm
+
+    shadow-[0_10px_40px_rgba(212,175,55,0.35)]
+    hover:shadow-[0_15px_60px_rgba(212,175,55,0.6)]
+
+    ${className || ""}
+  `;
+
   if (href) {
-    // Render as Next.js Link
     return (
-      <Link
-        href={href}
-        className={`
-          group relative inline-flex items-center justify-center
-          px-6 py-3 overflow-hidden font-medium
-          text-blue-950 border-2 bg-blue-950 rounded-full shadow-md
-          transition duration-300 ease-out
-          ${className || ""}
-        `}
-      >
+      <Link href={href} className={baseClasses}>
         {content}
       </Link>
     );
   }
 
-  // Render as normal button
   return (
-    <button
-      onClick={onClick}
-      className={`
-        group relative inline-flex items-center justify-center
-        px-6 py-3 overflow-hidden font-medium
-        text-white border-2 bg-blue-950 rounded-full shadow-md
-        transition duration-300 ease-out
-        ${className || ""}
-      `}
-    >
+    <button onClick={onClick} className={baseClasses}>
       {content}
     </button>
   );
