@@ -22,11 +22,11 @@ export const Footer = () => {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true }}
-      className="relative bg-gradient-to-t from-blue-950 via-amber-700 to-yellow-500 text-white overflow-hidden pt-16 pb-10"
+      className="relative bg-gradient-to-t from-[#d4af37]/80 to-[#f5d76e]/70  text-white overflow-hidden pt-16 pb-10"
     >
       {/* Top wave */}
       <svg
-        className="absolute top-0 w-full h-12 sm:h-20 -mt-10 text-blue-950"
+        className="absolute top-0 w-full h-12 sm:h-20 -mt-10 text-blue-900/80"
         preserveAspectRatio="none"
         viewBox="0 0 1440 54"
       >

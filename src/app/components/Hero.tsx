@@ -1,40 +1,59 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Dispatch, SetStateAction } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import React from "react";
 
 import WebDevSlide from "./WebDevSlide";
 import MobileAppSlide from "./MobileAppSlide";
 import GraphicsSlide from "./GraphicsSlide";
 import MarketingSlide from "./MarketingSlide";
 
-export default function Hero() {
-  const [index, setIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+// Use object or Record<string, unknown> for empty props
+type HeroProps = Record<string, unknown>;
 
-  const slides = useMemo(
+export default function Hero({}: HeroProps) {
+  const [index, setIndex] = useState<number>(0);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+
+  // Slides typed as ReactNode for SSR-safety
+  const slides: React.ReactNode[] = useMemo(
     () => [
-      <WebDevSlide key="web" setHeroPaused={setIsPaused} />,
-      <MobileAppSlide key="mobile" setHeroPaused={setIsPaused} />,
-      <GraphicsSlide key="graphics" setHeroPaused={setIsPaused} />,
-      <MarketingSlide key="marketing" setHeroPaused={setIsPaused} />,
+      <WebDevSlide
+        key="web"
+        setHeroPaused={setIsPaused as Dispatch<SetStateAction<boolean>>}
+      />,
+      <MobileAppSlide
+        key="mobile"
+        setHeroPaused={setIsPaused as Dispatch<SetStateAction<boolean>>}
+      />,
+      <GraphicsSlide
+        key="graphics"
+        setHeroPaused={setIsPaused as Dispatch<SetStateAction<boolean>>}
+      />,
+      <MarketingSlide
+        key="marketing"
+        setHeroPaused={setIsPaused as Dispatch<SetStateAction<boolean>>}
+      />,
     ],
     [],
   );
 
+  // Auto-rotation every 10s
   useEffect(() => {
     if (isPaused) return;
-
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % slides.length);
     }, 10000);
-
     return () => clearInterval(interval);
   }, [isPaused, slides.length]);
 
+  const prevSlide = () =>
+    setIndex((prev) => (prev - 1 + slides.length) % slides.length);
+  const nextSlide = () => setIndex((prev) => (prev + 1) % slides.length);
+
   return (
     <section className="relative w-full h-screen md:h-[75vh] lg:h-screen overflow-hidden">
-      {/* DEEP ROYAL BACKGROUND */}
       <div className="absolute inset-0 -z-10" />
 
       <AnimatePresence mode="wait">
@@ -50,14 +69,8 @@ export default function Hero() {
             opacity: 1,
             clipPath: "circle(160% at 50% 50%)",
           }}
-          exit={{
-            opacity: 0,
-            scale: 0.96,
-          }}
-          transition={{
-            duration: 1.4,
-            ease: [0.16, 1, 0.3, 1],
-          }}
+          exit={{ opacity: 0, scale: 0.96 }}
+          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
           className="absolute inset-0"
         >
           {slides[index]}
@@ -66,10 +79,7 @@ export default function Hero() {
           <motion.div
             initial={{ opacity: 0.9, scale: 0.4 }}
             animate={{ opacity: 0, scale: 2.4 }}
-            transition={{
-              duration: 1.3,
-              ease: [0.16, 1, 0.3, 1],
-            }}
+            transition={{ duration: 1.3, ease: [0.16, 1, 0.3, 1] }}
             className="absolute inset-0 pointer-events-none"
             style={{
               background: `
@@ -78,8 +88,7 @@ export default function Hero() {
                   rgba(245,215,110,0.45) 15%,
                   rgba(212,175,55,0.25) 35%,
                   rgba(212,175,55,0.1) 50%,
-                  transparent 75%)
-              `,
+                  transparent 75%)`,
               filter: "blur(70px)",
             }}
           />
@@ -95,14 +104,13 @@ export default function Hero() {
                 radial-gradient(circle at center,
                   transparent 60%,
                   rgba(212,175,55,0.15) 85%,
-                  rgba(0,0,0,0.4) 100%)
-              `,
+                  rgba(0,0,0,0.4) 100%)`,
             }}
           />
         </motion.div>
       </AnimatePresence>
 
-      {/* LUXURY COMPACT DOT NAVIGATION */}
+      {/* DOT NAVIGATION */}
       <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2 z-50">
         {slides.map((_, i) => (
           <button
@@ -116,6 +124,46 @@ export default function Hero() {
           />
         ))}
       </div>
+
+      {/* LEFT ARROW */}
+      <button
+        onClick={prevSlide}
+        className="flex md:hidden lg:flex absolute top-1/2 left-4 -translate-y-1/2 z-50 w-12 h-12 rounded-full bg-gradient-to-br from-[#d4af37]/80 to-[#f5d76e]/70 shadow-lg items-center justify-center hover:scale-105 transition-transform cursor-pointer"
+        aria-label="Previous Slide"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6 text-white"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+      </button>
+
+      {/* RIGHT ARROW */}
+      <button
+        onClick={nextSlide}
+        className="flex md:hidden lg:flex absolute top-1/2 right-4 -translate-y-1/2 z-50 w-12 h-12 rounded-full bg-gradient-to-br from-[#d4af37]/80 to-[#f5d76e]/70 shadow-lg items-center justify-center hover:scale-105 transition-transform cursor-pointer"
+        aria-label="Next Slide"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6 text-white"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
     </section>
   );
 }

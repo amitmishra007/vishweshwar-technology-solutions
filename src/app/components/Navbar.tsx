@@ -19,17 +19,21 @@ export default function Navbar() {
   const [logoLoaded, setLogoLoaded] = useState(false);
   const [showNav, setShowNav] = useState(true);
   const [lastScroll, setLastScroll] = useState(0);
+  const [scrollY, setScrollY] = useState(0);
   const [showTopBtn, setShowTopBtn] = useState(false);
   const spacing = 6;
 
+  // Logo animation
   useEffect(() => {
     const timer = setTimeout(() => setLogoLoaded(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
+  // Scroll handling
   useEffect(() => {
     const handleScroll = () => {
       const currentScroll = window.scrollY;
+      setScrollY(currentScroll);
       setShowNav(currentScroll < lastScroll || currentScroll < 50);
       setShowTopBtn(currentScroll > 300);
       setLastScroll(currentScroll);
@@ -38,12 +42,13 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScroll]);
 
+  // Nav item stagger variants
   const navItemVariants: Variants = {
-    hidden: { opacity: 0, y: -20 },
+    hidden: { opacity: 0, x: 50 },
     visible: (i: number) => ({
       opacity: 1,
-      y: 0,
-      transition: { delay: i * 0.1, type: "spring", stiffness: 120 },
+      x: 0,
+      transition: { delay: i * 0.08, type: "spring", stiffness: 120 },
     }),
   };
 
@@ -52,27 +57,21 @@ export default function Navbar() {
       {/* Navbar */}
       <motion.nav
         initial={{ y: 0 }}
-        animate={{ y: showNav ? 0 : -200 }} // Move navbar completely offscreen
+        animate={{ y: showNav ? 0 : -200 }}
         transition={{ type: "spring", stiffness: 120, damping: 20 }}
-        className="fixed top-0 left-0 z-[999] w-full bg-transparent"
+        className={`fixed top-0 left-0 z-[999] w-full ${
+          scrollY > 0
+            ? "bg-gradient-to-br from-[#FCF5E5#FAF9F6] via-[#FAF9F6] to-transparent "
+            : "bg-transparent"
+        }`}
       >
-        <div className="flex pt-2 items-center justify-between px-4 md:px-8 lg:px-12">
-          {/* Logo */}
+        <div className="flex items-center justify-between px-4 md:px-6 lg:px-12 py-2">
+          {/* Logo more left */}
           <motion.div
             initial={{ x: -160, opacity: 0 }}
             animate={logoLoaded ? { x: 0, opacity: 1 } : {}}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="
-              shrink-0
-              -ml-4 sm:-ml-6 md:-ml-8
-              mt-2 sm:mt-4 md:mt-6
-              h-32 w-40
-              sm:h-28 sm:w-56
-              md:h-32 md:w-64
-              lg:h-36 lg:w-72
-              xl:h-40 xl:w-80
-              relative
-            "
+            className="shrink-0 relative -ml-6 sm:-ml-8 md:-ml-10 mt-2 sm:mt-4 md:mt-6 h-32 w-40 sm:h-28 sm:w-56 md:h-32 md:w-64 lg:h-36 lg:w-72 xl:h-40 xl:w-80"
           >
             <Image
               src="/vishweshwar-industries-logo.png"
@@ -83,8 +82,8 @@ export default function Navbar() {
             />
           </motion.div>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex flex-1 justify-end space-x-8">
+          {/* Desktop Menu (lg+) */}
+          <div className="hidden lg:flex flex-1 justify-end space-x-8">
             {NAV_ITEMS.map((item, idx) => (
               <motion.div
                 key={item.href}
@@ -95,8 +94,7 @@ export default function Navbar() {
               >
                 <Link
                   href={item.href}
-                  className="bg-gradient-to-r from-blue-950 via-amber-700 to-yellow-700
-        bg-clip-text text-transparent font-semibold hover:text-blue-800 transition-colors duration-300"
+                  className="text-blue-900/80 font-semibold hover:text-red-400 hover:text-shadow-red-950 transition-colors duration-300"
                 >
                   {item.label}
                 </Link>
@@ -104,11 +102,11 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Hamburger */}
-          <div className="md:hidden">
+          {/* Hamburger (md/lg smaller) */}
+          <div className="lg:hidden">
             <button
               onClick={() => setOpen((prev) => !prev)}
-              className="relative h-10 w-10 flex items-center justify-center mr-4 sm:mr-4 md:mr-6 bg-transparent border-0 p-0 focus:outline-none cursor-pointer hover:scale-105"
+              className="relative h-10 w-10 flex items-center justify-center bg-transparent border-0 p-0 focus:outline-none cursor-pointer hover:scale-105"
               aria-label="Menu"
             >
               <div className="absolute top-1/2 left-0 w-full -translate-y-1/2">
@@ -130,42 +128,44 @@ export default function Navbar() {
         </div>
       </motion.nav>
 
-      {/* Menu Overlay */}
+      {/* Mobile/Tablet Menu Overlay */}
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, x: 200, y: -200, scale: 0.9 }}
-            animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
-            exit={{ opacity: 0, x: 200, y: -200, scale: 0.9 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-[998] flex items-center justify-center overflow-hidden w-full h-full bg-gradient-to-br from-white via-yellow-100 to-yellow-200"
+            initial={{ x: "100%", opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: "100%", opacity: 0 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="fixed inset-0 z-[998] bg-white/90 backdrop-blur-md flex flex-col items-center justify-center"
           >
-            <div className="flex flex-col items-center space-y-6">
-              {NAV_ITEMS.map((item, idx) => (
-                <motion.div
-                  key={item.href}
-                  custom={idx}
-                  initial="hidden"
-                  animate="visible"
-                  variants={navItemVariants}
+            {NAV_ITEMS.map((item, idx) => (
+              <motion.div
+                key={item.href}
+                custom={idx}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 50 }}
+                transition={{
+                  delay: idx * 0.08,
+                  type: "spring",
+                  stiffness: 120,
+                }}
+                className="my-4"
+              >
+                <Link
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className="text-2xl font-semibold text-blue-900/80 hover:text-red-400 hover:text-shadow-red-950  transition-colors duration-300"
                 >
-                  <Link
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className="font-semibold leading-tight
-        bg-gradient-to-r from-blue-950 via-amber-700 to-yellow-500
-        bg-clip-text text-transparent  transition-colors duration-300"
-                  >
-                    {item.label}
-                  </Link>
-                </motion.div>
-              ))}
-            </div>
+                  {item.label}
+                </Link>
+              </motion.div>
+            ))}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Scroll To Top Button */}
+      {/* Scroll To Top */}
       <AnimatePresence>
         {showTopBtn && (
           <motion.button

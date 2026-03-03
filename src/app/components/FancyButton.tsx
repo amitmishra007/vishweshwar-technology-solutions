@@ -63,10 +63,14 @@ export default function FancyButton({
     font-medium
     transition-all duration-500
 
-    /* Responsive sizing */
+    /* Default padding and font size */
     px-8 py-3 text-base
-    md:px-7 md:py-2.5 md:text-sm
-    sm:px-6 sm:py-2 sm:text-sm
+
+    /* Tablet adjustments */
+    md:px-5 md:py-2 md:text-sm
+
+    /* Mobile adjustments */
+    sm:px-4 sm:py-1.5 sm:text-xs
 
     shadow-[0_10px_40px_rgba(212,175,55,0.35)]
     hover:shadow-[0_15px_60px_rgba(212,175,55,0.6)]
