@@ -437,8 +437,6 @@ function OrbitLogo({
   pause,
   resume,
   index,
-  activePopupIndex,
-  setActivePopupIndex,
 }: OrbitLogoProps & {
   index: number;
   activePopupIndex: number | null;
@@ -481,13 +479,11 @@ function OrbitLogo({
   // Hide popup when neither logo nor popup is hovered
   useEffect(() => {
     if (!hoveringLogo && !hoveringPopup) {
-      setActivePopupIndex(null);
-      resume(); // resume rotation
+      resume();
     } else {
-      pause(); // pause rotation while hovering
-      setActivePopupIndex(index);
+      pause();
     }
-  }, [hoveringLogo, hoveringPopup]);
+  }, [hoveringLogo, hoveringPopup, pause, resume]);
 
   return (
     <>
