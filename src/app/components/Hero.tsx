@@ -111,7 +111,7 @@ export default function Hero({}: HeroProps) {
       </AnimatePresence>
 
       {/* DOT NAVIGATION */}
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2 z-50">
+      <div className="hidden md:flex absolute bottom-5 left-1/2 -translate-x-1/2 gap-2 z-50">
         {slides.map((_, i) => (
           <button
             key={i}

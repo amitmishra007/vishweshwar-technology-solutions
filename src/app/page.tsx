@@ -1,6 +1,7 @@
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import { Footer } from "./components/Footer";
+import Testimonials from "./components/Testimonials";
 
 export default function HomePage() {
   return (
@@ -8,6 +9,7 @@ export default function HomePage() {
       <Navbar />
       <Hero />
       {/* <SmartOpenLocator /> */}
+      <Testimonials />
       <Footer />
     </main>
   );
