@@ -501,7 +501,6 @@ import {
   Dispatch,
   SetStateAction,
   useLayoutEffect,
-  useCallback,
 } from "react";
 import Link from "next/link";
 import fadeUp from "../utils/animation";
@@ -521,6 +520,7 @@ type LogoItem = {
 };
 
 type OrbitLogoProps = {
+  index: number;
   logo: string;
   name: string;
   description: string;
@@ -596,13 +596,10 @@ const services = [
   { title: "Website Design & Development", id: "website-development" },
   { title: "Progressive Web Applications", id: "pwa" },
   { title: "ERPs / CRMs / CMS / Dashboards", id: "custom-systems" },
-  {
-    title: "Enterprise / School / Hospital Systems",
-    id: "enterprise-systems",
-  },
+  { title: "Enterprise / School / Hospital Systems", id: "enterprise-systems" },
 ];
 
-/* ================= MAIN ================= */
+/* ================= MAIN COMPONENT ================= */
 
 export default function WebDevSlide({ setHeroPaused }: SlideProps) {
   const rotation = useMotionValue(0);
@@ -614,31 +611,35 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
     "calc(80px + env(safe-area-inset-top))",
   );
 
-  /* ================= ROTATION ================= */
+  /* ROTATION */
 
-  const pauseRotation = useCallback(() => {
-    controlsRef.current?.stop();
-  }, []);
-
-  const resumeRotation = useCallback(() => {
-    const current = rotation.get();
-
-    controlsRef.current = animate(rotation, current + 360, {
-      duration: 32,
+  useEffect(() => {
+    controlsRef.current = animate(rotation, 360, {
+      duration: 36,
       ease: "linear",
       repeat: Infinity,
     });
+
+    return () => controlsRef.current?.stop();
   }, [rotation]);
 
-  useEffect(() => {
-    resumeRotation();
-    return () => controlsRef.current?.stop();
-  }, [resumeRotation]);
+  const pauseRotation = () => {
+    controlsRef.current?.stop();
+  };
 
-  /* ================= RESPONSIVE ================= */
+  const resumeRotation = () => {
+    const current = rotation.get();
+    controlsRef.current = animate(rotation, current + 360, {
+      duration: 36,
+      ease: "linear",
+      repeat: Infinity,
+    });
+  };
+
+  /* RESPONSIVE ORBIT */
 
   useEffect(() => {
-    const updateLayout = () => {
+    const updateOrbit = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
 
@@ -664,18 +665,28 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
 
       setOrbitSize(Math.max(size, 220));
       setOrbitalOffset(offset);
-
-      if (width < 380) setPaddingTop("calc(128px + env(safe-area-inset-top))");
-      else if (width < 768)
-        setPaddingTop("calc(80px + env(safe-area-inset-top))");
-      else if (width >= 1280) setPaddingTop("120px");
     };
 
-    updateLayout();
+    const updatePadding = () => {
+      const width = window.innerWidth;
 
-    window.addEventListener("resize", updateLayout);
+      if (width < 380) setPaddingTop("calc(128px + env(safe-area-inset-top))");
+      else if (width >= 540 && width < 768)
+        setPaddingTop("calc(129px + env(safe-area-inset-top))");
+      else if (width >= 1280) setPaddingTop("120px");
+      else setPaddingTop("calc(80px + env(safe-area-inset-top))");
+    };
 
-    return () => window.removeEventListener("resize", updateLayout);
+    updateOrbit();
+    updatePadding();
+
+    window.addEventListener("resize", updateOrbit);
+    window.addEventListener("resize", updatePadding);
+
+    return () => {
+      window.removeEventListener("resize", updateOrbit);
+      window.removeEventListener("resize", updatePadding);
+    };
   }, []);
 
   const logoSize = orbitSize * 0.14;
@@ -683,17 +694,27 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
   const radius = orbitSize / 2 - logoSize / 2;
 
   return (
-    <section
+    <motion.section
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      viewport={{ once: true }}
       onMouseEnter={() => setHeroPaused(true)}
       onMouseLeave={() => setHeroPaused(false)}
       className="relative w-full min-h-screen bg-gradient-to-b from-white to-blue-50 text-blue-950 flex flex-col md:flex-row justify-center items-center overflow-visible pb-12"
       style={{ paddingTop }}
     >
       <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-center px-6 md:px-8 gap-12">
-        {/* LEFT CONTENT */}
+        {/* LEFT SIDE */}
 
-        <div className="w-full md:w-1/2 flex items-center md:items-start justify-center md:justify-start text-center md:text-left">
-          <div className="flex flex-col gap-4 items-center md:items-start">
+        <motion.div
+          initial={{ opacity: 0, x: -60 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.9 }}
+          viewport={{ once: true }}
+          className="w-full md:w-1/2 flex items-center md:items-start justify-center md:justify-start text-center md:text-left"
+        >
+          <div className="flex flex-col gap-3 md:gap-4 items-center md:items-start justify-center">
             <motion.h1
               variants={fadeUp(0.7)}
               initial="hidden"
@@ -709,7 +730,7 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="text-sm sm:text-base text-blue-900/80 leading-relaxed max-w-[420px]"
+              className="text-sm sm:text-base text-blue-900/80 leading-relaxed max-w-[420px] mx-auto md:mx-0"
             >
               High-performance engineering, secure databases & cutting-edge
               technologies architecting enterprise-grade ecosystems.
@@ -717,33 +738,52 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
 
             {/* SERVICES */}
 
-            <div className="hidden md:flex flex-col mt-6 space-y-2">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={{
+                hidden: {},
+                visible: {
+                  transition: { staggerChildren: 0.08, delayChildren: 0.2 },
+                },
+              }}
+              className="hidden md:flex flex-col mt-6 space-y-2"
+            >
               {services.map((service) => (
-                <Link
+                <motion.div
                   key={service.id}
-                  href={`/services#${service.id}`}
-                  className="group relative py-2 px-4 rounded-r-2xl bg-white/60 backdrop-blur-md border border-blue-100 hover:border-[#d4af37]/70 transition-all duration-300 hover:shadow-[0_6px_18px_rgba(212,175,55,0.18)] max-w-max"
+                  variants={fadeUp(0.5)}
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  className="group relative py-2 px-4 rounded-r-2xl bg-white/60 backdrop-blur-md border border-blue-100 hover:border-[#d4af37]/70 transition-all duration-300 hover:shadow-[0_6px_18px_rgba(212,175,55,0.18)] cursor-pointer max-w-max"
                 >
-                  <div className="absolute left-0 top-0 h-full w-[2px] bg-gradient-to-b from-[#d4af37] to-[#f5d76e]" />
-
-                  <p className="pl-3 text-sm font-medium text-blue-950 group-hover:text-amber-700 transition">
-                    {service.title}
-                  </p>
-                </Link>
+                  <Link href={`/services#${service.id}`}>
+                    <div className="absolute left-0 top-0 h-full w-[2px] bg-gradient-to-b from-[#d4af37] to-[#f5d76e] rounded-l-lg opacity-80" />
+                    <p className="pl-3 text-sm font-medium text-blue-950 group-hover:text-amber-700 transition">
+                      {service.title}
+                    </p>
+                  </Link>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
 
-            <div className="mt-4">
+            <motion.div
+              variants={fadeUp(0.9)}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="flex justify-center md:justify-start mt-4"
+            >
               <FancyButton text="Explore Web Services" href="/services" />
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* RIGHT ORBIT */}
+        {/* RIGHT SIDE ORBIT */}
 
-        <div className="w-full md:w-1/2 flex items-center justify-center">
+        <div className="w-full md:w-1/2 flex items-center justify-center mt-8 md:mt-0">
           <div
-            className="relative flex items-center justify-center"
+            className="relative flex items-center justify-center isolate"
             style={{
               width: orbitSize,
               height: orbitSize,
@@ -751,18 +791,6 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
               willChange: "transform",
             }}
           >
-            {/* GOLDEN HALO */}
-
-            <div
-              className="absolute rounded-full blur-2xl opacity-60"
-              style={{
-                width: orbitSize * 1.1,
-                height: orbitSize * 1.1,
-                background:
-                  "radial-gradient(circle, rgba(255,215,0,0.45) 0%, rgba(212,175,55,0.2) 40%, transparent 70%)",
-              }}
-            />
-
             {/* CORE */}
 
             <motion.div
@@ -775,31 +803,41 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
                 background:
                   "radial-gradient(circle at center, rgba(255,215,0,0.9) 0%, rgba(212,175,55,0.8) 40%, rgba(25,32,72,0.4) 75%, rgba(10,15,40,0.2) 100%)",
                 boxShadow:
-                  "0 0 60px rgba(255,215,0,0.6),0 0 120px rgba(212,175,55,0.4)",
+                  "0 0 60px rgba(255,215,0,0.6), 0 0 120px rgba(212,175,55,0.4)",
               }}
             />
 
             {/* ORBIT RING */}
 
-            <div
+            <motion.div
+              animate={{ scale: [1, 1.02, 1] }}
+              transition={{ duration: 8, repeat: Infinity }}
               className="absolute rounded-full border border-yellow-400"
               style={{
                 width: orbitSize,
                 height: orbitSize,
                 boxShadow:
-                  "0 0 30px rgba(255,215,0,0.6),0 0 80px rgba(212,175,55,0.4)",
+                  "0 0 30px rgba(255,215,0,0.6), 0 0 80px rgba(212,175,55,0.4)",
               }}
             />
 
             {/* LOGOS */}
 
-            <motion.div style={{ rotate: rotation }} className="absolute">
+            <motion.div
+              style={{
+                rotate: rotation,
+                transform: "translateZ(0)",
+                willChange: "transform",
+              }}
+              className="absolute z-30"
+            >
               {logos.map((logo, index) => {
                 const angle = (360 / logos.length) * index;
 
                 return (
                   <OrbitLogo
                     key={logo.name}
+                    index={index}
                     logo={logo.src}
                     name={logo.name}
                     description={logo.description}
@@ -819,24 +857,22 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
 
             <motion.div
               animate={{ y: [0, -8, 0] }}
-              transition={{ repeat: Infinity, duration: 5 }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
               className="relative z-20"
+              style={{ transform: "translateZ(0)" }}
             >
               <Image
                 src="/mini-responsive-collage.webp"
                 alt="Web Development"
                 width={400}
                 height={400}
-                style={{
-                  width: coreSize * 0.9,
-                  height: "auto",
-                }}
+                style={{ width: coreSize * 0.9, height: "auto" }}
               />
             </motion.div>
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
 
@@ -858,11 +894,15 @@ function OrbitLogo({
 
   const ref = useRef<HTMLDivElement | null>(null);
 
-  const [popupPos, setPopupPos] = useState({ top: 0, left: 0 });
-  const [hovering, setHovering] = useState(false);
+  const [hoverLogo, setHoverLogo] = useState(false);
+  const [hoverPopup, setHoverPopup] = useState(false);
+
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+
+  const active = hoverLogo || hoverPopup;
 
   useLayoutEffect(() => {
-    if (!hovering || !ref.current) return;
+    if (!active || !ref.current) return;
 
     const rect = ref.current.getBoundingClientRect();
 
@@ -871,6 +911,7 @@ function OrbitLogo({
     const padding = 12;
 
     let top = rect.top - popupHeight - 12;
+
     if (top < padding) top = rect.bottom + 12;
 
     let left = rect.left + rect.width / 2 - popupWidth / 2;
@@ -880,19 +921,22 @@ function OrbitLogo({
       Math.min(left, window.innerWidth - popupWidth - padding),
     );
 
-    setPopupPos({ top, left });
-  }, [hovering]);
+    setPosition({ top, left });
+  }, [active, logoSize]);
 
   useEffect(() => {
-    if (hovering) pause();
+    if (active) pause();
     else resume();
-  }, [hovering, pause, resume]);
+  }, [active, pause, resume]);
 
   return (
     <>
       <div
         className="absolute top-1/2 left-1/2"
-        style={{ transform: `rotate(${angle}deg) translate(${radius}px)` }}
+        style={{
+          transform: `rotate(${angle}deg) translate(${radius}px) translateZ(0)`,
+          willChange: "transform",
+        }}
       >
         <motion.div
           ref={ref}
@@ -903,8 +947,8 @@ function OrbitLogo({
             transform: "translate(-50%, -50%) translateZ(0)",
           }}
           className="relative flex items-center justify-center rounded-full bg-white/80 backdrop-blur-md border border-white/40 shadow-lg cursor-pointer"
-          onMouseEnter={() => setHovering(true)}
-          onMouseLeave={() => setHovering(false)}
+          onMouseEnter={() => setHoverLogo(true)}
+          onMouseLeave={() => setHoverLogo(false)}
           whileHover={{ scale: 1.15 }}
         >
           <Image
@@ -912,15 +956,12 @@ function OrbitLogo({
             alt={name}
             width={60}
             height={60}
-            style={{
-              width: logoSize * 0.6,
-              height: logoSize * 0.6,
-            }}
+            style={{ width: logoSize * 0.6, height: logoSize * 0.6 }}
           />
         </motion.div>
       </div>
 
-      {hovering &&
+      {active &&
         createPortal(
           <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 15 }}
@@ -929,22 +970,24 @@ function OrbitLogo({
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             style={{
               position: "fixed",
-              top: popupPos.top,
-              left: popupPos.left,
+              top: position.top,
+              left: position.left,
               width: 260,
               zIndex: 1000,
+              transform: "translateZ(0)",
             }}
+            onMouseEnter={() => setHoverPopup(true)}
+            onMouseLeave={() => setHoverPopup(false)}
           >
             <div className="rounded-2xl bg-gradient-to-br from-blue-950 via-indigo-900 to-amber-600 text-white p-5 shadow-2xl border border-white/20 backdrop-blur-xl">
               <p className="text-sm font-semibold mb-2">{name}</p>
-
               <p className="text-xs text-white/80 leading-relaxed mb-4">
                 {description}
               </p>
 
               <Link
                 href={link}
-                className="text-xs font-semibold text-amber-300 hover:text-white transition"
+                className="text-xs font-semibold text-amber-300 hover:text-white transition-colors duration-300"
               >
                 Read More →
               </Link>
