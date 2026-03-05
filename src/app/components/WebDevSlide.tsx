@@ -501,6 +501,7 @@ import {
   Dispatch,
   SetStateAction,
   useLayoutEffect,
+  useCallback,
 } from "react";
 import Link from "next/link";
 import fadeUp from "../utils/animation";
@@ -623,18 +624,19 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
     return () => controlsRef.current?.stop();
   }, [rotation]);
 
-  const pauseRotation = () => {
+  const pauseRotation = useCallback(() => {
     controlsRef.current?.stop();
-  };
+  }, []);
 
-  const resumeRotation = () => {
+  const resumeRotation = useCallback(() => {
     const current = rotation.get();
+
     controlsRef.current = animate(rotation, current + 360, {
       duration: 36,
       ease: "linear",
       repeat: Infinity,
     });
-  };
+  }, [rotation]);
 
   /* RESPONSIVE ORBIT */
 
@@ -705,7 +707,7 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
       style={{ paddingTop }}
     >
       <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-center px-6 md:px-8 gap-12">
-        {/* LEFT SIDE */}
+        {/* LEFT SIDE (unchanged) */}
 
         <motion.div
           initial={{ opacity: 0, x: -60 }}
@@ -736,7 +738,7 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
               technologies architecting enterprise-grade ecosystems.
             </motion.p>
 
-            {/* SERVICES */}
+            {/* SERVICES LIST (unchanged) */}
 
             <motion.div
               initial="hidden"
@@ -783,12 +785,11 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
 
         <div className="w-full md:w-1/2 flex items-center justify-center mt-8 md:mt-0">
           <div
-            className="relative flex items-center justify-center isolate"
+            className="relative flex items-center justify-center isolate gpu-layer"
             style={{
               width: orbitSize,
               height: orbitSize,
-              transform: `translateY(${orbitalOffset}px) translateZ(0)`,
-              willChange: "transform",
+              transform: `translate3d(0, ${orbitalOffset}px, 0)`,
             }}
           >
             {/* CORE */}
@@ -796,7 +797,7 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
             <motion.div
               animate={{ scale: [1, 1.04, 1] }}
               transition={{ duration: 6, repeat: Infinity }}
-              className="absolute rounded-full"
+              className="absolute rounded-full gpu-layer"
               style={{
                 width: coreSize,
                 height: coreSize,
@@ -812,7 +813,7 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
             <motion.div
               animate={{ scale: [1, 1.02, 1] }}
               transition={{ duration: 8, repeat: Infinity }}
-              className="absolute rounded-full border border-yellow-400"
+              className="absolute rounded-full border border-yellow-400 gpu-layer"
               style={{
                 width: orbitSize,
                 height: orbitSize,
@@ -821,15 +822,11 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
               }}
             />
 
-            {/* LOGOS */}
+            {/* ROTATING LOGOS */}
 
             <motion.div
-              style={{
-                rotate: rotation,
-                transform: "translateZ(0)",
-                willChange: "transform",
-              }}
-              className="absolute z-30"
+              className="absolute z-30 gpu-layer"
+              style={{ rotate: rotation }}
             >
               {logos.map((logo, index) => {
                 const angle = (360 / logos.length) * index;
@@ -858,8 +855,7 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
             <motion.div
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className="relative z-20"
-              style={{ transform: "translateZ(0)" }}
+              className="relative z-20 gpu-layer"
             >
               <Image
                 src="/mini-responsive-collage.webp"
@@ -891,12 +887,10 @@ function OrbitLogo({
   resume,
 }: OrbitLogoProps) {
   const rotateDeg = useTransform(rotation, (r) => `${-(r + angle)}deg`);
-
   const ref = useRef<HTMLDivElement | null>(null);
 
   const [hoverLogo, setHoverLogo] = useState(false);
   const [hoverPopup, setHoverPopup] = useState(false);
-
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
   const active = hoverLogo || hoverPopup;
@@ -911,11 +905,9 @@ function OrbitLogo({
     const padding = 12;
 
     let top = rect.top - popupHeight - 12;
-
     if (top < padding) top = rect.bottom + 12;
 
     let left = rect.left + rect.width / 2 - popupWidth / 2;
-
     left = Math.max(
       padding,
       Math.min(left, window.innerWidth - popupWidth - padding),
@@ -932,10 +924,9 @@ function OrbitLogo({
   return (
     <>
       <div
-        className="absolute top-1/2 left-1/2"
+        className="absolute top-1/2 left-1/2 gpu-layer"
         style={{
-          transform: `rotate(${angle}deg) translate(${radius}px) translateZ(0)`,
-          willChange: "transform",
+          transform: `rotate(${angle}deg) translate(${radius}px)`,
         }}
       >
         <motion.div
@@ -944,9 +935,9 @@ function OrbitLogo({
             rotate: rotateDeg,
             width: logoSize,
             height: logoSize,
-            transform: "translate(-50%, -50%) translateZ(0)",
+            transform: "translate(-50%, -50%)",
           }}
-          className="relative flex items-center justify-center rounded-full bg-white/80 backdrop-blur-md border border-white/40 shadow-lg cursor-pointer"
+          className="relative flex items-center justify-center rounded-full bg-white/80 backdrop-blur-md border border-white/40 shadow-lg cursor-pointer gpu-layer"
           onMouseEnter={() => setHoverLogo(true)}
           onMouseLeave={() => setHoverLogo(false)}
           whileHover={{ scale: 1.15 }}
@@ -966,7 +957,6 @@ function OrbitLogo({
           <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 15 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 15 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             style={{
               position: "fixed",
@@ -974,7 +964,6 @@ function OrbitLogo({
               left: position.left,
               width: 260,
               zIndex: 1000,
-              transform: "translateZ(0)",
             }}
             onMouseEnter={() => setHoverPopup(true)}
             onMouseLeave={() => setHoverPopup(false)}
