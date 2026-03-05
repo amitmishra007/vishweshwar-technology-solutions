@@ -315,3 +315,9 @@
   background-size: 200% 200%;
   animation: gradientMove 6s ease infinite;
 }
+
+.motion-safe {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
+}
