@@ -133,7 +133,7 @@ export default function Testimonials() {
                     className={`inline-flex justify-center whitespace-nowrap rounded-full px-3 py-1.5 m-1.5 text-xs shadow-sm transition-colors duration-150 
                       ${
                         active === index
-                          ? "bg-indigo-500 text-white shadow-indigo-950/10"
+                          ? "bg-blue-950 text-white shadow-indigo-950/10"
                           : "bg-white hover:bg-indigo-100 text-slate-900"
                       }`}
                   >
