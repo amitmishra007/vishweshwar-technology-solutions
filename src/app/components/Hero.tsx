@@ -128,12 +128,15 @@ export default function Hero({}: HeroProps) {
       {/* LEFT ARROW */}
       <button
         onClick={prevSlide}
-        className="flex md:hidden lg:flex absolute top-1/2 left-4 -translate-y-1/2 z-50 w-12 h-12 rounded-full bg-gradient-to-br from-[#d4af37]/80 to-[#f5d76e]/70 shadow-lg items-center justify-center hover:scale-105 transition-transform cursor-pointer"
+        className="flex md:hidden lg:flex absolute top-1/2 left-3 -translate-y-1/2 z-50 
+  w-6 h-6 lg:w-12 lg:h-12 
+  rounded-full bg-gradient-to-br from-[#d4af37]/80 to-[#f5d76e]/70 shadow-lg 
+  items-center justify-center hover:scale-105 transition-transform cursor-pointer"
         aria-label="Previous Slide"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 text-white"
+          className="h-3 w-3 lg:h-6 lg:w-6 text-white"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -150,12 +153,15 @@ export default function Hero({}: HeroProps) {
       {/* RIGHT ARROW */}
       <button
         onClick={nextSlide}
-        className="flex md:hidden lg:flex absolute top-1/2 right-4 -translate-y-1/2 z-50 w-12 h-12 rounded-full bg-gradient-to-br from-[#d4af37]/80 to-[#f5d76e]/70 shadow-lg items-center justify-center hover:scale-105 transition-transform cursor-pointer"
+        className="flex md:hidden lg:flex absolute top-1/2 right-3 -translate-y-1/2 z-50 
+  w-6 h-6 lg:w-12 lg:h-12 
+  rounded-full bg-gradient-to-br from-[#d4af37]/80 to-[#f5d76e]/70 shadow-lg 
+  items-center justify-center hover:scale-105 transition-transform cursor-pointer"
         aria-label="Next Slide"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6 text-white"
+          className="h-3 w-3 lg:h-6 lg:w-6 text-white"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
