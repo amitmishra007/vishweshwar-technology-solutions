@@ -16,8 +16,7 @@ import {
   LucideIcon,
 } from "lucide-react";
 
-/* --------------------------------- DATA --------------------------------- */
-
+/* ----------------------------- NAV ITEMS ----------------------------- */
 const NAV_ITEMS = [
   { label: "Home", href: "/" },
   { label: "About Us", href: "/about-us" },
@@ -27,6 +26,7 @@ const NAV_ITEMS = [
   { label: "Contact Us", href: "/contact-us" },
 ] as const;
 
+/* --------------------------- SERVICES MENU -------------------------- */
 const SERVICE_MENU = {
   "Web Development": [
     { title: "Website Design & Development", id: "website-development" },
@@ -34,21 +34,18 @@ const SERVICE_MENU = {
     { title: "ERPs / CRMs / CMS / Dashboards", id: "custom-systems" },
     { title: "Enterprise Systems", id: "enterprise-systems" },
   ],
-
   "Mobile App Development": [
     { title: "iOS & Android Apps", id: "mobile-apps" },
     { title: "Cross Platform Apps", id: "cross-platform" },
     { title: "Enterprise Mobile Systems", id: "enterprise-mobile" },
     { title: "App UI / UX Design", id: "app-uiux" },
   ],
-
   "Graphics & Brand Identity": [
     { title: "Logo Design", id: "logo-design" },
     { title: "Brand Identity Systems", id: "brand-identity" },
     { title: "Marketing Graphics", id: "marketing-graphics" },
     { title: "Packaging & Print Design", id: "packaging" },
   ],
-
   "Marketing & SEO": [
     { title: "SEO & Organic Growth", id: "seo" },
     { title: "Google & Meta Ads", id: "paid-advertising" },
@@ -65,48 +62,20 @@ const SERVICE_ICONS: Record<ServiceCategory, LucideIcon> = {
   "Graphics & Brand Identity": Palette,
   "Marketing & SEO": TrendingUp,
 };
-/* -------------------------------------------------------------------------- */
 
+/* --------------------------- NAVBAR COMPONENT ------------------------ */
 export default function Navbar() {
+  /* ----------------------------- STATES ----------------------------- */
   const [desktopCategory, setDesktopCategory] =
     useState<ServiceCategory | null>(null);
   const [megaOpen, setMegaOpen] = useState(false);
   const [megaTimeout, setMegaTimeout] = useState<NodeJS.Timeout | null>(null);
 
-  // ---------------- MEGA MENU HANDLERS ----------------
-  const handleMegaEnter = () => {
-    if (megaTimeout) {
-      clearTimeout(megaTimeout);
-      setMegaTimeout(null);
-    }
-    setMegaOpen(true);
-  };
-
-  const handleMegaLeave = () => {
-    if (!desktopCategory) {
-      // If only Services hover (no submenu), close immediately
-      setMegaOpen(false);
-      return;
-    }
-
-    // If submenu open, keep mega menu visible for short delay
-    const timeout = setTimeout(() => setMegaOpen(false), 400); // 400ms delay
-    setMegaTimeout(timeout);
-  };
-
-  // ---------------- BACK BUTTON ----------------
-  const handleBackClick = () => {
-    setDesktopCategory(null);
-    // Mega menu remains open for 400ms
-    const timeout = setTimeout(() => setMegaOpen(false), 1200);
-    setMegaTimeout(timeout);
-  };
+  const [open, setOpen] = useState(false); // mobile hamburger
   const [mobileServiceOpen, setMobileServiceOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<ServiceCategory | null>(
     null,
   );
-
-  const [open, setOpen] = useState(false);
 
   const [logoLoaded, setLogoLoaded] = useState(false);
   const [showNav, setShowNav] = useState(true);
@@ -114,31 +83,36 @@ export default function Navbar() {
   const [scrollY, setScrollY] = useState(0);
   const [showTopBtn, setShowTopBtn] = useState(false);
 
-  /* ------------------------------ Logo Animation ----------------------------- */
+  const spacing = 6;
 
+  /* --------------------------- LOGO ANIMATION ------------------------ */
   useEffect(() => {
     const timer = setTimeout(() => setLogoLoaded(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
-  /* ------------------------------ Scroll Lock -------------------------------- */
-  /* ------------------------------ Scroll Lock -------------------------------- */
+  /* ---------------------------- SCROLL DETECTION -------------------- */
   useEffect(() => {
-    // Only lock scroll for mobile menu, never for desktop mega menu
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    const handleScroll = () => {
+      const currentScroll = window.scrollY;
+      setScrollY(currentScroll);
+      setShowNav(currentScroll < lastScroll || currentScroll < 50);
+      setShowTopBtn(currentScroll > 300);
+      setLastScroll(currentScroll);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScroll]);
 
-    // Cleanup on unmount
+  /* --------------------------- SCROLL LOCK MOBILE ------------------- */
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [open]); // <-- only include 'open' because 'megaOpen' no longer locks scroll
+  }, [open]);
 
-  /* ----------------------------- Reset States -------------------------------- */
-
+  /* ----------------------------- RESET STATES ------------------------ */
   useEffect(() => {
     if (!open) {
       setMobileServiceOpen(false);
@@ -150,24 +124,31 @@ export default function Navbar() {
     if (!megaOpen) setDesktopCategory(null);
   }, [megaOpen]);
 
-  /* ----------------------------- Scroll Detection ---------------------------- */
+  /* --------------------------- MEGA MENU HANDLERS ------------------- */
+  const handleMegaEnter = () => {
+    if (megaTimeout) {
+      clearTimeout(megaTimeout);
+      setMegaTimeout(null);
+    }
+    setMegaOpen(true);
+  };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScroll = window.scrollY;
+  const handleMegaLeave = () => {
+    if (!desktopCategory) {
+      setMegaOpen(false);
+      return;
+    }
+    const timeout = setTimeout(() => setMegaOpen(false), 400);
+    setMegaTimeout(timeout);
+  };
 
-      setScrollY(currentScroll);
-      setShowNav(currentScroll < lastScroll || currentScroll < 50);
-      setShowTopBtn(currentScroll > 300);
-      setLastScroll(currentScroll);
-    };
+  const handleBackClick = () => {
+    setDesktopCategory(null);
+    const timeout = setTimeout(() => setMegaOpen(false), 1200);
+    setMegaTimeout(timeout);
+  };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScroll]);
-
-  /* ----------------------------- Nav Animation ------------------------------- */
-
+  /* --------------------------- NAV ITEM ANIMATION ------------------ */
   const navItemVariants: Variants = {
     hidden: { opacity: 0, x: 40 },
     visible: (i: number) => ({
@@ -177,12 +158,10 @@ export default function Navbar() {
     }),
   };
 
-  /* ========================================================================== */
-
+  /* --------------------------- RENDER ------------------------------- */
   return (
     <>
       {/* ------------------------------ NAVBAR -------------------------------- */}
-
       <motion.nav
         initial={{ y: 0 }}
         animate={{ y: open ? 0 : showNav ? 0 : -200 }}
@@ -242,12 +221,11 @@ export default function Navbar() {
                             ease: [0.16, 1, 0.3, 1],
                           }}
                           className={`absolute left-1/2 top-full mt-2 -translate-x-1/2
-          rounded-3xl bg-white/90 backdrop-blur-xl border border-white/20
-          shadow-[0_25px_80px_rgba(0,0,0,0.2)] p-8 z-50
-          flex gap-10
-          ${desktopCategory ? "w-[750px] max-w-[95vw]" : "w-max"}`}
+                          rounded-3xl bg-white/90 backdrop-blur-xl border border-white/20
+                          shadow-[0_25px_80px_rgba(0,0,0,0.2)] p-8 z-50
+                          flex gap-10
+                          ${desktopCategory ? "w-[750px] max-w-[95vw]" : "w-max"}`}
                         >
-                          {/* CATEGORY SELECTION */}
                           {!desktopCategory && (
                             <motion.div
                               className="flex flex-col space-y-4 w-max"
@@ -268,23 +246,18 @@ export default function Navbar() {
                                   <motion.button
                                     key={category}
                                     onClick={() => setDesktopCategory(category)}
-                                    className="flex items-center gap-2 text-sm font-medium text-blue-900/80 
-                      hover:text-amber-500 transition-all duration-300 
-                      hover:translate-x-1"
+                                    className="flex items-center gap-2 text-sm font-medium text-blue-900/80 hover:text-amber-500 transition-all duration-300 hover:translate-x-1"
                                     whileHover={{ scale: 1.02 }}
                                   >
-                                    <Icon size={16} />
-                                    {category}
+                                    <Icon size={16} /> {category}
                                   </motion.button>
                                 );
                               })}
                             </motion.div>
                           )}
 
-                          {/* SUBMENU */}
                           {desktopCategory && (
                             <>
-                              {/* Left half: Title + Back */}
                               <div className="flex flex-col w-1/2 border-r border-white/20 pr-6 justify-center">
                                 <h3 className="text-blue-950 font-bold text-lg mb-6">
                                   {desktopCategory}
@@ -298,7 +271,6 @@ export default function Navbar() {
                                 </motion.button>
                               </div>
 
-                              {/* Right half: Submenu items */}
                               <motion.div
                                 className="flex flex-col w-1/2 space-y-5"
                                 initial="hidden"
@@ -361,7 +333,7 @@ export default function Navbar() {
                 >
                   <Link
                     href={item.href}
-                    className="text-blue-900/80 font-semibold hover:text-red-400 transition-colors duration-300"
+                    className="text-blue-900/80 font-semibold hover:text-amber-500 transition-colors duration-300"
                   >
                     {item.label}
                   </Link>
@@ -370,30 +342,49 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* HAMBURGER REMAINS UNCHANGED */}
+          {/* ------------------- HAMBURGER BUTTON -------------------- */}
+          <div className="lg:hidden">
+            <button
+              onClick={() => setOpen((prev) => !prev)}
+              className="relative h-10 w-10 flex items-center justify-center bg-transparent border-0 p-0 focus:outline-none cursor-pointer hover:scale-105"
+              aria-label="Menu"
+            >
+              <div className="absolute top-1/2 left-0 w-full -translate-y-1/2">
+                <motion.span
+                  animate={{ rotate: open ? 45 : 0, y: open ? 0 : -spacing }}
+                  className="absolute left-0 h-0.5 w-full rounded bg-linear-to-r from-[#d4af37] to-[#b8860b]"
+                />
+                <motion.span
+                  animate={{ opacity: open ? 0 : 1 }}
+                  className="absolute left-0 top-1/2 h-0.5 w-full rounded -translate-y-1/2 bg-linear-to-r from-[#d4af37] to-[#b8860b]"
+                />
+                <motion.span
+                  animate={{ rotate: open ? -45 : 0, y: open ? 0 : spacing }}
+                  className="absolute left-0 h-0.5 w-full rounded bg-linear-to-r from-[#d4af37] to-[#b8860b]"
+                />
+              </div>
+            </button>
+          </div>
         </div>
       </motion.nav>
 
       {/* -------------------------- MOBILE MENU -------------------------- */}
-
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ duration: 0.4 }}
-            className="fixed inset-0 z-[998] bg-white/95 backdrop-blur-md flex flex-col items-center justify-center gap-6"
+            initial={{ x: "100%", opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: "100%", opacity: 0 }}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
+            className="fixed inset-0 z-[998] bg-white/90 backdrop-blur-md flex flex-col items-center justify-center"
           >
-            {/* MAIN NAV */}
-
             {!mobileServiceOpen &&
               NAV_ITEMS.map((item) =>
                 item.label === "Services" ? (
                   <button
                     key="services"
                     onClick={() => setMobileServiceOpen(true)}
-                    className="text-lg font-semibold text-blue-900/80"
+                    className="text-lg font-medium text-blue-900/80 my-3"
                   >
                     Services
                   </button>
@@ -402,37 +393,32 @@ export default function Navbar() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setOpen(false)}
-                    className="text-lg font-semibold text-blue-900/80"
+                    className="text-lg font-medium text-blue-900/80 my-3"
                   >
                     {item.label}
                   </Link>
                 ),
               )}
 
-            {/* CATEGORY LEVEL */}
-
             {mobileServiceOpen && !activeCategory && (
               <>
                 <button
                   onClick={() => setMobileServiceOpen(false)}
-                  className="flex items-center gap-2 text-blue-900"
+                  className="flex items-center gap-2 text-blue-900 my-4"
                 >
-                  <ArrowLeft size={18} />
-                  Back
+                  <ArrowLeft size={18} /> Back
                 </button>
 
                 {(Object.keys(SERVICE_MENU) as ServiceCategory[]).map(
                   (category) => {
                     const Icon = SERVICE_ICONS[category];
-
                     return (
                       <button
                         key={category}
                         onClick={() => setActiveCategory(category)}
-                        className="flex items-center gap-3 text-base font-semibold text-blue-950"
+                        className="flex items-center gap-3 text-sm font-medium text-blue-950 my-2"
                       >
-                        <Icon size={20} />
-                        {category}
+                        <Icon size={20} /> {category}
                       </button>
                     );
                   },
@@ -440,16 +426,13 @@ export default function Navbar() {
               </>
             )}
 
-            {/* SERVICE LEVEL */}
-
             {mobileServiceOpen && activeCategory && (
               <>
                 <button
                   onClick={() => setActiveCategory(null)}
-                  className="flex items-center gap-2 text-blue-900"
+                  className="flex items-center gap-2 text-blue-900 my-4"
                 >
-                  <ArrowLeft size={18} />
-                  Back
+                  <ArrowLeft size={18} /> Back
                 </button>
 
                 {SERVICE_MENU[activeCategory].map((service) => (
@@ -457,37 +440,60 @@ export default function Navbar() {
                     key={service.id}
                     href={`/services/${service.id}`}
                     onClick={() => setOpen(false)}
-                    className="text-base text-blue-900/80"
+                    className="text-base text-blue-900/80 my-1.5"
                   >
                     {service.title}
                   </Link>
                 ))}
               </>
             )}
-
-            {/* SOCIAL BAR */}
-
-            <div className="absolute bottom-8 flex gap-6 text-blue-900">
-              <Linkedin className="hover:text-amber-600 cursor-pointer" />
-              <Instagram className="hover:text-amber-600 cursor-pointer" />
-              <Twitter className="hover:text-amber-600 cursor-pointer" />
+            {/* SOCIAL ICONS AT BOTTOM */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center justify-center gap-6">
+              <a
+                href="https://linkedin.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Linkedin
+                  size={24}
+                  className="text-blue-900 hover:text-amber-500 transition-colors"
+                />
+              </a>
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Instagram
+                  size={24}
+                  className="text-blue-900 hover:text-amber-500 transition-colors"
+                />
+              </a>
+              <a
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Twitter
+                  size={24}
+                  className="text-blue-900 hover:text-amber-500 transition-colors"
+                />
+              </a>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* -------------------------- SCROLL TOP -------------------------- */}
-
       <AnimatePresence>
         {showTopBtn && (
           <motion.button
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0, y: 50, scale: 0.8 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.8 }}
+            transition={{ type: "spring", stiffness: 120, damping: 15 }}
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="fixed bottom-8 right-8 w-14 h-14 rounded-full
-            bg-gradient-to-br from-blue-950 via-amber-700 to-yellow-500
-            text-white shadow-lg flex items-center justify-center"
+            className="fixed bottom-8 right-8 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-blue-950 via-amber-700 to-yellow-500 text-white shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-[999]"
           >
             ↑
           </motion.button>
