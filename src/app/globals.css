@@ -18,6 +18,39 @@
   --font-okaluera: var(--font-okaluera);
 }
 
+/* Modern Thin Gradient Scrollbar */
+
+/* width */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+/* track */
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* thumb */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    to bottom,
+    #1e3a8a,
+    /* blue */ #3b82f6,
+    #f59e0b /* amber */
+  );
+  border-radius: 999px;
+}
+
+.brand-font,
+h1 {
+  font-family: var(--font-stardom), sans-serif;
+}
+
+/* hover */
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #1e40af, #2563eb, #d97706);
+}
+
 /* Custom Animations */
 @keyframes pulseGlow {
   0%,

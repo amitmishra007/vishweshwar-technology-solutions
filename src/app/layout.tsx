@@ -13,16 +13,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// ⭐ CUSTOM OKALUERA FONT (LOCAL INSIDE APP FOLDER)
-const okaluera = localFont({
+// ⭐ CUSTOM STARDOM FONT
+const stardom = localFont({
   src: [
     {
-      path: "./fonts/Okaluera.woff2",
+      path: "../../public/fonts/Stardom-Regular.woff2",
       weight: "400",
       style: "normal",
     },
   ],
-  variable: "--font-okaluera",
+  variable: "--font-stardom",
   display: "swap",
 });
 
@@ -39,7 +39,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${okaluera.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable} ${stardom.variable}`}
     >
       <body className="antialiased">{children}</body>
     </html>
