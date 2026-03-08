@@ -57,26 +57,28 @@ export default function FancyButton({
   );
 
   const baseClasses = `
-    group relative inline-flex items-center justify-center
-    overflow-hidden
-    rounded-full
-    font-medium
-    transition-all duration-500
+  group relative inline-flex items-center justify-center
+  overflow-hidden
+  rounded-full
+  font-medium
+  transition-all duration-500
 
-    /* Default padding and font size */
-    px-8 py-3 text-base
+  /* Gradient background layers remain same */
+  px-8 py-3 text-base
+  md:px-5 md:py-2 md:text-sm
+  sm:px-4 sm:py-1.5 sm:text-xs
 
-    /* Tablet adjustments */
-    md:px-5 md:py-2 md:text-sm
+  /* Glassy 3D Emboss Effect */
+  shadow-[inset_0_2px_4px_rgba(255,255,255,0.25),_0_4px_6px_rgba(0,0,0,0.15)]
+  backdrop-blur-[6px]
+  border border-white/20
+  hover:shadow-[inset_0_2px_6px_rgba(255,255,255,0.3),_0_6px_10px_rgba(0,0,0,0.2)]
 
-    /* Mobile adjustments */
-    sm:px-4 sm:py-1.5 sm:text-xs
+  /* Optional: slightly lifted on hover */
+  hover:-translate-y-0.5 hover:scale-105
 
-    shadow-[0_10px_40px_rgba(212,175,55,0.35)]
-    hover:shadow-[0_15px_60px_rgba(212,175,55,0.6)]
-
-    ${className || ""}
-  `;
+  ${className || ""}
+`;
 
   if (href) {
     return (

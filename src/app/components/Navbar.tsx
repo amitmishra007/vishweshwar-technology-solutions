@@ -125,27 +125,46 @@ export default function Navbar() {
   }, [megaOpen]);
 
   /* --------------------------- MEGA MENU HANDLERS ------------------- */
+  const [backClicked, setBackClicked] = useState(false); // track if Back was clicked
+
   const handleMegaEnter = () => {
+    // Cancel any pending close
     if (megaTimeout) {
       clearTimeout(megaTimeout);
       setMegaTimeout(null);
     }
     setMegaOpen(true);
+    setBackClicked(false); // reset back click state
   };
 
   const handleMegaLeave = () => {
-    if (!desktopCategory) {
+    if (backClicked) {
+      // Give 2 seconds to return
+      const timeout = setTimeout(() => {
+        setMegaOpen(false);
+        setDesktopCategory(null);
+        setBackClicked(false);
+      }, 2000);
+      setMegaTimeout(timeout);
+    } else {
+      // normal hover out: close immediately
       setMegaOpen(false);
-      return;
+      setDesktopCategory(null);
     }
-    const timeout = setTimeout(() => setMegaOpen(false), 400);
-    setMegaTimeout(timeout);
   };
 
   const handleBackClick = () => {
+    // Just reset the subcategory, keep mega menu open
     setDesktopCategory(null);
-    const timeout = setTimeout(() => setMegaOpen(false), 1200);
-    setMegaTimeout(timeout);
+
+    // Set the backClicked state to true so leaving gives 2s
+    setBackClicked(true);
+
+    // Cancel any pending close
+    if (megaTimeout) {
+      clearTimeout(megaTimeout);
+      setMegaTimeout(null);
+    }
   };
 
   /* --------------------------- NAV ITEM ANIMATION ------------------ */
@@ -372,114 +391,143 @@ export default function Navbar() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ x: "100%", opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: "100%", opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="fixed inset-0 z-[998] bg-white/90 backdrop-blur-md flex flex-col items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[998] bg-black/50 backdrop-blur-md flex justify-center items-start pt-36"
           >
-            {!mobileServiceOpen &&
-              NAV_ITEMS.map((item) =>
-                item.label === "Services" ? (
+            <motion.div
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 120, damping: 20 }}
+              className="w-[82%] max-w-[600px] flex flex-col items-center bg-gradient-to-b from-white to-blue-50 rounded-3xl shadow-2xl p-6 space-y-4"
+            >
+              {/* ---------------- MAIN NAV LINKS ---------------- */}
+              {!mobileServiceOpen &&
+                NAV_ITEMS.map((item) =>
+                  item.label === "Services" ? (
+                    <button
+                      key="services"
+                      onClick={() => setMobileServiceOpen(true)}
+                      className="flex items-center gap-3 text-lg font-semibold text-blue-950 hover:text-amber-500 transition-colors px-4 py-3 rounded-xl w-full justify-center shadow-sm hover:shadow-md"
+                    >
+                      <Palette size={20} /> Services
+                    </button>
+                  ) : (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-3 text-lg font-semibold text-blue-950 hover:text-amber-500 transition-colors px-4 py-3 rounded-xl w-full justify-center shadow-sm hover:shadow-md"
+                    >
+                      {item.label}
+                    </Link>
+                  ),
+                )}
+
+              {/* ---------------- CATEGORY MENU ---------------- */}
+              {mobileServiceOpen && !activeCategory && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ staggerChildren: 0.05 }}
+                  className="w-full flex flex-col items-center space-y-4"
+                >
                   <button
-                    key="services"
-                    onClick={() => setMobileServiceOpen(true)}
-                    className="text-lg font-medium text-blue-900/80 my-3"
+                    onClick={() => setMobileServiceOpen(false)}
+                    className="flex items-center gap-2 text-blue-950 font-semibold bg-blue-50 hover:bg-blue-100 transition-colors px-4 py-2 rounded-full shadow-md hover:shadow-lg"
                   >
-                    Services
+                    <ArrowLeft size={18} /> Back
                   </button>
-                ) : (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setOpen(false)}
-                    className="text-lg font-medium text-blue-900/80 my-3"
-                  >
-                    {item.label}
-                  </Link>
-                ),
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                    {(Object.keys(SERVICE_MENU) as ServiceCategory[]).map(
+                      (category) => {
+                        const Icon = SERVICE_ICONS[category];
+                        return (
+                          <button
+                            key={category}
+                            onClick={() => setActiveCategory(category)}
+                            className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm hover:shadow-lg hover:bg-amber-50 transition-all font-medium text-blue-950 justify-start"
+                          >
+                            <Icon size={22} /> {category}
+                          </button>
+                        );
+                      },
+                    )}
+                  </div>
+                </motion.div>
               )}
 
-            {mobileServiceOpen && !activeCategory && (
-              <>
-                <button
-                  onClick={() => setMobileServiceOpen(false)}
-                  className="flex items-center gap-2 text-blue-900 my-4"
+              {/* ---------------- NESTED SERVICES ---------------- */}
+              {mobileServiceOpen && activeCategory && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  transition={{ staggerChildren: 0.05 }}
+                  className="w-full flex flex-col items-center space-y-4 bg-blue-50 rounded-xl p-4"
                 >
-                  <ArrowLeft size={18} /> Back
-                </button>
-
-                {(Object.keys(SERVICE_MENU) as ServiceCategory[]).map(
-                  (category) => {
-                    const Icon = SERVICE_ICONS[category];
-                    return (
-                      <button
-                        key={category}
-                        onClick={() => setActiveCategory(category)}
-                        className="flex items-center gap-3 text-sm font-medium text-blue-950 my-2"
-                      >
-                        <Icon size={20} /> {category}
-                      </button>
-                    );
-                  },
-                )}
-              </>
-            )}
-
-            {mobileServiceOpen && activeCategory && (
-              <>
-                <button
-                  onClick={() => setActiveCategory(null)}
-                  className="flex items-center gap-2 text-blue-900 my-4"
-                >
-                  <ArrowLeft size={18} /> Back
-                </button>
-
-                {SERVICE_MENU[activeCategory].map((service) => (
-                  <Link
-                    key={service.id}
-                    href={`/services/${service.id}`}
-                    onClick={() => setOpen(false)}
-                    className="text-base text-blue-900/80 my-1.5"
+                  <button
+                    onClick={() => setActiveCategory(null)}
+                    className="flex items-center gap-2 text-blue-950 font-semibold bg-white hover:bg-blue-100 transition-colors px-4 py-2 rounded-full shadow-md hover:shadow-lg"
                   >
-                    {service.title}
-                  </Link>
-                ))}
-              </>
-            )}
-            {/* SOCIAL ICONS AT BOTTOM */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center justify-center gap-6">
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Linkedin
-                  size={24}
-                  className="text-blue-900 hover:text-amber-500 transition-colors"
-                />
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Instagram
-                  size={24}
-                  className="text-blue-900 hover:text-amber-500 transition-colors"
-                />
-              </a>
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Twitter
-                  size={24}
-                  className="text-blue-900 hover:text-amber-500 transition-colors"
-                />
-              </a>
-            </div>
+                    <ArrowLeft size={18} /> Back
+                  </button>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                    {SERVICE_MENU[activeCategory].map((service) => (
+                      <Link
+                        key={service.id}
+                        href={`/services/${service.id}`}
+                        onClick={() => setOpen(false)}
+                        className="flex items-center gap-2 p-4 bg-white rounded-xl shadow-sm hover:shadow-lg hover:bg-amber-50 transition-all text-blue-950 font-medium"
+                      >
+                        <span className="w-5 h-5 bg-amber-300 rounded-full" />{" "}
+                        {service.title}
+                      </Link>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* SOCIAL ICONS */}
+              <div className="flex items-center justify-center gap-6 mt-6">
+                <a
+                  href="https://linkedin.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Linkedin
+                    size={24}
+                    className="text-blue-900 hover:text-amber-500 transition-colors"
+                  />
+                </a>
+                <a
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Instagram
+                    size={24}
+                    className="text-blue-900 hover:text-amber-500 transition-colors"
+                  />
+                </a>
+                <a
+                  href="https://twitter.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Twitter
+                    size={24}
+                    className="text-blue-900 hover:text-amber-500 transition-colors"
+                  />
+                </a>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
