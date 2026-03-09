@@ -15,6 +15,7 @@ import {
   Twitter,
   LucideIcon,
 } from "lucide-react";
+import FancyButton from "./FancyButton";
 
 /* ----------------------------- NAV ITEMS ----------------------------- */
 const NAV_ITEMS = [
@@ -84,6 +85,15 @@ export default function Navbar() {
   const [showTopBtn, setShowTopBtn] = useState(false);
 
   const spacing = 6;
+
+  const fadeUp = (duration = 0.3): Variants => ({
+    hidden: { opacity: 0, y: 12 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration, type: "spring", stiffness: 120 },
+    },
+  });
 
   /* --------------------------- LOGO ANIMATION ------------------------ */
   useEffect(() => {
@@ -277,58 +287,55 @@ export default function Navbar() {
 
                           {desktopCategory && (
                             <>
-                              <div className="flex flex-col w-1/2 border-r border-white/20 pr-6 justify-center">
+                              {/* Left panel: category title + back */}
+                              <div className="flex flex-col w-1/2 pr-6 justify-center">
                                 <h3 className="text-blue-950 font-bold text-lg mb-6">
                                   {desktopCategory}
                                 </h3>
-                                <motion.button
-                                  onClick={handleBackClick}
-                                  className="flex items-center gap-2 text-blue-900 font-semibold hover:text-amber-500 transition-all duration-300 hover:translate-x-1"
-                                  whileHover={{ scale: 1.02 }}
-                                >
-                                  <ArrowLeft size={16} /> Back
-                                </motion.button>
+                                <div className="flex justify-between">
+                                  <Link
+                                    className="text-blue-500 hover:text-amber-700 underline w-1/3"
+                                    href={"www.google.com"}
+                                  >
+                                    Know More
+                                  </Link>
+                                  <FancyButton
+                                    text="Back"
+                                    onClick={handleBackClick}
+                                    className="w-1/3 cursor-pointer hover:rotate-180"
+                                  />
+                                </div>
                               </div>
 
+                              {/* Right panel: services list */}
                               <motion.div
-                                className="flex flex-col w-1/2 space-y-5"
+                                className="flex flex-col w-1/2 mt-2 space-y-2"
                                 initial="hidden"
                                 animate="visible"
                                 variants={{
                                   hidden: {},
                                   visible: {
-                                    transition: { staggerChildren: 0.08 },
+                                    transition: {
+                                      staggerChildren: 0.08,
+                                      delayChildren: 0.1,
+                                    },
                                   },
                                 }}
                               >
                                 {SERVICE_MENU[desktopCategory].map(
-                                  (service, i) => (
+                                  (service) => (
                                     <motion.div
                                       key={service.id}
-                                      className="relative overflow-hidden rounded-lg"
-                                      initial={{ opacity: 0, y: 12 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      transition={{
-                                        delay: i * 0.05,
-                                        type: "spring",
-                                        stiffness: 120,
-                                      }}
+                                      variants={fadeUp(0.5)}
+                                      whileHover={{ scale: 1.02, y: -2 }}
+                                      className="group relative py-2 px-4 rounded-r-2xl bg-white/60 backdrop-blur-md border border-blue-100 hover:border-[#d4af37]/70 transition-all duration-300 hover:shadow-[0_6px_18px_rgba(212,175,55,0.18)] cursor-pointer max-w-max"
                                     >
-                                      <Link
-                                        href={`/services/${service.id}`}
-                                        className="relative z-10 text-blue-900/80 hover:text-amber-500 font-medium text-sm transition-all duration-300 py-2 block border-b border-white/20 last:border-b-0 px-2"
-                                      >
-                                        {service.title}
+                                      <Link href={`/services/${service.id}`}>
+                                        <div className="absolute left-0 top-0 h-full w-[2px] bg-gradient-to-b from-[#d4af37] to-[#f5d76e] rounded-l-lg opacity-80" />
+                                        <p className="pl-3 text-sm font-medium text-blue-950 group-hover:text-amber-700 transition">
+                                          {service.title}
+                                        </p>
                                       </Link>
-
-                                      <motion.div
-                                        className="absolute inset-0 bg-gradient-to-r from-amber-300/20 via-yellow-300/10 to-amber-300/20 opacity-0 pointer-events-none rounded-lg"
-                                        whileHover={{ opacity: 1 }}
-                                        transition={{
-                                          duration: 0.4,
-                                          ease: "easeInOut",
-                                        }}
-                                      />
                                     </motion.div>
                                   ),
                                 )}
