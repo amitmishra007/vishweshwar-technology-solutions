@@ -55,19 +55,33 @@ const STEPS: Step[] = [
 
 export default function ZigZagInfographic() {
   return (
-    <section className="relative w-full py-20 bg-blue-50">
+    <section className="relative w-full py-20 bg-blue-50 overflow-x-hidden">
       <h2 className="text-lg sm:text-xl md:text-xl lg:text-2xl text-center pb-20 font-semibold leading-tight bg-gradient-to-r from-blue-950 via-amber-700 to-yellow-500 bg-clip-text text-transparent">
         Our Software Development Methodology
       </h2>
 
-      <div className="flex flex-col items-center md:flex-row md:justify-center md:space-x-10 space-y-16 md:space-y-0">
+      {/* RESPONSIVE GRID */}
+      <div
+        className="
+        grid 
+        grid-cols-1 
+        sm:grid-cols-2 
+        lg:grid-cols-4 
+        gap-y-16 
+        gap-x-10 
+        max-w-7xl 
+        mx-auto 
+        px-6
+      "
+      >
         {STEPS.map((step, idx) => {
           const isTop = idx % 2 === 1;
 
           return (
             <motion.div
               key={idx}
-              className={`flex flex-col items-center justify-center w-64 relative p-4 text-center
+              className={`flex flex-col items-center justify-center relative p-4 text-center
+              w-full max-w-[260px] mx-auto
               ${
                 isTop
                   ? "border-t-8 border-t-[#d4af37]/80 rounded-t-full shadow-lg"
@@ -78,12 +92,12 @@ export default function ZigZagInfographic() {
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: idx * 0.2 }}
             >
-              {/* Step Number */}
+              {/* STEP NUMBER */}
               <div className="absolute -top-8 md:-top-10 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-gradient-to-br from-[#d4af37]/80 to-[#f5d76e]/70 flex items-center justify-center text-white font-bold text-lg shadow-xl z-10">
                 {step.number}
               </div>
 
-              {/* Image */}
+              {/* IMAGE */}
               <div className="w-[170px] h-[110px] mb-4">
                 <Image
                   src={step.image}
@@ -94,12 +108,12 @@ export default function ZigZagInfographic() {
                 />
               </div>
 
-              {/* Title */}
+              {/* TITLE */}
               <h3 className="font-semibold text-blue-900 text-lg mb-2">
                 {step.title}
               </h3>
 
-              {/* Description */}
+              {/* DESCRIPTION */}
               <ul className="list-disc list-inside text-blue-900 text-sm space-y-1">
                 {step.description.map((point, i) => (
                   <li key={i}>{point}</li>
