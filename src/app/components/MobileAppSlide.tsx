@@ -607,37 +607,41 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
 
   const rafRef = useRef<number | null>(null);
 
-  /* ROTATION ENGINE */
+  /* ================= ROTATION ENGINE ================= */
 
-  useEffect(() => {
-    controlsRef.current = animate(
-      rotation,
-      [rotation.get(), rotation.get() + 360],
-      {
-        duration: 36,
-        ease: "linear",
-        repeat: Infinity,
-      },
-    );
+  const startRotation = useCallback(() => {
+    if (controlsRef.current) return;
 
-    return () => controlsRef.current?.stop();
-  }, [rotation]);
-
-  const pauseRotation = useCallback(() => {
-    controlsRef.current?.stop();
-  }, []);
-
-  const resumeRotation = useCallback(() => {
     const current = rotation.get();
 
     controlsRef.current = animate(rotation, [current, current + 360], {
       duration: 36,
       ease: "linear",
       repeat: Infinity,
+      onComplete: () => {
+        controlsRef.current = null;
+      },
     });
   }, [rotation]);
 
-  /* RESPONSIVE ORBIT */
+  const pauseRotation = useCallback(() => {
+    controlsRef.current?.pause();
+  }, []);
+
+  const resumeRotation = useCallback(() => {
+    controlsRef.current?.play();
+  }, []);
+
+  useEffect(() => {
+    startRotation();
+
+    return () => {
+      controlsRef.current?.stop();
+      controlsRef.current = null;
+    };
+  }, [startRotation]);
+
+  /* ================= RESPONSIVE ORBIT ================= */
 
   useLayoutEffect(() => {
     const calculate = () => {
@@ -676,7 +680,6 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
 
     const handleResize = () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
-
       rafRef.current = requestAnimationFrame(calculate);
     };
 
@@ -919,6 +922,8 @@ const MemoOrbitLogo = memo(function OrbitLogo({
     if (active) pause();
     else resume();
   }, [active, pause, resume]);
+
+  if (typeof document === "undefined") return null;
 
   return (
     <>
