@@ -68,7 +68,10 @@ export default function ContactSection(): JSX.Element {
   };
 
   return (
-    <section className="relative w-full py-28 bg-gradient-to-b from-blue-50 via-white to-blue-50 overflow-hidden">
+    <section
+      suppressHydrationWarning
+      className="relative w-full py-28 bg-gradient-to-b from-blue-50 via-white to-blue-50 overflow-hidden"
+    >
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-stretch">
         {/* LEFT STORY PANEL */}
         <motion.div
@@ -76,41 +79,44 @@ export default function ContactSection(): JSX.Element {
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.9 }}
           viewport={{ once: true }}
-          className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-black p-10 flex flex-col justify-center"
+          className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-black p-12 flex flex-col justify-center"
         >
-          {/* glow */}
-          <div className="absolute top-0 left-0 w-72 h-72 bg-amber-500/20 blur-[120px] rounded-full" />
-          <div className="absolute bottom-0 right-0 w-72 h-72 bg-blue-500/20 blur-[120px] rounded-full" />
+          {/* cinematic glow */}
+          <div className="absolute -top-10 -left-10 w-96 h-96 bg-amber-400/20 blur-[160px] rounded-full" />
+          <div className="absolute bottom-0 right-0 w-80 h-80 bg-blue-500/20 blur-[160px] rounded-full" />
+
+          {/* subtle pattern */}
+          <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle_at_center,white_1px,transparent_1px)] [background-size:28px_28px]" />
 
           <div className="relative z-10 max-w-lg">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-5">
               <Sparkles className="text-amber-400" size={20} />
-              <br />
-              <span className="text-amber-300 text-sm font-medium">
+              <span className="text-amber-300 text-sm font-medium tracking-wide">
                 Let’s Build Something Amazing
               </span>
             </div>
 
-            <h2 className="text-3xl md:text-4xl font-semibold text-white leading-tight">
+            <h2 className="text-3xl md:text-4xl font-semibold text-white leading-tight tracking-tight">
               Have an idea, project or question?
             </h2>
 
             <p className="text-blue-200/80 mt-6 leading-relaxed text-sm md:text-base">
               Whether you&apos;re planning a new digital platform, improving
               your online presence, or launching a mobile application, our team
-              is ready to help you transform your vision into reality.
+              is ready to help transform your vision into something exceptional.
             </p>
 
             <p className="text-blue-200/80 mt-4 leading-relaxed text-sm md:text-base">
-              Reach out with your questions or ideas — we believe the best
-              partnerships start with a simple conversation.
+              Great partnerships begin with a simple conversation. Tell us about
+              your idea and we’ll help you shape it into a powerful digital
+              experience.
             </p>
 
-            {/* small highlights */}
+            {/* highlights */}
             <div className="mt-8 space-y-3 text-sm text-blue-200">
               <p>✔ Free consultation for your project</p>
               <p>✔ Transparent communication</p>
-              <p>✔ Solutions built for long-term scalability</p>
+              <p>✔ Long-term scalable solutions</p>
             </div>
           </div>
         </motion.div>
@@ -131,6 +137,8 @@ export default function ContactSection(): JSX.Element {
             </label>
 
             <input
+              suppressHydrationWarning
+              autoComplete="name"
               type="text"
               name="name"
               value={formData.name}
@@ -159,6 +167,8 @@ export default function ContactSection(): JSX.Element {
             </label>
 
             <input
+              suppressHydrationWarning
+              autoComplete="email"
               type="email"
               name="email"
               value={formData.email}
@@ -187,6 +197,8 @@ export default function ContactSection(): JSX.Element {
             </label>
 
             <input
+              suppressHydrationWarning
+              autoComplete="tel"
               type="tel"
               name="phone"
               value={formData.phone}
@@ -215,6 +227,8 @@ export default function ContactSection(): JSX.Element {
             </label>
 
             <textarea
+              suppressHydrationWarning
+              autoComplete="off"
               rows={4}
               name="message"
               value={formData.message}

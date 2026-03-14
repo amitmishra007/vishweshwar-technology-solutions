@@ -63,18 +63,15 @@ export default function FancyButton({
   font-medium
   transition-all duration-500
 
-  /* Gradient background layers remain same */
   px-8 py-3 text-base
   md:px-5 md:py-2 md:text-sm
   sm:px-4 sm:py-1.5 sm:text-xs
 
-  /* Glassy 3D Emboss Effect */
   shadow-[inset_0_2px_4px_rgba(255,255,255,0.25),_0_4px_6px_rgba(0,0,0,0.15)]
   backdrop-blur-[6px]
   border border-white/20
   hover:shadow-[inset_0_2px_6px_rgba(255,255,255,0.3),_0_6px_10px_rgba(0,0,0,0.2)]
 
-  /* Optional: slightly lifted on hover */
   hover:-translate-y-0.5 hover:scale-105
 
   ${className || ""}
@@ -82,14 +79,19 @@ export default function FancyButton({
 
   if (href) {
     return (
-      <Link href={href} className={baseClasses}>
+      <Link href={href} className={baseClasses} suppressHydrationWarning>
         {content}
       </Link>
     );
   }
 
   return (
-    <button onClick={onClick} className={baseClasses}>
+    <button
+      onClick={onClick}
+      className={baseClasses}
+      suppressHydrationWarning
+      type="button"
+    >
       {content}
     </button>
   );

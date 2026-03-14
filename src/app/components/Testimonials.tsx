@@ -45,7 +45,7 @@ export default function Testimonials() {
   const [active, setActive] = useState(0);
   const mountRef = useRef<HTMLDivElement | null>(null);
 
-  /* ---------------- AUTO ROTATE ---------------- */
+  /* AUTO ROTATE */
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -55,7 +55,7 @@ export default function Testimonials() {
     return () => clearInterval(interval);
   }, []);
 
-  /* ---------------- MOUSE PARALLAX ---------------- */
+  /* MOUSE PARALLAX */
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -69,7 +69,9 @@ export default function Testimonials() {
     mouseY.set(e.clientY - rect.top - rect.height / 2);
   };
 
-  /* ---------------- THREE GLASS ORB ---------------- */
+  /* THREE GLASS ORB */
+
+  /* ---------------- LUXURY GOLD ORB ---------------- */
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -78,43 +80,64 @@ export default function Testimonials() {
 
     const scene = new THREE.Scene();
 
-    const camera = new THREE.PerspectiveCamera(70, 1, 0.1, 1000);
-    camera.position.z = 5;
+    const camera = new THREE.PerspectiveCamera(65, 1, 0.1, 1000);
+    camera.position.z = 6;
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
       antialias: true,
     });
 
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(600, 600);
     mount.appendChild(renderer.domElement);
 
-    const geometry = new THREE.IcosahedronGeometry(2, 1);
+    /* GEOMETRY */
+
+    const geometry = new THREE.IcosahedronGeometry(2, 2);
+
+    /* PREMIUM GOLD MATERIAL */
 
     const material = new THREE.MeshPhysicalMaterial({
-      color: 0xfbbf24,
-      roughness: 0.15,
-      metalness: 0.9,
-      transmission: 0.4,
-      thickness: 1,
+      color: 0xd4af37,
+      metalness: 1,
+      roughness: 0.18,
       clearcoat: 1,
+      clearcoatRoughness: 0.1,
+      reflectivity: 1,
+      transmission: 0.2,
+      thickness: 1,
     });
 
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
 
-    const light = new THREE.PointLight(0xffffff, 1.8);
-    light.position.set(5, 5, 5);
-    scene.add(light);
+    /* LIGHTING */
 
-    const ambient = new THREE.AmbientLight(0xffffff, 0.5);
+    const light1 = new THREE.PointLight(0xffffff, 2);
+    light1.position.set(5, 5, 5);
+    scene.add(light1);
+
+    const light2 = new THREE.PointLight(0xffd700, 2);
+    light2.position.set(-5, -3, 5);
+    scene.add(light2);
+
+    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambient);
 
     let frame: number;
 
+    /* ANIMATION */
+
     const animate = () => {
-      mesh.rotation.y += 0.002;
-      mesh.rotation.x += 0.001;
+      const time = Date.now() * 0.001;
+
+      mesh.rotation.y += 0.0015;
+      mesh.rotation.x += 0.0006;
+
+      /* floating motion */
+
+      mesh.position.y = Math.sin(time) * 0.25;
 
       renderer.render(scene, camera);
       frame = requestAnimationFrame(animate);
@@ -134,14 +157,12 @@ export default function Testimonials() {
   return (
     <section
       onMouseMove={handleMouseMove}
-      className="relative py-48 overflow-hidden bg-white"
+      className="relative py-40 overflow-hidden bg-white"
     >
-      {/* CINEMATIC LIGHTS */}
+      {/* GOLDEN AMBIENT LIGHT */}
 
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[700px] h-[700px] bg-gradient-to-br from-[#d4af37]/80 to-[#f5d76e]/70rounded-full blur-[160px]" />
-
-        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-white rounded-full blur-[160px]" />
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[700px] h-[700px] bg-[#d4af37]/20 rounded-full blur-[160px]" />
       </div>
 
       {/* THREE ORB */}
@@ -149,7 +170,7 @@ export default function Testimonials() {
       <motion.div
         ref={mountRef}
         style={{ rotateX, rotateY }}
-        className="absolute left-1/2 top-24 -translate-x-1/2 opacity-40 pointer-events-none"
+        className="absolute left-1/2 top-20 -translate-x-1/2 opacity-40 pointer-events-none"
       />
 
       <div className="relative max-w-5xl mx-auto px-6 text-center">
@@ -160,33 +181,35 @@ export default function Testimonials() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9 }}
           viewport={{ once: true }}
-          className="text-4xl md:text-5xl font-semibold text-blue-900 tracking-tight mb-24"
+          className="text-3xl md:text-4xl font-semibold text-blue-900 tracking-tight mb-20"
         >
           Trusted by ambitious businesses
         </motion.h2>
 
-        {/* AVATAR */}
+        {/* AVATAR WITH GOLD SHIMMER */}
 
         <AnimatePresence mode="wait">
           <motion.div
             key={active}
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
+            exit={{ opacity: 0, scale: 0.85 }}
             transition={{ duration: 0.7 }}
-            className="flex justify-center mb-14"
+            className="flex justify-center mb-12 relative"
           >
+            <div className="absolute w-44 h-44 rounded-full bg-gradient-to-r from-[#d4af37] via-[#f6e27a] to-[#d4af37] opacity-40 blur-2xl animate-pulse" />
+
             <Image
               src={t.img}
               alt={t.name}
               width={120}
               height={120}
-              className="rounded-full shadow-xl"
+              className="rounded-full shadow-2xl relative z-10 border border-amber-300/40"
             />
           </motion.div>
         </AnimatePresence>
 
-        {/* QUOTE */}
+        {/* PREMIUM QUOTE */}
 
         <AnimatePresence mode="wait">
           <motion.p
@@ -195,9 +218,11 @@ export default function Testimonials() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -40 }}
             transition={{ duration: 0.7 }}
-            className="text-xl md:text-2xl text-slate-700 leading-relaxed max-w-3xl mx-auto font-medium"
+            className="text-xl md:text-2xl text-slate-700 leading-relaxed max-w-3xl mx-auto font-medium tracking-wide"
           >
-            “{t.quote}”
+            <span className="text-4xl text-[#d4af37] mr-2">“</span>
+            {t.quote}
+            <span className="text-4xl text-[#d4af37] ml-2">”</span>
           </motion.p>
         </AnimatePresence>
 
@@ -211,7 +236,6 @@ export default function Testimonials() {
           className="mt-12"
         >
           <p className="text-lg font-semibold text-blue-900">{t.name}</p>
-
           <p className="text-sm text-slate-500 mt-1">{t.role}</p>
         </motion.div>
 
