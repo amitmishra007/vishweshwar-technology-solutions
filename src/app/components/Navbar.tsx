@@ -201,7 +201,7 @@ export default function Navbar() {
             : "bg-transparent"
         }`}
       >
-        <div className="flex items-center justify-between px-4 md:px-6 lg:px-12 py-2 md:py-0">
+        <div className="flex items-center justify-between px-4 md:px-6 lg:px-10 py-2 md:py-0">
           {/* LOGO */}
           <motion.div
             initial={{ x: -160, opacity: 0 }}
@@ -236,7 +236,7 @@ export default function Navbar() {
                       variants={navItemVariants}
                       className="cursor-pointer text-blue-900/80 font-semibold hover:text-amber-500 transition-colors"
                     >
-                      Services
+                      Services +
                     </motion.div>
 
                     <AnimatePresence>

@@ -499,8 +499,6 @@ import {
   SetStateAction,
   useLayoutEffect,
   useCallback,
-  useMemo,
-  memo,
 } from "react";
 import Link from "next/link";
 import fadeUp from "../utils/animation";
@@ -605,46 +603,36 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
     "calc(80px + env(safe-area-inset-top))",
   );
 
-  const rafRef = useRef<number | null>(null);
+  /* ROTATION ENGINE */
 
-  /* ================= ROTATION ENGINE ================= */
-
-  const startRotation = useCallback(() => {
-    if (controlsRef.current) return;
-
-    const current = rotation.get();
-
-    controlsRef.current = animate(rotation, [current, current + 360], {
+  useEffect(() => {
+    controlsRef.current = animate(rotation, 360, {
       duration: 36,
       ease: "linear",
       repeat: Infinity,
-      onComplete: () => {
-        controlsRef.current = null;
-      },
     });
+
+    return () => controlsRef.current?.stop();
   }, [rotation]);
 
   const pauseRotation = useCallback(() => {
-    controlsRef.current?.pause();
+    controlsRef.current?.stop();
   }, []);
 
   const resumeRotation = useCallback(() => {
-    controlsRef.current?.play();
-  }, []);
+    const current = rotation.get();
+
+    controlsRef.current = animate(rotation, current + 360, {
+      duration: 36,
+      ease: "linear",
+      repeat: Infinity,
+    });
+  }, [rotation]);
+
+  /* RESPONSIVE ORBIT */
 
   useEffect(() => {
-    startRotation();
-
-    return () => {
-      controlsRef.current?.stop();
-      controlsRef.current = null;
-    };
-  }, [startRotation]);
-
-  /* ================= RESPONSIVE ORBIT ================= */
-
-  useLayoutEffect(() => {
-    const calculate = () => {
+    const updateOrbit = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
 
@@ -670,6 +658,10 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
 
       setOrbitSize(Math.max(size, 220));
       setOrbitalOffset(offset);
+    };
+
+    const updatePadding = () => {
+      const width = window.innerWidth;
 
       if (width < 380) setPaddingTop("calc(128px + env(safe-area-inset-top))");
       else if (width >= 540 && width < 768)
@@ -678,27 +670,21 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
       else setPaddingTop("calc(80px + env(safe-area-inset-top))");
     };
 
-    const handleResize = () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(calculate);
-    };
+    updateOrbit();
+    updatePadding();
 
-    calculate();
-
-    window.addEventListener("resize", handleResize, { passive: true });
+    window.addEventListener("resize", updateOrbit);
+    window.addEventListener("resize", updatePadding);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      window.removeEventListener("resize", updateOrbit);
+      window.removeEventListener("resize", updatePadding);
     };
   }, []);
 
-  const logoSize = useMemo(() => orbitSize * 0.14, [orbitSize]);
-  const coreSize = useMemo(() => orbitSize * 0.65, [orbitSize]);
-  const radius = useMemo(
-    () => orbitSize / 2 - logoSize / 2,
-    [orbitSize, logoSize],
-  );
+  const logoSize = orbitSize * 0.14;
+  const coreSize = orbitSize * 0.65;
+  const radius = orbitSize / 2 - logoSize / 2;
 
   return (
     <motion.section
@@ -712,7 +698,7 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
       style={{ paddingTop }}
     >
       <div className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-center px-6 md:px-8 gap-12">
-        {/* LEFT CONTENT (unchanged) */}
+        {/* LEFT CONTENT */}
 
         <motion.div
           initial={{ opacity: 0, x: -60 }}
@@ -743,6 +729,8 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
               modern frameworks, scalable architecture and seamless user
               experiences.
             </motion.p>
+
+            {/* SERVICES */}
 
             <motion.div
               initial="hidden"
@@ -796,7 +784,6 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
               transform: `translate3d(0, ${orbitalOffset}px, 0)`,
             }}
           >
-            {/* Core */}
             <motion.div
               animate={{ scale: [1, 1.04, 1] }}
               transition={{ duration: 6, repeat: Infinity }}
@@ -811,7 +798,6 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
               }}
             />
 
-            {/* Ring */}
             <motion.div
               animate={{ scale: [1, 1.02, 1] }}
               transition={{ duration: 8, repeat: Infinity }}
@@ -824,7 +810,6 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
               }}
             />
 
-            {/* Logos */}
             <motion.div
               className="absolute z-30 gpu-layer"
               style={{ rotate: rotation }}
@@ -833,7 +818,7 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
                 const angle = (360 / logos.length) * index;
 
                 return (
-                  <MemoOrbitLogo
+                  <OrbitLogo
                     key={logo.name}
                     index={index}
                     logo={logo.src}
@@ -851,7 +836,6 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
               })}
             </motion.div>
 
-            {/* Center Image */}
             <motion.div
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
@@ -862,8 +846,6 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
                 alt="Mobile App Development"
                 width={400}
                 height={400}
-                priority
-                sizes="(max-width:768px) 80vw, 40vw"
                 style={{ width: coreSize * 0.9, height: "auto" }}
               />
             </motion.div>
@@ -876,7 +858,7 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
 
 /* ================= ORBIT LOGO ================= */
 
-const MemoOrbitLogo = memo(function OrbitLogo({
+function OrbitLogo({
   logo,
   name,
   description,
@@ -922,8 +904,6 @@ const MemoOrbitLogo = memo(function OrbitLogo({
     if (active) pause();
     else resume();
   }, [active, pause, resume]);
-
-  if (typeof document === "undefined") return null;
 
   return (
     <>
@@ -990,4 +970,4 @@ const MemoOrbitLogo = memo(function OrbitLogo({
         )}
     </>
   );
-});
+}

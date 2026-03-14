@@ -13,6 +13,14 @@ import MarketingSlide from "./MarketingSlide";
 type HeroProps = Record<string, unknown>;
 
 export default function Hero({}: HeroProps) {
+  /* ---------------- HYDRATION SAFETY ---------------- */
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  /* -------------------------------------------------- */
+
   const [index, setIndex] = useState<number>(0);
   const [isPaused, setIsPaused] = useState<boolean>(false);
 
@@ -44,13 +52,22 @@ export default function Hero({}: HeroProps) {
     if (isPaused) return;
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % slides.length);
-    }, 10000);
+    }, 5000);
     return () => clearInterval(interval);
   }, [isPaused, slides.length]);
 
   const prevSlide = () =>
     setIndex((prev) => (prev - 1 + slides.length) % slides.length);
+
   const nextSlide = () => setIndex((prev) => (prev + 1) % slides.length);
+
+  /* ------------ PREVENT HYDRATION MISMATCH ----------- */
+  if (!mounted) {
+    return (
+      <section className="relative w-full h-screen md:h-[75vh] lg:h-screen overflow-hidden" />
+    );
+  }
+  /* --------------------------------------------------- */
 
   return (
     <section className="relative w-full h-screen md:h-[75vh] lg:h-screen overflow-hidden">

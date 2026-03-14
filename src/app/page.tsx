@@ -4,6 +4,7 @@ import { Footer } from "./components/Footer";
 import Testimonials from "./components/Testimonials";
 import AboutSection from "./components/AboutSection";
 import WhoWeAre from "./components/WhoWeAre";
+import ContactSection from "./components/ContactSection";
 
 export default function HomePage() {
   return (
@@ -12,6 +13,7 @@ export default function HomePage() {
       <Hero />
       <AboutSection />
       <WhoWeAre />
+      <ContactSection />
       {/* <SmartOpenLocator /> */}
       <Testimonials />
       <Footer />
