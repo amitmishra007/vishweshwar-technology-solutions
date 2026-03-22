@@ -30,35 +30,75 @@ export default function ContactSection(): JSX.Element {
   const [errors, setErrors] = useState<Errors>({});
   const [success, setSuccess] = useState("");
 
-  const validate = () => {
-    const newErrors: Errors = {};
+  // 🔥 VALIDATION
+  const validateField = (name: keyof FormData, value: string) => {
+    switch (name) {
+      case "name":
+        return value.trim() ? "" : "Please enter your name";
 
-    if (!formData.name.trim()) newErrors.name = "Please enter your name";
+      case "email":
+        if (!value.trim()) return "Email required";
+        return /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(value)
+          ? ""
+          : "Enter a valid email";
 
-    if (!formData.email.trim()) {
-      newErrors.email = "Email required";
-    } else if (
-      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email)
-    ) {
-      newErrors.email = "Enter a valid email";
+      case "phone":
+        if (!value.trim()) return "Phone number required";
+        if (value.length < 10) return "Enter valid phone number";
+        return "";
+
+      case "message":
+        return value.trim()
+          ? ""
+          : "Please write a message (Describe your idea/ share any websites)";
+
+      default:
+        return "";
     }
+  };
 
-    if (!formData.phone.trim()) newErrors.phone = "Phone number required";
-    if (!formData.message.trim()) newErrors.message = "Please write a message";
-
+  const validateAll = () => {
+    const newErrors: Errors = {};
+    (Object.keys(formData) as (keyof FormData)[]).forEach((key) => {
+      const err = validateField(key, formData[key]);
+      if (err) newErrors[key] = err;
+    });
     return newErrors;
   };
 
+  // 🔥 HANDLE CHANGE (LIVE VALIDATION)
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name } = e.target;
+    let { value } = e.target;
+
+    // ✅ phone: only numbers
+    if (name === "phone") {
+      value = value.replace(/\D/g, "").slice(0, 10);
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    // ✅ live validation
+    const errorMsg = validateField(name as keyof FormData, value);
+
+    setErrors((prev) => ({
+      ...prev,
+      [name]: errorMsg || undefined,
+    }));
+
+    setSuccess("");
   };
 
+  // 🔥 SUBMIT
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const validationErrors = validate();
+    const validationErrors = validateAll();
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
@@ -73,19 +113,16 @@ export default function ContactSection(): JSX.Element {
       className="relative w-full py-28 bg-gradient-to-b from-blue-50 via-white to-blue-50 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-stretch">
-        {/* LEFT STORY PANEL */}
+        {/* LEFT STORY PANEL (UNCHANGED) */}
         <motion.div
           initial={{ opacity: 0, x: -60 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.9 }}
           viewport={{ once: true }}
-          className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-black p-12 flex flex-col justify-center"
+          className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-blue-950  p-12 flex flex-col justify-center"
         >
-          {/* cinematic glow */}
           <div className="absolute -top-10 -left-10 w-96 h-96 bg-amber-400/20 blur-[160px] rounded-full" />
           <div className="absolute bottom-0 right-0 w-80 h-80 bg-blue-500/20 blur-[160px] rounded-full" />
-
-          {/* subtle pattern */}
           <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle_at_center,white_1px,transparent_1px)] [background-size:28px_28px]" />
 
           <div className="relative z-10 max-w-lg">
@@ -112,7 +149,6 @@ export default function ContactSection(): JSX.Element {
               experience.
             </p>
 
-            {/* highlights */}
             <div className="mt-8 space-y-3 text-sm text-blue-200">
               <p>✔ Free consultation for your project</p>
               <p>✔ Transparent communication</p>
@@ -130,22 +166,18 @@ export default function ContactSection(): JSX.Element {
           viewport={{ once: true }}
           className="bg-white/70 backdrop-blur-md border border-blue-100 rounded-3xl shadow-[0_30px_80px_rgba(0,0,0,0.15)] p-8 md:p-10"
         >
-          {/* name */}
+          {/* NAME */}
           <div className="mb-6">
             <label className="text-sm font-medium text-blue-900 flex items-center gap-2 mb-2">
               <User size={16} /> Name
             </label>
-
             <input
-              suppressHydrationWarning
-              autoComplete="name"
               type="text"
               name="name"
               value={formData.name}
               onChange={handleChange}
               className="w-full border border-blue-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-400/60"
             />
-
             <AnimatePresence>
               {errors.name && (
                 <motion.p
@@ -160,22 +192,18 @@ export default function ContactSection(): JSX.Element {
             </AnimatePresence>
           </div>
 
-          {/* email */}
+          {/* EMAIL */}
           <div className="mb-6">
             <label className="text-sm font-medium text-blue-900 flex items-center gap-2 mb-2">
               <Mail size={16} /> Email
             </label>
-
             <input
-              suppressHydrationWarning
-              autoComplete="email"
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               className="w-full border border-blue-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-400/60"
             />
-
             <AnimatePresence>
               {errors.email && (
                 <motion.p
@@ -190,22 +218,18 @@ export default function ContactSection(): JSX.Element {
             </AnimatePresence>
           </div>
 
-          {/* phone */}
+          {/* PHONE */}
           <div className="mb-6">
             <label className="text-sm font-medium text-blue-900 flex items-center gap-2 mb-2">
               <Phone size={16} /> Phone
             </label>
-
             <input
-              suppressHydrationWarning
-              autoComplete="tel"
               type="tel"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
               className="w-full border border-blue-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-400/60"
             />
-
             <AnimatePresence>
               {errors.phone && (
                 <motion.p
@@ -220,22 +244,18 @@ export default function ContactSection(): JSX.Element {
             </AnimatePresence>
           </div>
 
-          {/* message */}
+          {/* MESSAGE */}
           <div className="mb-8">
             <label className="text-sm font-medium text-blue-900 flex items-center gap-2 mb-2">
               <MessageSquare size={16} /> Message
             </label>
-
             <textarea
-              suppressHydrationWarning
-              autoComplete="off"
               rows={4}
               name="message"
               value={formData.message}
               onChange={handleChange}
               className="w-full border border-blue-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-400/60"
             />
-
             <AnimatePresence>
               {errors.message && (
                 <motion.p
@@ -250,10 +270,13 @@ export default function ContactSection(): JSX.Element {
             </AnimatePresence>
           </div>
 
-          <FancyButton
-            className="w-full py-3 rounded-xl font-medium shadow-lg hover:scale-[1.02] transition"
-            text="Send Message"
-          />
+          {/* 🔥 FORCE SUBMIT (critical fix) */}
+          <button type="submit" className="w-full">
+            <FancyButton
+              className="w-full py-3 rounded-xl font-medium shadow-lg hover:scale-[1.02] transition"
+              text="Send Message"
+            />
+          </button>
 
           <AnimatePresence>
             {success && (

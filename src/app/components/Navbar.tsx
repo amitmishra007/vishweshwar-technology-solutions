@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence, Variants } from "framer-motion";
@@ -66,6 +67,7 @@ const SERVICE_ICONS: Record<ServiceCategory, LucideIcon> = {
 
 /* --------------------------- NAVBAR COMPONENT ------------------------ */
 export default function Navbar() {
+  const pathname = usePathname();
   /* ----------------------------- STATES ----------------------------- */
   const [desktopCategory, setDesktopCategory] =
     useState<ServiceCategory | null>(null);
@@ -102,17 +104,44 @@ export default function Navbar() {
   }, []);
 
   /* ---------------------------- SCROLL DETECTION -------------------- */
+
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      const currentScroll = window.scrollY;
-      setScrollY(currentScroll);
-      setShowNav(currentScroll < lastScroll || currentScroll < 50);
-      setShowTopBtn(currentScroll > 300);
-      setLastScroll(currentScroll);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScroll = window.scrollY;
+
+          setScrollY(currentScroll);
+          setShowNav(currentScroll < lastScroll || currentScroll < 50);
+          setShowTopBtn(currentScroll > 300);
+          setLastScroll(currentScroll);
+
+          ticking = false;
+        });
+
+        ticking = true;
+      }
     };
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScroll]);
+
+  // Escape Key
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        setMegaOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, []);
 
   /* --------------------------- SCROLL LOCK MOBILE ------------------- */
   useEffect(() => {
@@ -234,7 +263,7 @@ export default function Navbar() {
                       initial="hidden"
                       animate="visible"
                       variants={navItemVariants}
-                      className="cursor-pointer text-blue-900/80 font-semibold hover:text-amber-500 transition-colors"
+                      className="cursor-pointer text-blue-950/90 font-semibold hover:text-amber-700 transition-colors"
                     >
                       Services +
                     </motion.div>
@@ -275,7 +304,7 @@ export default function Navbar() {
                                   <motion.button
                                     key={category}
                                     onClick={() => setDesktopCategory(category)}
-                                    className="flex items-center gap-2 text-sm font-medium text-blue-900/80 hover:text-amber-500 transition-all duration-300 hover:translate-x-1"
+                                    className="flex items-center gap-2 text-sm font-medium text-blue-950/90 hover:text-amber-700 transition-all duration-300 hover:translate-x-1"
                                     whileHover={{ scale: 1.02 }}
                                   >
                                     <Icon size={16} /> {category}
@@ -359,7 +388,11 @@ export default function Navbar() {
                 >
                   <Link
                     href={item.href}
-                    className="text-blue-900/80 font-semibold hover:text-amber-500 transition-colors duration-300"
+                    className={`font-semibold transition-colors duration-300 ${
+                      pathname === item.href
+                        ? "text-amber-700"
+                        : "text-blue-950/90 hover:text-amber-700"
+                    }`}
                   >
                     {item.label}
                   </Link>
@@ -418,7 +451,7 @@ export default function Navbar() {
                     <button
                       key="services"
                       onClick={() => setMobileServiceOpen(true)}
-                      className="flex items-center gap-3 text-lg font-semibold text-blue-950 hover:text-amber-500 transition-colors px-4 py-3 rounded-xl w-full justify-center shadow-sm hover:shadow-md"
+                      className="flex items-center gap-3 text-lg font-semibold text-blue-950 hover:text-amber-700 transition-colors px-4 py-3 rounded-xl w-full justify-center shadow-sm hover:shadow-md"
                     >
                       <Palette size={20} /> Services
                     </button>
@@ -427,7 +460,7 @@ export default function Navbar() {
                       key={item.href}
                       href={item.href}
                       onClick={() => setOpen(false)}
-                      className="flex items-center gap-3 text-lg font-semibold text-blue-950 hover:text-amber-500 transition-colors px-4 py-3 rounded-xl w-full justify-center shadow-sm hover:shadow-md"
+                      className="flex items-center gap-3 text-lg font-semibold text-blue-950 hover:text-amber-700 transition-colors px-4 py-3 rounded-xl w-full justify-center shadow-sm hover:shadow-md"
                     >
                       {item.label}
                     </Link>
@@ -510,7 +543,7 @@ export default function Navbar() {
                 >
                   <Linkedin
                     size={24}
-                    className="text-blue-900 hover:text-amber-500 transition-colors"
+                    className="text-blue-900 hover:text-amber-700 transition-colors"
                   />
                 </a>
                 <a
@@ -520,7 +553,7 @@ export default function Navbar() {
                 >
                   <Instagram
                     size={24}
-                    className="text-blue-900 hover:text-amber-500 transition-colors"
+                    className="text-blue-900 hover:text-amber-700 transition-colors"
                   />
                 </a>
                 <a
@@ -530,7 +563,7 @@ export default function Navbar() {
                 >
                   <Twitter
                     size={24}
-                    className="text-blue-900 hover:text-amber-500 transition-colors"
+                    className="text-blue-900 hover:text-amber-700 transition-colors"
                   />
                 </a>
               </div>

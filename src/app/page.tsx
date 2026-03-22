@@ -5,6 +5,7 @@ import Testimonials from "./components/Testimonials";
 import AboutSection from "./components/AboutSection";
 import WhoWeAre from "./components/WhoWeAre";
 import ContactSection from "./components/ContactSection";
+import PortfolioSection from "./components/PortfolioSection";
 
 export default function HomePage() {
   return (
@@ -12,6 +13,7 @@ export default function HomePage() {
       <Navbar />
       <Hero />
       <AboutSection />
+      <PortfolioSection />
       <WhoWeAre />
       <ContactSection />
       {/* <SmartOpenLocator /> */}

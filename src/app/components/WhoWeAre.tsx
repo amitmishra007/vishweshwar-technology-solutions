@@ -26,9 +26,9 @@ const STEPS: Step[] = [
     number: "02",
     title: "Planning",
     description: [
-      "Define scope",
-      "Set budget & timeline",
-      "Develop project plan",
+      "Define Scope",
+      "Set Budget & Timeline",
+      "Develop Project Plan",
     ],
     image:
       "https://cdn.pixabay.com/photo/2017/03/08/14/20/flat-2126876_960_720.png",
@@ -36,7 +36,7 @@ const STEPS: Step[] = [
   {
     number: "03",
     title: "Execution",
-    description: ["Development", "Monitoring & reporting", "Testing"],
+    description: ["Development", "Monitoring & Reporting", "Testing"],
     image:
       "https://cdn.pixabay.com/photo/2017/03/08/14/20/flat-2126878_960_720.png",
   },
@@ -84,8 +84,8 @@ export default function ZigZagInfographic() {
               w-full max-w-[260px] mx-auto
               ${
                 isTop
-                  ? "border-t-8 border-t-[#d4af37]/80 rounded-t-full shadow-lg"
-                  : "border-b-8 border-b-blue-900 rounded-b-full shadow-lg"
+                  ? "border-t-8 border-t-amber-700 rounded-t-full shadow-lg"
+                  : "border-b-8 border-b-blue-950 rounded-b-full shadow-lg"
               }`}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -93,7 +93,16 @@ export default function ZigZagInfographic() {
               transition={{ duration: 0.8, delay: idx * 0.2 }}
             >
               {/* STEP NUMBER */}
-              <div className="absolute -top-8 md:-top-10 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-gradient-to-br from-[#d4af37]/80 to-[#f5d76e]/70 flex items-center justify-center text-white font-bold text-lg shadow-xl z-10">
+              <div className="absolute -top-8 md:-top-10 left-1/2 -translate-x-1/2 w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-xl z-10 overflow-hidden">
+                {/* CINEMATIC BG */}
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-blue-950 opacity-95 -z-10" />
+                <div className="absolute -top-10 -left-10 w-96 h-96 bg-amber-400/20 blur-[160px] rounded-full -z-10" />
+                <div className="absolute bottom-0 right-0 w-80 h-80 bg-blue-500/20 blur-[160px] rounded-full -z-10" />
+                <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(circle_at_center,white_1px,transparent_1px)] [background-size:28px_28px] -z-10" />
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 bg-gradient-to-r from-blue-500/10 via-transparent to-amber-500/10" />
+
+                {/* subtle pattern */}
+                <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle_at_center,white_1px,transparent_1px)] [background-size:28px_28px]" />
                 {step.number}
               </div>
 
@@ -104,7 +113,7 @@ export default function ZigZagInfographic() {
                   alt={step.title}
                   width={270}
                   height={180}
-                  className="object-contain w-full h-full"
+                  className="object-contain w-full h-full pt-2.5"
                 />
               </div>
 

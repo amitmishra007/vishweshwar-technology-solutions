@@ -140,10 +140,17 @@ export default function AboutSection() {
           ].map((stat, i) => (
             <div
               key={i}
-              className="group relative bg-gradient-to-br from-slate-900 via-blue-950 to-black border border-white/10 rounded-2xl p-6 shadow-[0_20px_60px_rgba(0,0,0,0.45)] hover:shadow-[0_30px_80px_rgba(0,0,0,0.6)] transition-all duration-500 hover:-translate-y-1 text-center overflow-hidden"
+              className="group relative bg-gradient-to-br from-slate-900 via-blue-900 to-blue-950 border border-white/10 rounded-2xl p-6 shadow-[0_20px_60px_rgba(0,0,0,0.45)] hover:shadow-[0_30px_80px_rgba(0,0,0,0.6)] transition-all duration-500 hover:-translate-y-1 text-center overflow-hidden"
             >
+              {/* CINEMATIC BG */}
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-blue-950 opacity-95 -z-10" />
+              <div className="absolute -top-10 -left-10 w-96 h-96 bg-amber-400/20 blur-[160px] rounded-full -z-10" />
+              <div className="absolute bottom-0 right-0 w-80 h-80 bg-blue-500/20 blur-[160px] rounded-full -z-10" />
+              <div className="absolute inset-0 opacity-[0.05] bg-[radial-gradient(circle_at_center,white_1px,transparent_1px)] [background-size:28px_28px] -z-10" />
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 bg-gradient-to-r from-blue-500/10 via-transparent to-amber-500/10" />
 
+              {/* subtle pattern */}
+              <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle_at_center,white_1px,transparent_1px)] [background-size:28px_28px]" />
               <p className="text-sm font-medium text-white/70">{stat.label}</p>
 
               <div className="h-px bg-white/10 my-3" />
