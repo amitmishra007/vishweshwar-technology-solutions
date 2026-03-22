@@ -1,3 +1,4 @@
+"use client";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import { Footer } from "./components/Footer";
@@ -6,14 +7,16 @@ import AboutSection from "./components/AboutSection";
 import WhoWeAre from "./components/WhoWeAre";
 import ContactSection from "./components/ContactSection";
 import PortfolioSection from "./components/PortfolioSection";
+import { useState } from "react";
 
 export default function HomePage() {
+  const [isPortfolioModalOpen, setIsPortfolioModalOpen] = useState(false);
   return (
     <main className="relative">
-      <Navbar />
+      <Navbar hide={isPortfolioModalOpen} />
       <Hero />
       <AboutSection />
-      <PortfolioSection />
+      <PortfolioSection setIsModalOpen={setIsPortfolioModalOpen} />
       <WhoWeAre />
       <ContactSection />
       {/* <SmartOpenLocator /> */}

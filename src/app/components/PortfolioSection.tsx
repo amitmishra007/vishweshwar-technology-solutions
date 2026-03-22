@@ -10,9 +10,10 @@ const categories: Category[] = ["Websites", "Brochures", "Logos"];
 
 const data: Record<Category, string[]> = {
   Websites: [
+    "/websites/Vishweshwar_Industries_Bhiwadi_Client_Atom_Learning_Centre_Gurugram.png",
     "/websites/Vishweshwar_Industries_Bhiwadi_Client_Paradigm_Spaces_Gurugram.png",
     "/websites/Vishweshwar_Industries_Bhiwadi_Client_Atom_Learning_Centre_Gurugram.png",
-    "/websites/site3.jpg",
+    "/websites/Vishweshwar_Industries_Bhiwadi_Client_Paradigm_Spaces_Gurugram.png",
   ],
   Brochures: ["/logos/BMRPROFILEUPDATED.pdf", "/logos/BMRPROFILEUPDATED.pdf"],
   Logos: [
@@ -21,34 +22,37 @@ const data: Record<Category, string[]> = {
   ],
 };
 
-export default function Portfolio(): JSX.Element {
-  const [activeCategory, setActiveCategory] = useState<Category>("Websites");
+export default function Portfolio({
+  setIsModalOpen,
+}: {
+  setIsModalOpen: (val: boolean) => void;
+}): JSX.Element {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  // SCROLL LOCK
   useEffect(() => {
-    if (activeIndex !== null) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
+    setIsModalOpen(activeIndex !== null);
+  }, [activeIndex, setIsModalOpen]);
+  const [activeCategory, setActiveCategory] = useState<Category>("Websites");
+
+  useEffect(() => {
+    document.body.style.overflow = activeIndex !== null ? "hidden" : "auto";
   }, [activeIndex]);
 
-  const images: string[] = data[activeCategory];
+  const items = data[activeCategory];
 
   return (
-    <section className="w-screen h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-blue-950 text-white overflow-hidden relative">
+    <section className="w-full min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-blue-950 text-white relative overflow-hidden">
+      {/* BG */}
       <div className="absolute -top-10 -left-10 w-96 h-96 bg-amber-400/20 blur-[160px] rounded-full" />
       <div className="absolute bottom-0 right-0 w-80 h-80 bg-blue-500/20 blur-[160px] rounded-full" />
-      <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle_at_center,white_1px,transparent_1px)] [background-size:28px_28px]" />
 
-      {/* CATEGORY NAV */}
-      <div className="absolute top-10 w-full flex justify-center gap-6 z-20">
-        {categories.map((cat: Category) => (
+      {/* NAV */}
+      <div className="sticky top-0 z-30 backdrop-blur-md bg-black/20 py-6 flex justify-center gap-4 md:gap-6">
+        {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
-            className={`cursor-col-resize px-6 py-2 border rounded-full transition-all ${
+            className={`cursor-pointer px-4 md:px-6 py-2 text-sm md:text-base rounded-full border transition ${
               activeCategory === cat
                 ? "bg-white text-black"
                 : "border-white/30 hover:border-white"
@@ -60,80 +64,46 @@ export default function Portfolio(): JSX.Element {
       </div>
 
       {/* GRID */}
-      <motion.div layout className="grid grid-cols-3 gap-4 p-20 pt-32">
-        {images.map((img: string, index: number) => (
+      <motion.div
+        layout
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 p-6 md:p-16"
+      >
+        {items.map((item, index) => (
           <motion.div
-            key={`${img}_${index}`}
-            layoutId={img}
+            key={`${item}_${index}`}
+            layoutId={item}
             onClick={() => setActiveIndex(index)}
-            className="cursor-pointer overflow-hidden rounded-2xl group bg-neutral-900"
-            whileHover={{ scale: 1.05 }}
+            className="group rounded-2xl overflow-hidden bg-neutral-900 cursor-pointer"
+            whileHover={{ scale: 1.03 }}
           >
             {/* WEBSITES */}
             {activeCategory === "Websites" && (
-              <div className="relative w-full h-[300px] overflow-hidden">
+              <div className="h-[220px] md:h-[300px] overflow-hidden">
                 <Image
-                  src={img}
-                  alt="portfolio"
+                  src={item}
+                  alt="website"
                   width={1200}
                   height={2000}
-                  className="w-full h-auto transition-transform duration-[8000ms] ease-in-out group-hover:-translate-y-[60%]"
+                  className="w-full h-auto transition-transform duration-[8000ms] ease-linear group-hover:-translate-y-[60%]"
                 />
               </div>
             )}
 
-            {/* BROCHURES (SUBTLE PDF CARD) */}
+            {/* BROCHURES (NOW SAME BEHAVIOR AS WEBSITE) */}
             {activeCategory === "Brochures" && (
-              <div className="relative w-full h-[300px] overflow-hidden bg-white group">
-                {/* PDF subtle scrolling preview */}
-                <embed
-                  src={`${img}#page=1&view=FitH`}
-                  type="application/pdf"
-                  className="w-full h-full pointer-events-none transition-transform duration-[6000ms] ease-linear group-hover:-translate-y-[40%]"
+              <div className="h-[220px] md:h-[300px] overflow-hidden bg-white">
+                <iframe
+                  src={`${item}#page=1&view=FitH`}
+                  className="w-full h-[600px] pointer-events-none transition-transform duration-[8000ms] ease-linear group-hover:-translate-y-[50%]"
                 />
-
-                {/* minimal dark overlay on hover */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-300" />
-
-                {/* ACTIONS (ONLY ON HOVER) */}
-                <div className="absolute inset-0 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveIndex(index);
-                    }}
-                    className="px-4 py-2 text-xs bg-white/90 text-black rounded-md font-semibold"
-                  >
-                    Open
-                  </button>
-
-                  <a
-                    href={img}
-                    download
-                    onClick={(e) => e.stopPropagation()}
-                    className="px-4 py-2 text-xs bg-white/90 text-black rounded-md font-semibold"
-                  >
-                    Download
-                  </a>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setActiveIndex(null);
-                    }}
-                    className="px-4 py-2 text-xs bg-white/90 text-black rounded-md font-semibold"
-                  >
-                    Close
-                  </button>
-                </div>
               </div>
             )}
 
-            {/* LOGOS (CENTERED + CONTAINED) */}
+            {/* LOGOS */}
             {activeCategory === "Logos" && (
-              <div className="relative w-full h-[220px] flex items-center justify-center p-6">
+              <div className="h-[160px] md:h-[220px] flex items-center justify-center p-6 bg-gradient-to-br from-amber-50 via-white to-blue-100">
                 <Image
-                  src={img}
+                  src={item}
                   alt="logo"
                   width={300}
                   height={200}
@@ -149,82 +119,80 @@ export default function Portfolio(): JSX.Element {
       <AnimatePresence>
         {activeIndex !== null && (
           <motion.div
-            className="fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center"
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center px-4 overflow-hidden
+bg-gradient-to-br from-slate-900 via-blue-900 to-blue-950 text-white"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
+            {/* BG INSIDE MODAL */}
+            <div className="absolute -top-10 -left-10 w-96 h-96 bg-amber-400/20 blur-[160px] rounded-full" />
+            <div className="absolute bottom-0 right-0 w-80 h-80 bg-blue-500/20 blur-[160px] rounded-full" />
             {/* CLOSE */}
             <button
-              className="absolute top-6 right-6 text-2xl"
+              className="absolute top-6 right-6 text-2xl cursor-pointer "
               onClick={() => setActiveIndex(null)}
             >
               ✕
             </button>
 
-            {/* WEBSITES VIEW */}
+            {/* CONTENT */}
             {activeCategory === "Websites" && (
               <motion.img
-                key={images[activeIndex]}
-                src={images[activeIndex]}
-                alt="preview"
-                className="max-h-[80vh] rounded-2xl shadow-2xl"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
+                src={items[activeIndex]}
+                className="max-h-[80vh] rounded-xl"
               />
             )}
 
-            {/* BROCHURE FULL VIEW (READABLE PDF) */}
             {activeCategory === "Brochures" && (
-              <div className="w-[85vw] h-[85vh] bg-white rounded-xl overflow-hidden shadow-2xl">
-                <iframe src={images[activeIndex]} className="w-full h-full" />
+              <div className="w-full md:w-[85vw] h-[70vh] md:h-[85vh] bg-white rounded-xl overflow-hidden">
+                <iframe src={items[activeIndex]} className="w-full h-full" />
               </div>
             )}
 
-            {/* LOGO VIEW */}
             {activeCategory === "Logos" && (
               <motion.img
-                key={images[activeIndex]}
-                src={images[activeIndex]}
-                className="max-h-[60vh] object-contain"
+                src={items[activeIndex]}
+                className="max-h-[50vh] object-contain"
               />
             )}
 
             {/* NAV */}
-            <div className="flex gap-6 mt-6">
+            <div className="flex gap-6 mt-6 text-sm md:text-base">
               <button
+                className="cursor-pointer"
                 onClick={() =>
-                  setActiveIndex((prev) => {
-                    if (prev === null) return 0;
-                    return (prev - 1 + images.length) % images.length;
-                  })
+                  setActiveIndex((prev) =>
+                    prev === null
+                      ? 0
+                      : (prev - 1 + items.length) % items.length,
+                  )
                 }
               >
                 Prev
               </button>
               <button
+                className="cursor-pointer"
                 onClick={() =>
-                  setActiveIndex((prev) => {
-                    if (prev === null) return 0;
-                    return (prev + 1) % images.length;
-                  })
+                  setActiveIndex((prev) =>
+                    prev === null ? 0 : (prev + 1) % items.length,
+                  )
                 }
               >
                 Next
               </button>
             </div>
 
-            {/* CATEGORY SWITCH INSIDE MODAL */}
-            <div className="flex gap-4 mt-8">
-              {categories.map((cat: Category) => (
+            {/* CATEGORY SWITCH */}
+            <div className="flex gap-4 mt-6 text-xs md:text-sm opacity-70">
+              {categories.map((cat) => (
                 <button
+                  className="cursor-pointer"
                   key={cat}
                   onClick={() => {
                     setActiveCategory(cat);
                     setActiveIndex(0);
                   }}
-                  className="text-sm opacity-70 hover:opacity-100"
                 >
                   {cat}
                 </button>

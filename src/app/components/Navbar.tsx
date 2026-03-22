@@ -66,7 +66,7 @@ const SERVICE_ICONS: Record<ServiceCategory, LucideIcon> = {
 };
 
 /* --------------------------- NAVBAR COMPONENT ------------------------ */
-export default function Navbar() {
+export default function Navbar({ hide = false }: { hide?: boolean }) {
   const pathname = usePathname();
   /* ----------------------------- STATES ----------------------------- */
   const [desktopCategory, setDesktopCategory] =
@@ -222,7 +222,9 @@ export default function Navbar() {
       {/* ------------------------------ NAVBAR -------------------------------- */}
       <motion.nav
         initial={{ y: 0 }}
-        animate={{ y: open ? 0 : showNav ? 0 : -200 }}
+        animate={{
+          y: hide ? -200 : open ? 0 : showNav ? 0 : -180,
+        }}
         transition={{ type: "spring", stiffness: 120, damping: 20 }}
         className={`fixed top-0 left-0 z-[999] w-full ${
           scrollY > 0
@@ -230,13 +232,13 @@ export default function Navbar() {
             : "bg-transparent"
         }`}
       >
-        <div className="flex items-center justify-between px-4 md:px-6 lg:px-10 py-2 md:py-0">
+        <div className="flex items-center justify-between px-4 md:px-6 lg:px-8 py-1">
           {/* LOGO */}
           <motion.div
             initial={{ x: -160, opacity: 0 }}
             animate={logoLoaded ? { x: 0, opacity: 1 } : {}}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="shrink-0 relative -ml-6 sm:-ml-8 md:-ml-10 mt-2 sm:mt-4 md:mt-6 h-32 w-40 sm:h-28 sm:w-56 md:h-32 md:w-64 lg:h-36 lg:w-72 xl:h-40 xl:w-80"
+            className="shrink-0 relative -ml-6 sm:-ml-8 md:-ml-10 mt-1 sm:mt-2 md:mt-3 h-20 w-32 sm:h-24 sm:w-44 md:h-26 md:w-52 lg:h-28 lg:w-56 xl:h-32 xl:w-64"
           >
             <Image
               src="/vishweshwar-industries-logo.png"

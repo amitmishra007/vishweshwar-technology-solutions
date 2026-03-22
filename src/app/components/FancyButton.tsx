@@ -77,22 +77,24 @@ export default function FancyButton({
   ${className || ""}
 `;
 
+  // ✅ LINK CASE
   if (href) {
     return (
-      <Link href={href} className={baseClasses} suppressHydrationWarning>
+      <Link href={href} className={baseClasses}>
         {content}
       </Link>
     );
   }
 
-  return (
-    <button
-      onClick={onClick}
-      className={baseClasses}
-      suppressHydrationWarning
-      type="button"
-    >
-      {content}
-    </button>
-  );
+  // ✅ BUTTON CASE (only when onClick exists)
+  if (onClick) {
+    return (
+      <button onClick={onClick} className={baseClasses} type="button">
+        {content}
+      </button>
+    );
+  }
+
+  // ✅ SAFE FALLBACK (prevents nested button hydration errors)
+  return <span className={baseClasses}>{content}</span>;
 }
