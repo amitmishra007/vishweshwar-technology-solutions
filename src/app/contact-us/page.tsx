@@ -137,10 +137,10 @@ export default function ContactPage() {
 
       <section className="relative w-full min-h-screen pt-40 pb-24 overflow-hidden bg-gradient-to-b from-white via-blue-50 to-white">
         {/* BACKGROUND FX */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-blue-200/30 blur-[180px] rounded-full" />
-          <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-amber-200/30 blur-[180px] rounded-full" />
-        </div>
+
+        <div className="absolute -top-10 -left-10 w-96 h-96 bg-amber-400/20 blur-[160px] rounded-full" />
+        <div className="absolute bottom-0 right-0 w-80 h-80 bg-blue-500/20 blur-[160px] rounded-full" />
+        <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle_at_center,white_1px,transparent_1px)] [background-size:28px_28px]" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-10">
           {/* HEADER */}
@@ -204,7 +204,7 @@ export default function ContactPage() {
                   transition={{ delay: 0.2 }}
                   className="flex items-center gap-2 text-amber-400 text-sm tracking-widest"
                 >
-                  ✦ CREATIVE DIGITAL STUDIO
+                  ✦ Let Us Build Something Exceptional
                 </motion.div>
 
                 {/* HEADLINE */}
@@ -214,9 +214,9 @@ export default function ContactPage() {
                   transition={{ delay: 0.3 }}
                   className="text-3xl md:text-4xl font-bold leading-tight"
                 >
-                  Let’s Build <br />
+                  Welcome to <br />
                   <span className="bg-gradient-to-r from-amber-400 to-yellow-300 text-transparent bg-clip-text">
-                    Something Exceptional
+                    Vishweshwar Industries
                   </span>
                 </motion.h2>
 
@@ -225,13 +225,13 @@ export default function ContactPage() {
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="text-white/70 leading-relaxed text-sm md:text-base max-w-md"
+                  className="text-white/70 leading-relaxed text-sm md:text-base max-w-md brand-font"
                 >
-                  &quot; We are a digital creative studio specializing in web,
-                  mobile, and application development, alongside branding and
-                  design. Our work is focused on empowering organizations in the
-                  arts, culture, entertainment, and nonprofit sectors through
-                  impactful, high-quality digital experiences.&quot;
+                  We are a digital creative studio specializing in web, mobile,
+                  and application development, alongside branding and design.
+                  Our work is focused on empowering organizations in the arts,
+                  culture, entertainment, and nonprofit sectors through
+                  impactful, high-quality digital experiences.
                 </motion.p>
 
                 {/* CONTACT CARDS */}
@@ -255,7 +255,7 @@ export default function ContactPage() {
 
                   {/* PHONE */}
                   <motion.a
-                    href="tel:+919876543210"
+                    href="tel:+91950990768"
                     whileHover={{ scale: 1.04 }}
                     className="group flex items-center justify-between bg-white/5 border border-white/10 backdrop-blur-xl rounded-xl px-4 py-3 transition hover:border-amber-400/40"
                   >
@@ -279,8 +279,7 @@ export default function ContactPage() {
                 transition={{ delay: 0.8 }}
                 className="relative z-10 text-xs text-white/40 mt-10"
               >
-                © {new Date().getFullYear()} Your Company. Crafted with
-                precision.
+                © {new Date().getFullYear()} Vishweshwar Industries.
               </motion.div>
             </motion.div>
 
