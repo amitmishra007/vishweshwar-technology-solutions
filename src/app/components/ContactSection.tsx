@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, JSX } from "react";
+import { useState, JSX, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, User, Phone, MessageSquare, Sparkles } from "lucide-react";
 import FancyButton from "./FancyButton";
@@ -31,7 +31,7 @@ export default function ContactSection(): JSX.Element {
   const [success, setSuccess] = useState("");
 
   // 🔥 VALIDATION
-  const validateField = (name: keyof FormData, value: string) => {
+  const validateField = useCallback((name: keyof FormData, value: string) => {
     switch (name) {
       case "name":
         return value.trim() ? "" : "Please enter your name";
@@ -55,7 +55,7 @@ export default function ContactSection(): JSX.Element {
       default:
         return "";
     }
-  };
+  }, []);
 
   const validateAll = () => {
     const newErrors: Errors = {};
@@ -66,14 +66,13 @@ export default function ContactSection(): JSX.Element {
     return newErrors;
   };
 
-  // 🔥 HANDLE CHANGE (LIVE VALIDATION)
+  // 🔥 HANDLE CHANGE
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name } = e.target;
     let { value } = e.target;
 
-    // ✅ phone: only numbers
     if (name === "phone") {
       value = value.replace(/\D/g, "").slice(0, 10);
     }
@@ -83,7 +82,6 @@ export default function ContactSection(): JSX.Element {
       [name]: value,
     }));
 
-    // ✅ live validation
     const errorMsg = validateField(name as keyof FormData, value);
 
     setErrors((prev) => ({
@@ -113,13 +111,13 @@ export default function ContactSection(): JSX.Element {
       className="relative w-full py-28 bg-gradient-to-b from-blue-50 via-white to-blue-50 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-stretch">
-        {/* LEFT STORY PANEL (UNCHANGED) */}
+        {/* LEFT PANEL */}
         <motion.div
           initial={{ opacity: 0, x: -60 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.9 }}
           viewport={{ once: true }}
-          className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-blue-950  p-12 flex flex-col justify-center"
+          className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-blue-950 p-12 flex flex-col justify-center"
         >
           <div className="absolute -top-10 -left-10 w-96 h-96 bg-amber-400/20 blur-[160px] rounded-full" />
           <div className="absolute bottom-0 right-0 w-80 h-80 bg-blue-500/20 blur-[160px] rounded-full" />
@@ -144,9 +142,7 @@ export default function ContactSection(): JSX.Element {
             </p>
 
             <p className="text-blue-200/80 mt-4 leading-relaxed text-sm md:text-base">
-              Great partnerships begin with a simple conversation. Tell us about
-              your idea and we’ll help you shape it into a powerful digital
-              experience.
+              Great partnerships begin with a simple conversation.
             </p>
 
             <div className="mt-8 space-y-3 text-sm text-blue-200">
@@ -160,18 +156,28 @@ export default function ContactSection(): JSX.Element {
         {/* FORM PANEL */}
         <motion.form
           onSubmit={handleSubmit}
+          noValidate
           initial={{ opacity: 0, x: 60 }}
           whileInView={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.9 }}
           viewport={{ once: true }}
           className="bg-white/70 backdrop-blur-md border border-blue-100 rounded-3xl shadow-[0_30px_80px_rgba(0,0,0,0.15)] p-8 md:p-10"
         >
+          {/* INPUT BASE CLASS */}
+          {/*
+            🔥 KEY FIXES:
+            - suppressHydrationWarning
+            - autoComplete OFF (reduces extension interference)
+          */}
+
           {/* NAME */}
           <div className="mb-6">
             <label className="text-sm font-medium text-blue-900 flex items-center gap-2 mb-2">
               <User size={16} /> Name
             </label>
             <input
+              suppressHydrationWarning
+              autoComplete="off"
               type="text"
               name="name"
               value={formData.name}
@@ -180,12 +186,7 @@ export default function ContactSection(): JSX.Element {
             />
             <AnimatePresence>
               {errors.name && (
-                <motion.p
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="text-red-500 text-xs mt-1"
-                >
+                <motion.p className="text-red-500 text-xs mt-1">
                   {errors.name}
                 </motion.p>
               )}
@@ -198,6 +199,8 @@ export default function ContactSection(): JSX.Element {
               <Mail size={16} /> Email
             </label>
             <input
+              suppressHydrationWarning
+              autoComplete="off"
               type="email"
               name="email"
               value={formData.email}
@@ -206,12 +209,7 @@ export default function ContactSection(): JSX.Element {
             />
             <AnimatePresence>
               {errors.email && (
-                <motion.p
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="text-red-500 text-xs mt-1"
-                >
+                <motion.p className="text-red-500 text-xs mt-1">
                   {errors.email}
                 </motion.p>
               )}
@@ -224,6 +222,9 @@ export default function ContactSection(): JSX.Element {
               <Phone size={16} /> Phone
             </label>
             <input
+              suppressHydrationWarning
+              autoComplete="off"
+              inputMode="numeric"
               type="tel"
               name="phone"
               value={formData.phone}
@@ -232,12 +233,7 @@ export default function ContactSection(): JSX.Element {
             />
             <AnimatePresence>
               {errors.phone && (
-                <motion.p
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="text-red-500 text-xs mt-1"
-                >
+                <motion.p className="text-red-500 text-xs mt-1">
                   {errors.phone}
                 </motion.p>
               )}
@@ -250,6 +246,8 @@ export default function ContactSection(): JSX.Element {
               <MessageSquare size={16} /> Message
             </label>
             <textarea
+              suppressHydrationWarning
+              autoComplete="off"
               rows={4}
               name="message"
               value={formData.message}
@@ -258,33 +256,23 @@ export default function ContactSection(): JSX.Element {
             />
             <AnimatePresence>
               {errors.message && (
-                <motion.p
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="text-red-500 text-xs mt-1"
-                >
+                <motion.p className="text-red-500 text-xs mt-1">
                   {errors.message}
                 </motion.p>
               )}
             </AnimatePresence>
           </div>
 
-          {/* 🔥 FORCE SUBMIT (critical fix) */}
-          <button type="submit" className="w-full">
-            <FancyButton
-              className="w-full py-3 rounded-xl font-medium shadow-lg hover:scale-[1.02] transition"
-              text="Send Message"
-            />
-          </button>
+          {/* 🔥 FIXED BUTTON (no nested button issue) */}
+          <FancyButton
+            type="submit"
+            className="w-full py-3 rounded-xl font-medium shadow-lg hover:scale-[1.02] transition"
+            text="Send Message"
+          />
 
           <AnimatePresence>
             {success && (
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-green-600 text-sm text-center mt-4"
-              >
+              <motion.p className="text-green-600 text-sm text-center mt-4">
                 {success}
               </motion.p>
             )}

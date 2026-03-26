@@ -1,20 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { MouseEventHandler } from "react";
+import { ButtonHTMLAttributes, AnchorHTMLAttributes } from "react";
 
-interface FancyButtonProps {
+type FancyButtonProps = {
   text: string;
   href?: string;
-  onClick?: MouseEventHandler<HTMLButtonElement>;
   className?: string;
-}
+} & ButtonHTMLAttributes<HTMLButtonElement> &
+  AnchorHTMLAttributes<HTMLAnchorElement>;
 
 export default function FancyButton({
   text,
   href,
-  onClick,
   className,
+  ...props
 }: FancyButtonProps) {
   const content = (
     <>
@@ -29,12 +29,12 @@ export default function FancyButton({
         <span className="absolute top-0 left-[-75%] w-1/2 h-full bg-white/20 skew-x-[-25deg] group-hover:left-[130%] transition-all duration-[1200ms] ease-out" />
       </span>
 
-      {/* 🎬 Text Layer */}
+      {/* 🎬 Text */}
       <span className="absolute inset-0 flex items-center justify-center text-white font-semibold tracking-wide transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-10 group-hover:opacity-0">
         {text}
       </span>
 
-      {/* ➡ Arrow Layer */}
+      {/* ➡ Arrow */}
       <span className="absolute inset-0 flex items-center justify-center text-white opacity-0 translate-y-10 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:opacity-100">
         <svg
           className="w-6 h-6 md:w-5 md:h-5 sm:w-4 sm:h-4"
@@ -51,50 +51,43 @@ export default function FancyButton({
         </svg>
       </span>
 
-      {/* Invisible span for sizing */}
+      {/* Invisible sizing */}
       <span className="relative invisible">{text}</span>
     </>
   );
 
   const baseClasses = `
-  group relative inline-flex items-center justify-center
-  overflow-hidden
-  rounded-full
-  font-medium
-  transition-all duration-500
+    group relative inline-flex items-center justify-center
+    overflow-hidden rounded-full font-medium
+    transition-all duration-500
 
-  px-8 py-3 text-base
-  md:px-5 md:py-2 md:text-sm
-  sm:px-4 sm:py-1.5 sm:text-xs
+    px-8 py-3 text-base
+    md:px-5 md:py-2 md:text-sm
+    sm:px-4 sm:py-1.5 sm:text-xs
 
-  shadow-[inset_0_2px_4px_rgba(255,255,255,0.25),_0_4px_6px_rgba(0,0,0,0.15)]
-  backdrop-blur-[6px]
-  border border-white/20
-  hover:shadow-[inset_0_2px_6px_rgba(255,255,255,0.3),_0_6px_10px_rgba(0,0,0,0.2)]
+    shadow-[inset_0_2px_4px_rgba(255,255,255,0.25),_0_4px_6px_rgba(0,0,0,0.15)]
+    backdrop-blur-[6px]
+    border border-white/20
 
-  hover:-translate-y-0.5 hover:scale-105
+    hover:shadow-[inset_0_2px_6px_rgba(255,255,255,0.3),_0_6px_10px_rgba(0,0,0,0.2)]
+    hover:-translate-y-0.5 hover:scale-105
 
-  ${className || ""}
-`;
+    ${className || ""}
+  `;
 
-  // ✅ LINK CASE
+  // ✅ LINK MODE
   if (href) {
     return (
-      <Link href={href} className={baseClasses}>
+      <Link href={href} className={baseClasses} {...props}>
         {content}
       </Link>
     );
   }
 
-  // ✅ BUTTON CASE (only when onClick exists)
-  if (onClick) {
-    return (
-      <button onClick={onClick} className={baseClasses} type="button">
-        {content}
-      </button>
-    );
-  }
-
-  // ✅ SAFE FALLBACK (prevents nested button hydration errors)
-  return <span className={baseClasses}>{content}</span>;
+  // ✅ ALWAYS BUTTON (fixes your issue completely)
+  return (
+    <button className={baseClasses} {...props}>
+      {content}
+    </button>
+  );
 }

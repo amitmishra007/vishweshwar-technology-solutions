@@ -18,6 +18,7 @@ export default function HomePage() {
       <AboutSection />
       <PortfolioSection setIsModalOpen={setIsPortfolioModalOpen} />
       <WhoWeAre />
+
       <ContactSection />
       {/* <SmartOpenLocator /> */}
       <Testimonials />
