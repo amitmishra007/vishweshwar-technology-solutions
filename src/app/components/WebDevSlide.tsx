@@ -487,25 +487,10 @@
 
 import Image from "next/image";
 import FancyButton from "./FancyButton";
-import {
-  motion,
-  useMotionValue,
-  useTransform,
-  animate,
-  MotionValue,
-} from "framer-motion";
-import {
-  useEffect,
-  useState,
-  useRef,
-  Dispatch,
-  SetStateAction,
-  useLayoutEffect,
-  useCallback,
-} from "react";
+import { motion, useMotionValue, animate } from "framer-motion";
+import { useEffect, useRef, Dispatch, SetStateAction } from "react";
 import Link from "next/link";
 import fadeUp from "../utils/animation";
-import { createPortal } from "react-dom";
 
 /* ================= TYPES ================= */
 
@@ -513,85 +498,7 @@ type SlideProps = {
   setHeroPaused: Dispatch<SetStateAction<boolean>>;
 };
 
-type LogoItem = {
-  src: string;
-  name: string;
-  description: string;
-  link: string;
-};
-
-type OrbitLogoProps = {
-  index: number;
-  logo: string;
-  name: string;
-  description: string;
-  link: string;
-  angle: number;
-  radius: number;
-  rotation: MotionValue<number>;
-  logoSize: number;
-  pause: () => void;
-  resume: () => void;
-};
-
 /* ================= DATA ================= */
-
-const logos: LogoItem[] = [
-  {
-    src: "/logo4.png",
-    name: "React.js",
-    description: "UI library for dynamic web apps.",
-    link: "/services#react-development",
-  },
-  {
-    src: "/logo5.png",
-    name: "Next.js",
-    description: "SSR & static site generation.",
-    link: "/services#nextjs-development",
-  },
-  {
-    src: "/logo6.png",
-    name: "Node.js",
-    description: "Server-side JavaScript runtime.",
-    link: "/services#node-development",
-  },
-  {
-    src: "/logo7.png",
-    name: "Express.js",
-    description: "Backend web framework for Node.",
-    link: "/services#express-development",
-  },
-  {
-    src: "/logo8.png",
-    name: "MongoDB",
-    description: "NoSQL database solutions.",
-    link: "/services#mongo-database",
-  },
-  {
-    src: "/logo9.png",
-    name: "PostgreSQL",
-    description: "SQL relational database.",
-    link: "/services#postgresql",
-  },
-  {
-    src: "/logo10.png",
-    name: "Docker",
-    description: "Containerization & deployment.",
-    link: "/services#docker",
-  },
-  {
-    src: "/logo11.png",
-    name: "Tailwind CSS",
-    description: "Utility-first CSS framework.",
-    link: "/services#tailwind",
-  },
-  {
-    src: "/logo12.png",
-    name: "TypeScript",
-    description: "Typed superset of JavaScript.",
-    link: "/services#typescript",
-  },
-];
 
 const services = [
   { title: "Website Design & Development", id: "website-development" },
@@ -606,11 +513,7 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
   const rotation = useMotionValue(0);
   const controlsRef = useRef<ReturnType<typeof animate> | null>(null);
 
-  const [orbitSize, setOrbitSize] = useState(300);
-  const [orbitalOffset, setOrbitalOffset] = useState(0);
-  const [paddingTop, setPaddingTop] = useState(
-    "calc(80px + env(safe-area-inset-top))",
-  );
+  const paddingTop = "calc(80px + env(safe-area-inset-top))";
 
   /* ROTATION */
 
@@ -623,77 +526,6 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
 
     return () => controlsRef.current?.stop();
   }, [rotation]);
-
-  const pauseRotation = useCallback(() => {
-    controlsRef.current?.stop();
-  }, []);
-
-  const resumeRotation = useCallback(() => {
-    const current = rotation.get();
-
-    controlsRef.current = animate(rotation, current + 360, {
-      duration: 36,
-      ease: "linear",
-      repeat: Infinity,
-    });
-  }, [rotation]);
-
-  /* RESPONSIVE ORBIT */
-
-  useEffect(() => {
-    const updateOrbit = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-
-      const navbarHeight = 80;
-      const verticalPadding = navbarHeight + 40;
-
-      let size = 0;
-      let offset = 0;
-
-      if (width < 380) {
-        size = width * 0.65;
-        offset = -30;
-      } else if (width >= 540 && width < 768) {
-        size = width * 0.65;
-        offset = -50;
-      } else if (width < 768) {
-        size = Math.min(width * 0.75, height - verticalPadding);
-      } else if (width < 1280) {
-        size = Math.min(width * 0.46, height - verticalPadding);
-      } else {
-        size = Math.min(width * 0.28, height - verticalPadding);
-      }
-
-      setOrbitSize(Math.max(size, 220));
-      setOrbitalOffset(offset);
-    };
-
-    const updatePadding = () => {
-      const width = window.innerWidth;
-
-      if (width < 380) setPaddingTop("calc(128px + env(safe-area-inset-top))");
-      else if (width >= 540 && width < 768)
-        setPaddingTop("calc(129px + env(safe-area-inset-top))");
-      else if (width >= 1280) setPaddingTop("120px");
-      else setPaddingTop("calc(80px + env(safe-area-inset-top))");
-    };
-
-    updateOrbit();
-    updatePadding();
-
-    window.addEventListener("resize", updateOrbit);
-    window.addEventListener("resize", updatePadding);
-
-    return () => {
-      window.removeEventListener("resize", updateOrbit);
-      window.removeEventListener("resize", updatePadding);
-    };
-  }, []);
-
-  const logoSize = orbitSize * 0.14;
-  const coreSize = orbitSize * 0.65;
-  const radius = orbitSize / 2 - logoSize / 2;
 
   return (
     <motion.section
@@ -783,207 +615,58 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
 
         {/* RIGHT SIDE ORBIT */}
 
+        {/* RIGHT SIDE – CLEAN PREMIUM VISUAL */}
+
         <div className="w-full md:w-1/2 flex items-center justify-center mt-8 md:mt-0">
-          <div
-            className="relative flex items-center justify-center isolate gpu-layer"
-            style={{
-              width: orbitSize,
-              height: orbitSize,
-              transform: `translate3d(0, ${orbitalOffset}px, 0)`,
-            }}
-          >
-            {/* CORE */}
+          <div className="relative flex items-center justify-center">
+            {/* 🌊 Soft Glow Background */}
+            <div className="absolute w-[80%] h-[80%] rounded-full bg-gradient-to-r from-amber-400/30 via-yellow-300/20 to-blue-900/20 blur-3xl animate-pulse" />
 
+            {/* 💎 Floating Image Container */}
             <motion.div
-              animate={{ scale: [1, 1.04, 1] }}
-              transition={{ duration: 6, repeat: Infinity }}
-              className="absolute rounded-full gpu-layer"
-              style={{
-                width: coreSize,
-                height: coreSize,
-                background:
-                  "radial-gradient(circle at center, rgba(255,215,0,0.9) 0%, rgba(212,175,55,0.8) 40%, rgba(25,32,72,0.4) 75%, rgba(10,15,40,0.2) 100%)",
-                boxShadow:
-                  "0 0 60px rgba(255,215,0,0.6), 0 0 120px rgba(212,175,55,0.4)",
-              }}
-            />
-
-            {/* ORBIT RING */}
-
-            <motion.div
-              animate={{ scale: [1, 1.02, 1] }}
-              transition={{ duration: 8, repeat: Infinity }}
-              className="absolute rounded-full border border-yellow-400 gpu-layer"
-              style={{
-                width: orbitSize,
-                height: orbitSize,
-                boxShadow:
-                  "0 0 30px rgba(255,215,0,0.6), 0 0 80px rgba(212,175,55,0.4)",
-              }}
-            />
-
-            {/* ROTATING LOGOS */}
-
-            <motion.div
-              className="absolute z-30 gpu-layer"
-              style={{ rotate: rotation }}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="relative z-10"
             >
-              {logos.map((logo, index) => {
-                const angle = (360 / logos.length) * index;
+              <motion.div
+                animate={{ y: [0, -12, 0] }}
+                transition={{
+                  duration: 6,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+                className="relative will-change-transform"
+              >
+                {/* 🖼 Image */}
+                <Image
+                  src="/mini-responsive-collage.webp"
+                  alt="Web Development"
+                  width={500}
+                  height={500}
+                  className="w-[260px] sm:w-[320px] md:w-[380px] lg:w-[420px] h-auto drop-shadow-[0_20px_40px_rgba(0,0,0,0.25)]"
+                  priority
+                />
 
-                return (
-                  <OrbitLogo
-                    key={logo.name}
-                    index={index}
-                    logo={logo.src}
-                    name={logo.name}
-                    description={logo.description}
-                    link={logo.link}
-                    angle={angle}
-                    radius={radius}
-                    rotation={rotation}
-                    logoSize={logoSize}
-                    pause={pauseRotation}
-                    resume={resumeRotation}
-                  />
-                );
-              })}
+                {/* ✨ Light Reflection */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-white/10 via-transparent to-transparent pointer-events-none" />
+              </motion.div>
             </motion.div>
 
-            {/* CENTER IMAGE */}
-
+            {/* ⚡ Optional subtle rotating ring (very cheap) */}
             <motion.div
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className="relative z-20 gpu-layer"
-            >
-              <Image
-                src="/mini-responsive-collage.webp"
-                alt="Web Development"
-                width={400}
-                height={400}
-                style={{ width: coreSize * 0.9, height: "auto" }}
-              />
-            </motion.div>
+              animate={{ rotate: 360 }}
+              transition={{
+                duration: 40,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              className="absolute w-[90%] h-[90%] rounded-full border border-amber-400/20"
+            />
           </div>
         </div>
       </div>
     </motion.section>
-  );
-}
-
-/* ================= ORBIT LOGO ================= */
-
-function OrbitLogo({
-  logo,
-  name,
-  description,
-  link,
-  angle,
-  radius,
-  rotation,
-  logoSize,
-  pause,
-  resume,
-}: OrbitLogoProps) {
-  const rotateDeg = useTransform(rotation, (r) => `${-(r + angle)}deg`);
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  const [hoverLogo, setHoverLogo] = useState(false);
-  const [hoverPopup, setHoverPopup] = useState(false);
-  const [position, setPosition] = useState({ top: 0, left: 0 });
-
-  const active = hoverLogo || hoverPopup;
-
-  useLayoutEffect(() => {
-    if (!active || !ref.current) return;
-
-    const rect = ref.current.getBoundingClientRect();
-
-    const popupWidth = 260;
-    const popupHeight = 140;
-    const padding = 12;
-
-    let top = rect.top - popupHeight - 12;
-    if (top < padding) top = rect.bottom + 12;
-
-    let left = rect.left + rect.width / 2 - popupWidth / 2;
-    left = Math.max(
-      padding,
-      Math.min(left, window.innerWidth - popupWidth - padding),
-    );
-
-    setPosition({ top, left });
-  }, [active, logoSize]);
-
-  useEffect(() => {
-    if (active) pause();
-    else resume();
-  }, [active, pause, resume]);
-
-  return (
-    <>
-      <div
-        className="absolute top-1/2 left-1/2 gpu-layer"
-        style={{
-          transform: `rotate(${angle}deg) translate(${radius}px)`,
-        }}
-      >
-        <motion.div
-          ref={ref}
-          style={{
-            rotate: rotateDeg,
-            width: logoSize,
-            height: logoSize,
-            transform: "translate(-50%, -50%)",
-          }}
-          className="relative flex items-center justify-center rounded-full bg-white/80 backdrop-blur-md border border-white/40 shadow-lg cursor-pointer gpu-layer"
-          onMouseEnter={() => setHoverLogo(true)}
-          onMouseLeave={() => setHoverLogo(false)}
-          whileHover={{ scale: 1.15 }}
-        >
-          <Image
-            src={logo}
-            alt={name}
-            width={60}
-            height={60}
-            style={{ width: logoSize * 0.6, height: logoSize * 0.6 }}
-          />
-        </motion.div>
-      </div>
-
-      {active &&
-        createPortal(
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 15 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-            style={{
-              position: "fixed",
-              top: position.top,
-              left: position.left,
-              width: 260,
-              zIndex: 1000,
-            }}
-            onMouseEnter={() => setHoverPopup(true)}
-            onMouseLeave={() => setHoverPopup(false)}
-          >
-            <div className="rounded-2xl bg-gradient-to-br from-blue-950 via-indigo-900 to-amber-600 text-white p-5 shadow-2xl border border-white/20 backdrop-blur-xl">
-              <p className="text-sm font-semibold mb-2">{name}</p>
-              <p className="text-xs text-white/80 leading-relaxed mb-4">
-                {description}
-              </p>
-
-              <Link
-                href={link}
-                className="text-xs font-semibold text-amber-300 hover:text-white transition-colors duration-300"
-              >
-                Read More →
-              </Link>
-            </div>
-          </motion.div>,
-          document.body,
-        )}
-    </>
   );
 }
