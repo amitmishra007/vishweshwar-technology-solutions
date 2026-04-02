@@ -433,41 +433,63 @@ export default function Navbar({ hide = false }: { hide?: boolean }) {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[998] bg-black/50 backdrop-blur-md flex justify-center items-start pt-36"
+            initial={{ clipPath: "circle(0% at calc(100% - 40px) 40px)" }}
+            animate={{ clipPath: "circle(150% at calc(100% - 40px) 40px)" }}
+            exit={{ clipPath: "circle(0% at calc(100% - 40px) 40px)" }}
+            transition={{ duration: 0.6, ease: [0.83, 0, 0.17, 1] }}
+            className="fixed inset-0 z-[998] bg-gradient-to-br from-[#FCF5E5] via-white to-blue-50 backdrop-blur-xl flex justify-center items-start pt-36"
           >
             <motion.div
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -20, opacity: 0 }}
               transition={{ type: "spring", stiffness: 120, damping: 20 }}
-              className="w-[82%] max-w-[600px] flex flex-col items-center bg-gradient-to-b from-white to-blue-50 rounded-3xl shadow-2xl p-6 space-y-4"
+              className="w-full h-full flex flex-col items-center justify-center px-6 relative"
             >
               {/* ---------------- MAIN NAV LINKS ---------------- */}
-              {!mobileServiceOpen &&
-                NAV_ITEMS.map((item) =>
-                  item.label === "Services" ? (
-                    <button
-                      key="services"
-                      onClick={() => setMobileServiceOpen(true)}
-                      className="flex items-center gap-3 text-lg font-semibold text-blue-950 hover:text-amber-700 transition-colors px-4 py-3 rounded-xl w-full justify-center shadow-sm hover:shadow-md"
-                    >
-                      <Palette size={20} /> Services
-                    </button>
-                  ) : (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setOpen(false)}
-                      className="flex items-center gap-3 text-lg font-semibold text-blue-950 hover:text-amber-700 transition-colors px-4 py-3 rounded-xl w-full justify-center shadow-sm hover:shadow-md"
-                    >
-                      {item.label}
-                    </Link>
-                  ),
-                )}
+              <div className="flex flex-col items-center space-y-8">
+                {!mobileServiceOpen &&
+                  NAV_ITEMS.map((item, idx) =>
+                    item.label === "Services" ? (
+                      <motion.button
+                        key="services"
+                        onClick={() => setMobileServiceOpen(true)}
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: idx * 0.07 }}
+                        className="relative text-3xl md:text-4xl font-semibold text-blue-950/90 hover:text-amber-700 transition-all group flex items-center gap-3"
+                      >
+                        Services
+                        {/* Chevron */}
+                        <motion.span
+                          animate={{ rotate: mobileServiceOpen ? 180 : 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="text-amber-600 text-xl"
+                        >
+                          ↓
+                        </motion.span>
+                        {/* Gold underline */}
+                        <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-amber-600 group-hover:w-16 transition-all duration-300" />
+                      </motion.button>
+                    ) : (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setOpen(false)}
+                      >
+                        <motion.div
+                          initial={{ opacity: 0, y: 30 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: idx * 0.07 }}
+                          className="relative text-3xl md:text-4xl font-semibold text-blue-950/90 hover:text-amber-700 transition-all group"
+                        >
+                          {item.label}
+                          <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-amber-600 group-hover:w-16 transition-all duration-300" />
+                        </motion.div>
+                      </Link>
+                    ),
+                  )}
+              </div>
 
               {/* ---------------- CATEGORY MENU ---------------- */}
               {mobileServiceOpen && !activeCategory && (
@@ -485,7 +507,7 @@ export default function Navbar({ hide = false }: { hide?: boolean }) {
                     <ArrowLeft size={18} /> Back
                   </button>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                  <div className="flex flex-col space-y-5 w-full mt-6">
                     {(Object.keys(SERVICE_MENU) as ServiceCategory[]).map(
                       (category) => {
                         const Icon = SERVICE_ICONS[category];
@@ -493,9 +515,12 @@ export default function Navbar({ hide = false }: { hide?: boolean }) {
                           <button
                             key={category}
                             onClick={() => setActiveCategory(category)}
-                            className="flex items-center gap-3 p-4 bg-white rounded-xl shadow-sm hover:shadow-lg hover:bg-amber-50 transition-all font-medium text-blue-950 justify-start"
+                            className="flex items-center justify-between text-lg font-medium text-blue-950/90 hover:text-amber-700 transition group"
                           >
-                            <Icon size={22} /> {category}
+                            <span className="flex items-center gap-3">
+                              <Icon size={20} /> {category}
+                            </span>
+                            <span className="w-0 group-hover:w-8 h-[2px] bg-amber-600 transition-all" />
                           </button>
                         );
                       },
@@ -515,21 +540,21 @@ export default function Navbar({ hide = false }: { hide?: boolean }) {
                 >
                   <button
                     onClick={() => setActiveCategory(null)}
-                    className="flex items-center gap-2 text-blue-950 font-semibold bg-white hover:bg-blue-100 transition-colors px-4 py-2 rounded-full shadow-md hover:shadow-lg"
+                    className="flex items-center gap-2 text-blue-950/80 hover:text-amber-700 transition text-sm tracking-wide"
                   >
                     <ArrowLeft size={18} /> Back
                   </button>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                  <div className="flex flex-col space-y-4 w-full mt-6">
                     {SERVICE_MENU[activeCategory].map((service) => (
                       <Link
                         key={service.id}
                         href={`/services/${service.id}`}
                         onClick={() => setOpen(false)}
-                        className="flex items-center gap-2 p-4 bg-white rounded-xl shadow-sm hover:shadow-lg hover:bg-amber-50 transition-all text-blue-950 font-medium"
+                        className="group flex items-center justify-between text-base text-blue-950/90 hover:text-amber-700 transition"
                       >
-                        <span className="w-5 h-5 bg-amber-300 rounded-full" />{" "}
                         {service.title}
+                        <span className="w-0 group-hover:w-6 h-[2px] bg-amber-600 transition-all" />
                       </Link>
                     ))}
                   </div>
@@ -537,36 +562,15 @@ export default function Navbar({ hide = false }: { hide?: boolean }) {
               )}
 
               {/* SOCIAL ICONS */}
-              <div className="flex items-center justify-center gap-6 mt-6">
-                <a
-                  href="https://linkedin.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Linkedin
-                    size={24}
-                    className="text-blue-900 hover:text-amber-700 transition-colors"
-                  />
+              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-8">
+                <a href="https://linkedin.com" target="_blank">
+                  <Linkedin className="text-blue-900 hover:text-amber-700 transition-all hover:scale-110" />
                 </a>
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Instagram
-                    size={24}
-                    className="text-blue-900 hover:text-amber-700 transition-colors"
-                  />
+                <a href="https://instagram.com" target="_blank">
+                  <Instagram className="text-blue-900 hover:text-amber-700 transition-all hover:scale-110" />
                 </a>
-                <a
-                  href="https://twitter.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Twitter
-                    size={24}
-                    className="text-blue-900 hover:text-amber-700 transition-colors"
-                  />
+                <a href="https://twitter.com" target="_blank">
+                  <Twitter className="text-blue-900 hover:text-amber-700 transition-all hover:scale-110" />
                 </a>
               </div>
             </motion.div>

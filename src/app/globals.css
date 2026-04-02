@@ -354,3 +354,12 @@ h1 {
   backface-visibility: hidden;
   will-change: transform;
 }
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
