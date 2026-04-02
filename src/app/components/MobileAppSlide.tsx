@@ -484,16 +484,105 @@
 
 import Image from "next/image";
 import FancyButton from "./FancyButton";
-import { motion, useMotionValue, animate } from "framer-motion";
-import { useEffect, useRef, Dispatch, SetStateAction } from "react";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  animate,
+  MotionValue,
+} from "framer-motion";
+import {
+  useEffect,
+  useState,
+  useRef,
+  Dispatch,
+  SetStateAction,
+  useLayoutEffect,
+  useCallback,
+} from "react";
 import Link from "next/link";
 import fadeUp from "../utils/animation";
+import { createPortal } from "react-dom";
 
 /* ================= TYPES ================= */
 
 type SlideProps = {
   setHeroPaused: Dispatch<SetStateAction<boolean>>;
 };
+
+type LogoItem = {
+  src: string;
+  name: string;
+  description: string;
+  link: string;
+};
+
+type OrbitLogoProps = {
+  index: number;
+  logo: string;
+  name: string;
+  description: string;
+  link: string;
+  angle: number;
+  radius: number;
+  rotation: MotionValue<number>;
+  logoSize: number;
+  pause: () => void;
+  resume: () => void;
+};
+
+/* ================= DATA ================= */
+
+const logos: LogoItem[] = [
+  {
+    src: "/logo1.png",
+    name: "React Native",
+    description: "Cross-platform mobile apps.",
+    link: "/services#react-native",
+  },
+  {
+    src: "/logo2.png",
+    name: "Flutter",
+    description: "Google UI toolkit.",
+    link: "/services#flutter",
+  },
+  {
+    src: "/logo3.png",
+    name: "Swift",
+    description: "Native iOS development.",
+    link: "/services#swift",
+  },
+  {
+    src: "/logo4.png",
+    name: "Kotlin",
+    description: "Native Android development.",
+    link: "/services#kotlin",
+  },
+  {
+    src: "/logo5.png",
+    name: "Firebase",
+    description: "Realtime backend services.",
+    link: "/services#firebase",
+  },
+  {
+    src: "/logo6.png",
+    name: "Expo",
+    description: "React Native toolchain.",
+    link: "/services#expo",
+  },
+  {
+    src: "/logo7.png",
+    name: "AWS Amplify",
+    description: "Cloud backend deployment.",
+    link: "/services#aws-amplify",
+  },
+  {
+    src: "/logo8.png",
+    name: "App Stores",
+    description: "Publishing & distribution.",
+    link: "/services#app-distribution",
+  },
+];
 
 const services = [
   { title: "Cross-Platform Mobile Apps", id: "react-native" },
@@ -508,7 +597,11 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
   const rotation = useMotionValue(0);
   const controlsRef = useRef<ReturnType<typeof animate> | null>(null);
 
-  const paddingTop = "calc(80px + env(safe-area-inset-top))";
+  const [orbitSize, setOrbitSize] = useState(300);
+  const [orbitalOffset, setOrbitalOffset] = useState(0);
+  const [paddingTop, setPaddingTop] = useState(
+    "calc(80px + env(safe-area-inset-top))",
+  );
 
   /* ROTATION ENGINE */
 
@@ -521,6 +614,77 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
 
     return () => controlsRef.current?.stop();
   }, [rotation]);
+
+  const pauseRotation = useCallback(() => {
+    controlsRef.current?.stop();
+  }, []);
+
+  const resumeRotation = useCallback(() => {
+    const current = rotation.get();
+
+    controlsRef.current = animate(rotation, current + 360, {
+      duration: 36,
+      ease: "linear",
+      repeat: Infinity,
+    });
+  }, [rotation]);
+
+  /* RESPONSIVE ORBIT */
+
+  useEffect(() => {
+    const updateOrbit = () => {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      const navbarHeight = 80;
+      const verticalPadding = navbarHeight + 40;
+
+      let size = 0;
+      let offset = 0;
+
+      if (width < 380) {
+        size = width * 0.65;
+        offset = -30;
+      } else if (width >= 540 && width < 768) {
+        size = width * 0.65;
+        offset = -50;
+      } else if (width < 768) {
+        size = Math.min(width * 0.75, height - verticalPadding);
+      } else if (width < 1280) {
+        size = Math.min(width * 0.46, height - verticalPadding);
+      } else {
+        size = Math.min(width * 0.28, height - verticalPadding);
+      }
+
+      setOrbitSize(Math.max(size, 220));
+      setOrbitalOffset(offset);
+    };
+
+    const updatePadding = () => {
+      const width = window.innerWidth;
+
+      if (width < 380) setPaddingTop("calc(128px + env(safe-area-inset-top))");
+      else if (width >= 540 && width < 768)
+        setPaddingTop("calc(129px + env(safe-area-inset-top))");
+      else if (width >= 1280) setPaddingTop("120px");
+      else setPaddingTop("calc(80px + env(safe-area-inset-top))");
+    };
+
+    updateOrbit();
+    updatePadding();
+
+    window.addEventListener("resize", updateOrbit);
+    window.addEventListener("resize", updatePadding);
+
+    return () => {
+      window.removeEventListener("resize", updateOrbit);
+      window.removeEventListener("resize", updatePadding);
+    };
+  }, []);
+
+  const logoSize = orbitSize * 0.14;
+  const coreSize = orbitSize * 0.65;
+  const radius = orbitSize / 2 - logoSize / 2;
 
   return (
     <motion.section
@@ -609,62 +773,201 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
           </div>
         </motion.div>
 
-        {/* RIGHT SIDE – PREMIUM MOBILE APP VISUAL */}
+        {/* RIGHT ORBIT */}
 
         <div className="w-full md:w-1/2 flex items-center justify-center mt-8 md:mt-0">
-          <div className="relative flex items-center justify-center">
-            {/* 🌊 Ambient Gradient Glow */}
-            <div className="absolute w-[85%] h-[85%] rounded-full bg-gradient-to-r from-blue-400/30 via-indigo-300/20 to-amber-400/20 blur-3xl animate-pulse" />
-
-            {/* 📱 Floating Device Mockup */}
+          <div
+            className="relative flex items-center justify-center isolate gpu-layer"
+            style={{
+              width: orbitSize,
+              height: orbitSize,
+              transform: `translate3d(0, ${orbitalOffset}px, 0)`,
+            }}
+          >
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="relative z-10"
+              animate={{ scale: [1, 1.04, 1] }}
+              transition={{ duration: 6, repeat: Infinity }}
+              className="absolute rounded-full gpu-layer"
+              style={{
+                width: coreSize,
+                height: coreSize,
+                background:
+                  "radial-gradient(circle at center, rgba(255,215,0,0.9) 0%, rgba(212,175,55,0.8) 40%, rgba(25,32,72,0.4) 75%, rgba(10,15,40,0.2) 100%)",
+                boxShadow:
+                  "0 0 60px rgba(255,215,0,0.6), 0 0 120px rgba(212,175,55,0.4)",
+              }}
+            />
+
+            <motion.div
+              animate={{ scale: [1, 1.02, 1] }}
+              transition={{ duration: 8, repeat: Infinity }}
+              className="absolute rounded-full border border-yellow-400 gpu-layer"
+              style={{
+                width: orbitSize,
+                height: orbitSize,
+                boxShadow:
+                  "0 0 30px rgba(255,215,0,0.6), 0 0 80px rgba(212,175,55,0.4)",
+              }}
+            />
+
+            <motion.div
+              className="absolute z-30 gpu-layer"
+              style={{ rotate: rotation }}
             >
-              <motion.div
-                animate={{ y: [0, -14, 0] }}
-                transition={{
-                  duration: 6,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="relative will-change-transform"
-              >
-                <Image
-                  src="/iOS-and-Android-development2.png"
-                  alt="Mobile App Development"
-                  width={500}
-                  height={500}
-                  className="w-[260px] sm:w-[320px] md:w-[380px] lg:w-[420px] h-auto drop-shadow-[0_25px_60px_rgba(0,0,0,0.35)]"
-                  priority
-                />
+              {logos.map((logo, index) => {
+                const angle = (360 / logos.length) * index;
 
-                {/* ✨ Glass Reflection */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-white/10 via-transparent to-transparent pointer-events-none" />
-
-                {/* ⚡ Shimmer Sweep */}
-                <div className="absolute inset-0 overflow-hidden rounded-2xl">
-                  <div className="absolute w-[200%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shimmer_5s_linear_infinite]" />
-                </div>
-              </motion.div>
+                return (
+                  <OrbitLogo
+                    key={logo.name}
+                    index={index}
+                    logo={logo.src}
+                    name={logo.name}
+                    description={logo.description}
+                    link={logo.link}
+                    angle={angle}
+                    radius={radius}
+                    rotation={rotation}
+                    logoSize={logoSize}
+                    pause={pauseRotation}
+                    resume={resumeRotation}
+                  />
+                );
+              })}
             </motion.div>
 
-            {/* 🔄 Subtle Rotating Halo */}
             <motion.div
-              animate={{ rotate: 360 }}
-              transition={{
-                duration: 60,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-              className="absolute w-[90%] h-[90%] rounded-full border border-blue-300/20"
-            />
+              animate={{ y: [0, -8, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              className="relative z-20 gpu-layer"
+            >
+              <Image
+                src="/iOS-and-Android-development.png"
+                alt="Mobile App Development"
+                width={400}
+                height={400}
+                style={{ width: coreSize * 0.9, height: "auto" }}
+              />
+            </motion.div>
           </div>
         </div>
       </div>
     </motion.section>
+  );
+}
+
+/* ================= ORBIT LOGO ================= */
+
+function OrbitLogo({
+  logo,
+  name,
+  description,
+  link,
+  angle,
+  radius,
+  rotation,
+  logoSize,
+  pause,
+  resume,
+}: OrbitLogoProps) {
+  const rotateDeg = useTransform(rotation, (r) => `${-(r + angle)}deg`);
+  const ref = useRef<HTMLDivElement | null>(null);
+
+  const [hoverLogo, setHoverLogo] = useState(false);
+  const [hoverPopup, setHoverPopup] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+
+  const active = hoverLogo || hoverPopup;
+
+  useLayoutEffect(() => {
+    if (!active || !ref.current) return;
+
+    const rect = ref.current.getBoundingClientRect();
+
+    const popupWidth = 260;
+    const popupHeight = 140;
+    const padding = 12;
+
+    let top = rect.top - popupHeight - 12;
+    if (top < padding) top = rect.bottom + 12;
+
+    let left = rect.left + rect.width / 2 - popupWidth / 2;
+    left = Math.max(
+      padding,
+      Math.min(left, window.innerWidth - popupWidth - padding),
+    );
+
+    setPosition({ top, left });
+  }, [active, logoSize]);
+
+  useEffect(() => {
+    if (active) pause();
+    else resume();
+  }, [active, pause, resume]);
+
+  return (
+    <>
+      <div
+        className="absolute top-1/2 left-1/2 gpu-layer"
+        style={{
+          transform: `rotate(${angle}deg) translate(${radius}px)`,
+        }}
+      >
+        <motion.div
+          ref={ref}
+          style={{
+            rotate: rotateDeg,
+            width: logoSize,
+            height: logoSize,
+            transform: "translate(-50%, -50%)",
+          }}
+          className="relative flex items-center justify-center rounded-full bg-white/80 backdrop-blur-md border border-white/40 shadow-lg cursor-pointer gpu-layer"
+          onMouseEnter={() => setHoverLogo(true)}
+          onMouseLeave={() => setHoverLogo(false)}
+          whileHover={{ scale: 1.15 }}
+        >
+          <Image
+            src={logo}
+            alt={name}
+            width={60}
+            height={60}
+            style={{ width: logoSize * 0.6, height: logoSize * 0.6 }}
+          />
+        </motion.div>
+      </div>
+
+      {active &&
+        createPortal(
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, y: 15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            style={{
+              position: "fixed",
+              top: position.top,
+              left: position.left,
+              width: 260,
+              zIndex: 1000,
+            }}
+            onMouseEnter={() => setHoverPopup(true)}
+            onMouseLeave={() => setHoverPopup(false)}
+          >
+            <div className="rounded-2xl bg-gradient-to-br from-blue-950 via-indigo-900 to-amber-600 text-white p-5 shadow-2xl border border-white/20 backdrop-blur-xl">
+              <p className="text-sm font-semibold mb-2">{name}</p>
+              <p className="text-xs text-white/80 leading-relaxed mb-4">
+                {description}
+              </p>
+
+              <Link
+                href={link}
+                className="text-xs font-semibold text-amber-300 hover:text-white transition-colors duration-300"
+              >
+                Read More →
+              </Link>
+            </div>
+          </motion.div>,
+          document.body,
+        )}
+    </>
   );
 }
