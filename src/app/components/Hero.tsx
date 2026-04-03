@@ -15,6 +15,7 @@ type HeroProps = Record<string, unknown>;
 export default function Hero({}: HeroProps) {
   /* ---------------- HYDRATION SAFETY ---------------- */
   const [mounted, setMounted] = useState(false);
+  const [direction, setDirection] = useState(1); // 1 = next, -1 = prev
 
   useEffect(() => {
     setMounted(true);
@@ -56,10 +57,20 @@ export default function Hero({}: HeroProps) {
     return () => clearInterval(interval);
   }, [isPaused, slides.length]);
 
-  const prevSlide = () =>
-    setIndex((prev) => (prev - 1 + slides.length) % slides.length);
+  // const prevSlide = () =>
+  //   setIndex((prev) => (prev - 1 + slides.length) % slides.length);
 
-  const nextSlide = () => setIndex((prev) => (prev + 1) % slides.length);
+  // const nextSlide = () => setIndex((prev) => (prev + 1) % slides.length);
+
+  const nextSlide = () => {
+    setDirection(1);
+    setIndex((prev) => (prev + 1) % slides.length);
+  };
+
+  const prevSlide = () => {
+    setDirection(-1);
+    setIndex((prev) => (prev - 1 + slides.length) % slides.length);
+  };
 
   /* ------------ PREVENT HYDRATION MISMATCH ----------- */
   if (!mounted) {
@@ -73,55 +84,74 @@ export default function Hero({}: HeroProps) {
     <section className="relative w-full h-screen md:h-[75vh] lg:h-screen overflow-hidden">
       <div className="absolute inset-0 -z-10" />
 
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" custom={direction}>
         <motion.div
           key={index}
-          initial={{
-            scale: 0.92,
-            opacity: 0,
-            clipPath: "circle(0% at 50% 50%)",
+          custom={direction}
+          variants={{
+            initial: (dir: number) => ({
+              x: dir > 0 ? "100%" : "-100%",
+              scale: 0.9,
+              opacity: 0,
+              rotateY: dir > 0 ? 25 : -25,
+              filter: "blur(20px)",
+            }),
+            animate: {
+              x: "0%",
+              scale: 1,
+              opacity: 1,
+              rotateY: 0,
+              filter: "blur(0px)",
+              transition: {
+                duration: 1.2,
+                ease: [0.22, 1, 0.36, 1], // cinematic ease
+              },
+            },
+            exit: (dir: number) => ({
+              x: dir > 0 ? "-60%" : "60%",
+              scale: 0.95,
+              opacity: 0,
+              rotateY: dir > 0 ? -15 : 15,
+              filter: "blur(10px)",
+              transition: {
+                duration: 1,
+                ease: [0.4, 0, 0.2, 1],
+              },
+            }),
           }}
-          animate={{
-            scale: 1,
-            opacity: 1,
-            clipPath: "circle(160% at 50% 50%)",
-          }}
-          exit={{ opacity: 0, scale: 0.96 }}
-          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+          initial="initial"
+          animate="animate"
+          exit="exit"
           className="absolute inset-0"
+          style={{
+            perspective: "1200px",
+            transformStyle: "preserve-3d",
+          }}
         >
           {slides[index]}
 
-          {/* GOLDEN CINEMATIC BURST */}
+          {/* LIGHT SWEEP */}
           <motion.div
-            initial={{ opacity: 0.9, scale: 0.4 }}
-            animate={{ opacity: 0, scale: 2.4 }}
-            transition={{ duration: 1.3, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ x: "-100%", opacity: 0.4 }}
+            animate={{ x: "100%", opacity: 0 }}
+            transition={{ duration: 1.2, ease: "easeInOut" }}
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: `
-                radial-gradient(circle at center,
-                  rgba(212,175,55,0.6) 0%,
-                  rgba(245,215,110,0.45) 15%,
-                  rgba(212,175,55,0.25) 35%,
-                  rgba(212,175,55,0.1) 50%,
-                  transparent 75%)`,
-              filter: "blur(70px)",
+              background:
+                "linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.25), transparent 70%)",
+              mixBlendMode: "overlay",
             }}
           />
 
-          {/* SUBTLE GOLD EDGE VIGNETTE */}
+          {/* DEPTH SHADOW */}
           <motion.div
-            initial={{ opacity: 0.8 }}
+            initial={{ opacity: 0.5 }}
             animate={{ opacity: 0 }}
-            transition={{ duration: 1.2 }}
+            transition={{ duration: 1 }}
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: `
-                radial-gradient(circle at center,
-                  transparent 60%,
-                  rgba(212,175,55,0.15) 85%,
-                  rgba(0,0,0,0.4) 100%)`,
+              background:
+                "radial-gradient(circle at center, rgba(0,0,0,0.5), transparent 70%)",
             }}
           />
         </motion.div>
