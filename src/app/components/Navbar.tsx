@@ -587,7 +587,7 @@ export default function Navbar({ hide = false }: { hide?: boolean }) {
             exit={{ opacity: 0, y: 50, scale: 0.8 }}
             transition={{ type: "spring", stiffness: 120, damping: 15 }}
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="fixed bottom-8 right-8 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-blue-950 via-amber-700 to-yellow-500 text-white shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-[999]"
+            className="cursor-pointer fixed bottom-16 right-8 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-[#d4af37] via-[#f5d76e] to-amber-400/70 text-white shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-[999]"
           >
             ↑
           </motion.button>

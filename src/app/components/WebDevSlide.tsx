@@ -533,8 +533,6 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
       whileInView={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
       viewport={{ once: true }}
-      onMouseEnter={() => setHeroPaused(true)}
-      onMouseLeave={() => setHeroPaused(false)}
       className="relative w-full min-h-screen bg-gradient-to-b from-white to-blue-50 text-blue-950 flex flex-col md:flex-row justify-center items-center overflow-visible pb-12"
       style={{ paddingTop }}
     >
@@ -590,6 +588,8 @@ export default function WebDevSlide({ setHeroPaused }: SlideProps) {
                   variants={fadeUp(0.5)}
                   whileHover={{ scale: 1.02, y: -2 }}
                   className="group relative py-2 px-4 rounded-r-2xl bg-white/60 backdrop-blur-md border border-blue-100 hover:border-[#d4af37]/70 transition-all duration-300 hover:shadow-[0_6px_18px_rgba(212,175,55,0.18)] cursor-pointer max-w-max"
+                  onMouseEnter={() => setHeroPaused(true)}
+                  onMouseLeave={() => setHeroPaused(false)}
                 >
                   <Link href={`/services#${service.id}`}>
                     <div className="absolute left-0 top-0 h-full w-[2px] bg-gradient-to-b from-[#d4af37] to-[#f5d76e] rounded-l-lg opacity-80" />

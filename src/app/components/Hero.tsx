@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo, Dispatch, SetStateAction } from "react";
+import {
+  useState,
+  useEffect,
+  useMemo,
+  Dispatch,
+  SetStateAction,
+  useRef,
+} from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import React from "react";
 
@@ -15,6 +22,7 @@ type HeroProps = Record<string, unknown>;
 export default function Hero({}: HeroProps) {
   /* ---------------- HYDRATION SAFETY ---------------- */
   const [mounted, setMounted] = useState(false);
+
   const [direction, setDirection] = useState(1); // 1 = next, -1 = prev
 
   useEffect(() => {
@@ -48,26 +56,51 @@ export default function Hero({}: HeroProps) {
     [],
   );
 
-  // Auto-rotation every 10s
+  // Auto-rotation every 5s
+  // useEffect(() => {
+  //   if (isPaused) return;
+  //   const interval = setInterval(() => {
+  //     setIndex((prev) => (prev + 1) % slides.length);
+  //   }, 5000);
+  //   return () => clearInterval(interval);
+  // }, [isPaused, slides.length]);
+
   useEffect(() => {
     if (isPaused) return;
-    const interval = setInterval(() => {
+
+    intervalRef.current = setInterval(() => {
+      setDirection(1);
       setIndex((prev) => (prev + 1) % slides.length);
-    }, 5000);
-    return () => clearInterval(interval);
+    }, 6000);
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, [isPaused, slides.length]);
+
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // const prevSlide = () =>
   //   setIndex((prev) => (prev - 1 + slides.length) % slides.length);
 
   // const nextSlide = () => setIndex((prev) => (prev + 1) % slides.length);
 
+  const resetInterval = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+  };
+
   const nextSlide = () => {
+    resetInterval(); // 🔥 stop current autoplay
     setDirection(1);
     setIndex((prev) => (prev + 1) % slides.length);
   };
 
   const prevSlide = () => {
+    resetInterval(); // 🔥 stop current autoplay
     setDirection(-1);
     setIndex((prev) => (prev - 1 + slides.length) % slides.length);
   };
@@ -175,6 +208,8 @@ export default function Hero({}: HeroProps) {
       {/* LEFT ARROW */}
       <button
         onClick={prevSlide}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
         className="flex md:hidden lg:flex absolute top-1/2 left-3 -translate-y-1/2 z-50 
   w-6 h-6 lg:w-12 lg:h-12 
   rounded-full bg-gradient-to-br from-[#d4af37]/80 to-[#f5d76e]/70 shadow-lg 
@@ -200,6 +235,8 @@ export default function Hero({}: HeroProps) {
       {/* RIGHT ARROW */}
       <button
         onClick={nextSlide}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
         className="flex md:hidden lg:flex absolute top-1/2 right-3 -translate-y-1/2 z-50 
   w-6 h-6 lg:w-12 lg:h-12 
   rounded-full bg-gradient-to-br from-[#d4af37]/80 to-[#f5d76e]/70 shadow-lg 
