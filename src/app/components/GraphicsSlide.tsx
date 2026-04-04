@@ -537,30 +537,30 @@ type OrbitLogoProps = {
 /* ================= DATA ================= */
 
 const logos: LogoItem[] = [
-  {
-    src: "/logo1.png",
-    name: "Adobe Illustrator",
-    description: "Vector graphics & illustration.",
-    link: "/services#logo-design",
-  },
-  {
-    src: "/logo2.png",
-    name: "Adobe Photoshop",
-    description: "Raster image editing & design.",
-    link: "/services#logo-design",
-  },
-  {
-    src: "/logo3.png",
-    name: "Figma",
-    description: "UI/UX prototyping and design.",
-    link: "/services#brand-guidelines",
-  },
-  {
-    src: "/logo4.png",
-    name: "Canva",
-    description: "Quick graphics creation.",
-    link: "/services#marketing-design",
-  },
+  // {
+  //   src: "/logo1.png",
+  //   name: "Adobe Illustrator",
+  //   description: "Vector graphics & illustration.",
+  //   link: "/services#logo-design",
+  // },
+  // {
+  //   src: "/logo2.png",
+  //   name: "Adobe Photoshop",
+  //   description: "Raster image editing & design.",
+  //   link: "/services#logo-design",
+  // },
+  // {
+  //   src: "/logo3.png",
+  //   name: "Figma",
+  //   description: "UI/UX prototyping and design.",
+  //   link: "/services#brand-guidelines",
+  // },
+  // {
+  //   src: "/logo4.png",
+  //   name: "Canva",
+  //   description: "Quick graphics creation.",
+  //   link: "/services#marketing-design",
+  // },
   {
     src: "/logo5.png",
     name: "After Effects",

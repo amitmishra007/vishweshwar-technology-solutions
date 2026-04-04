@@ -491,6 +491,7 @@ import {
   animate,
   MotionValue,
 } from "framer-motion";
+import AndroidModel from "./AndroidModel";
 import {
   useEffect,
   useState,
@@ -564,24 +565,24 @@ const logos: LogoItem[] = [
     description: "Realtime backend services.",
     link: "/services#firebase",
   },
-  {
-    src: "/logo6.png",
-    name: "Expo",
-    description: "React Native toolchain.",
-    link: "/services#expo",
-  },
-  {
-    src: "/logo7.png",
-    name: "AWS Amplify",
-    description: "Cloud backend deployment.",
-    link: "/services#aws-amplify",
-  },
-  {
-    src: "/logo8.png",
-    name: "App Stores",
-    description: "Publishing & distribution.",
-    link: "/services#app-distribution",
-  },
+  // {
+  //   src: "/logo6.png",
+  //   name: "Expo",
+  //   description: "React Native toolchain.",
+  //   link: "/services#expo",
+  // },
+  // {
+  //   src: "/logo7.png",
+  //   name: "AWS Amplify",
+  //   description: "Cloud backend deployment.",
+  //   link: "/services#aws-amplify",
+  // },
+  // {
+  //   src: "/logo8.png",
+  //   name: "App Stores",
+  //   description: "Publishing & distribution.",
+  //   link: "/services#app-distribution",
+  // },
 ];
 
 const services = [
@@ -839,15 +840,20 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
             <motion.div
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className="relative z-20 gpu-layer"
+              className="relative z-20 gpu-layer flex items-center justify-center"
             >
-              <Image
-                src="/iOS-and-Android-development.png"
-                alt="Mobile App Development"
-                width={400}
-                height={400}
-                style={{ width: coreSize * 0.9, height: "auto" }}
-              />
+              <div
+                className="backdrop-blur-xl -[0.3px] border-white/60 shadow-[0_10px_40px_rgba(0,0,0,0.12)] flex items-center justify-center"
+                style={{
+                  width: coreSize * 0.95,
+                  height: coreSize * 0.95,
+                  borderRadius: "50%",
+                }}
+              >
+                <div className="w-full h-full flex items-center justify-center">
+                  <AndroidModel />
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
