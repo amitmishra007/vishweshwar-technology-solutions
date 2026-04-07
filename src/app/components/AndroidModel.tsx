@@ -10,7 +10,6 @@ function Android() {
   const { scene } = useGLTF("/models/AndroidRobot.glb");
   const ref = useRef<THREE.Group>(null);
 
-  // ✅ center ONCE (optimized)
   const centeredScene = useMemo(() => {
     const cloned = scene.clone();
     const box = new THREE.Box3().setFromObject(cloned);
@@ -23,19 +22,26 @@ function Android() {
     if (!ref.current) return;
 
     const t = state.clock.elapsedTime;
-    ref.current.rotation.y += 0.008;
-    ref.current.position.y = -0.45 + Math.sin(t * 1.4) * 0.08;
 
-    // subtle depth breathing
-    ref.current.position.z = Math.sin(t * 0.6) * 0.05;
+    // rotation
+    ref.current.rotation.y += 0.008;
+
+    // floating (clean, no bias)
+    ref.current.position.y = Math.sin(t * 1.4) * 0.08;
+
+    // depth breathing
+    ref.current.position.z = Math.sin(t * 0.6) * 0.08;
+
+    // subtle scale pulse (cinematic life)
+    const scalePulse = 1 + Math.sin(t * 1.2) * 0.025;
+    ref.current.scale.setScalar(9.2 * scalePulse);
   });
 
   return (
     <primitive
       ref={ref}
       object={centeredScene}
-      scale={9.2} // 👈 increased from 8.2
-      position={[-1.1, -0.25, 0]} // 👈 closer + pushed down
+      position={[-1.25, 0, 0]} // ✅ more spacing
     />
   );
 }
@@ -60,17 +66,19 @@ function Apple() {
 
     ref.current.rotation.y -= 0.008;
 
-    ref.current.position.y = -0.45 + Math.sin(t * 0.9 + Math.PI) * 0.06;
+    ref.current.position.y = Math.sin(t * 0.9 + Math.PI) * 0.06;
 
-    ref.current.position.z = Math.cos(t * 0.5) * 0.05;
+    ref.current.position.z = Math.cos(t * 0.5) * 0.08;
+
+    const scalePulse = 1 + Math.sin(t * 1.1 + Math.PI) * 0.02;
+    ref.current.scale.setScalar(6.2 * scalePulse);
   });
 
   return (
     <primitive
       ref={ref}
       object={centeredScene}
-      scale={6.2} // 👈 increased from 5.5
-      position={[1.1, -0.25, 0]} // 👈 closer + pushed down
+      position={[1.25, 0, 0]} // ✅ symmetric spacing
     />
   );
 }
@@ -88,22 +96,30 @@ function Loader() {
 export default function AndroidModel() {
   return (
     <Canvas
-      camera={{ position: [0, 0.4, 5.5], fov: 45 }} // 👈 was 0 → now 0.4
+      camera={{ position: [0, 0.15, 5.5], fov: 45 }} // ✅ FIXED CAMERA
       dpr={[1, 2]}
     >
-      {/* 🌤️ Base lighting */}
-      <ambientLight intensity={1.1} />
-      {/* 🎯 Key lights (cinematic separation) */}
-      <pointLight position={[-2, 2, 2]} intensity={2} color="#34d399" />{" "}
-      {/* Android tint */}
-      <pointLight position={[2, 2, 2]} intensity={2} color="#ffffff" />{" "}
-      {/* Apple clean */}
-      {/* ✨ subtle rim light */}
-      <pointLight position={[0, -3, -2]} intensity={1.2} color="#d4af37" />
+      {/* 🌫️ Cinematic atmosphere */}
+      <fog attach="fog" args={["#0b0f19", 6, 11]} />
+
+      {/* 🌤️ Base light */}
+      <ambientLight intensity={1.0} />
+
+      {/* 🎯 Key lights */}
+      <pointLight position={[-2, 2, 2]} intensity={2.2} color="#34d399" />
+      <pointLight position={[2, 2, 2]} intensity={2.2} color="#ffffff" />
+
+      {/* ✨ Rim light */}
+      <pointLight position={[0, -3, -2]} intensity={1.5} color="#d4af37" />
+
+      {/* 🌌 Global alignment group */}
       <Suspense fallback={<Loader />}>
-        <Android />
-        <Apple />
+        <group position={[0, -0.15, 0]}>
+          <Android />
+          <Apple />
+        </group>
       </Suspense>
+
       <OrbitControls
         enableZoom={false}
         enablePan={false}
