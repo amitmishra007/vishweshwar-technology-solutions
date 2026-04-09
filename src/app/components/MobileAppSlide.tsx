@@ -565,24 +565,24 @@ const logos: LogoItem[] = [
     description: "Realtime backend services.",
     link: "/services#firebase",
   },
-  // {
-  //   src: "/logo6.png",
-  //   name: "Expo",
-  //   description: "React Native toolchain.",
-  //   link: "/services#expo",
-  // },
-  // {
-  //   src: "/logo7.png",
-  //   name: "AWS Amplify",
-  //   description: "Cloud backend deployment.",
-  //   link: "/services#aws-amplify",
-  // },
-  // {
-  //   src: "/logo8.png",
-  //   name: "App Stores",
-  //   description: "Publishing & distribution.",
-  //   link: "/services#app-distribution",
-  // },
+  {
+    src: "/logo6.png",
+    name: "Expo",
+    description: "React Native toolchain.",
+    link: "/services#expo",
+  },
+  {
+    src: "/logo7.png",
+    name: "AWS Amplify",
+    description: "Cloud backend deployment.",
+    link: "/services#aws-amplify",
+  },
+  {
+    src: "/logo8.png",
+    name: "App Stores",
+    description: "Publishing & distribution.",
+    link: "/services#app-distribution",
+  },
 ];
 
 const services = [
@@ -843,11 +843,36 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
               className="relative z-20 gpu-layer flex items-center justify-center"
             >
               <div
-                className="backdrop-blur-xl -[0.3px] border-white/60 shadow-[0_10px_40px_rgba(0,0,0,0.12)] flex items-center justify-center"
+                className="relative flex items-center justify-center gpu-layer"
                 style={{
                   width: coreSize * 0.95,
                   height: coreSize * 0.95,
                   borderRadius: "50%",
+
+                  /* 🔥 AMBER → MAROON CORE */
+                  background: `
+      radial-gradient(
+        circle at 35% 30%,
+        rgba(255, 215, 0, 0.85) 0%,
+        rgba(212, 175, 55, 0.75) 25%,
+        rgba(128, 0, 32, 0.55) 55%,
+        rgba(40, 0, 10, 0.65) 80%,
+        rgba(10, 0, 5, 0.85) 100%
+      )
+    `,
+
+                  /* ✨ CINEMATIC GLOW */
+                  boxShadow: `
+      inset 0 0 60px rgba(255, 215, 0, 0.35),
+      inset 0 0 120px rgba(128, 0, 32, 0.35),
+      0 0 40px rgba(212, 175, 55, 0.35),
+      0 0 90px rgba(128, 0, 32, 0.25)
+    `,
+
+                  /* 💎 GLASS EDGE */
+                  border: "1px solid rgba(255, 215, 0, 0.25)",
+
+                  backdropFilter: "blur(18px) saturate(140%)",
                 }}
               >
                 <div className="w-full h-full flex items-center justify-center">
