@@ -536,16 +536,16 @@ type OrbitLogoProps = {
 
 const logos: LogoItem[] = [
   {
-    src: "/logo1.png",
-    name: "React Native",
+    src: "/google-playstore-for-android-logo-vishweshwar-industries-bhiwadi.png",
+    name: "playstore logo",
     description: "Cross-platform mobile apps.",
     link: "/services#react-native",
   },
   {
-    src: "/logo2.png",
-    name: "Flutter",
-    description: "Google UI toolkit.",
-    link: "/services#flutter",
+    src: "/apple-store-for-ios-devices-logo-vishweshwar-industries-bhiwadi.png",
+    name: "Apple Store Deployment",
+    description: "ios UI toolkit.",
+    link: "/services#apple-store",
   },
   {
     src: "/logo3.png",
@@ -554,33 +554,38 @@ const logos: LogoItem[] = [
     link: "/services#swift",
   },
   {
-    src: "/logo4.png",
+    src: "/kotlin-for-android-application-development-logo-vishweshwar-industries-bhiwadi.png",
     name: "Kotlin",
-    description: "Native Android development.",
+    description:
+      "Kotlin is a modern, statically typed, cross-platform programming language developed by JetBrains and officially supported by Google for Android development. It is designed to be concise, safe, and fully interoperable with Java, enabling developers to build powerful and scalable applications with reduced boilerplate code. Kotlin is primarily used for native Android app development, leveraging the Android SDK and modern frameworks like Jetpack to create high-performance, responsive, and feature-rich mobile experiences. Kotlin supports multiple platforms, including Android, backend, web, and even iOS through Kotlin Multiplatform, allowing teams to share business logic across platforms while maintaining native performance. Its expressive syntax, null-safety features, and coroutine-based asynchronous programming model make development faster, more efficient, and less error-prone. With strong tooling support in Android Studio, Kotlin enhances developer productivity through intelligent code suggestions, seamless debugging, and robust testing capabilities. Integrated CI/CD pipelines, combined with modern DevOps practices, enable streamlined testing, deployment, and continuous delivery to platforms like the Google Play Store and Apple App Store (via multiplatform approaches). Kotlin also prioritizes security and reliability, offering features that minimize runtime crashes and protect sensitive data, making it an ideal choice for enterprise-grade mobile applications that demand performance, scalability, and long-term maintainability.",
     link: "/services#kotlin",
   },
   {
-    src: "/logo5.png",
-    name: "Firebase",
-    description: "Realtime backend services.",
+    src: "/flutter-for-android-application-and-ios-development-logo-vishweshwar-industries-bhiwadi.png",
+    name: "Flutter",
+    description:
+      "Flutter is an open source, cross-platform software development kit (SDK) developed by Google. It extends a wide range of plugins backed by Google and allows mobile apps to be built for both Android and Apple iOS platforms. A trending mobile application development framework, Flutter allows you to build, test, and deploy natively-compiled stunning mobile apps for any screen (mobile, desktop, web) from a single code base. It uses “Dart” as a programming language instead of JavaScript which facilitates rapid and effective analysis, fabricates UIs, includes highlights, and fixes bugs in milliseconds. Flutter is a unique mobile app development toolkit that doesn’t rely on the web browser technology and the widgets shipped with each device. Flutter uses its own high-performance engine to customize widgets. ",
     link: "/services#firebase",
   },
   {
-    src: "/logo6.png",
-    name: "Expo",
-    description: "React Native toolchain.",
+    src: "/react-native-for-android-application-development-logo-vishweshwar-industries-bhiwadi.png",
+    name: "React Native",
+    description:
+      "This JavaScript open-source framework is one of the most preferred native mobile app development technologies in recent times. React Native offers ample support to IDEs and other  tools to support the development of native apps for iOS and Android platforms. ReactNative allows native mobile apps to be built with JavaScript, using the same design as React. Native apps built using this framework are truly native, that cannot be distinguished from an app built using Objective-C or Java or Swift. React Native can be used to upgrade your existing iOS and Android apps as well as to create whole new native mobile apps from scratch. Developers can use React Native to share code across multiple platforms from a single code base. This can be done by creating platform-specific versions of the code components. ",
     link: "/services#expo",
   },
   {
-    src: "/logo7.png",
-    name: "AWS Amplify",
-    description: "Cloud backend deployment.",
+    src: "/ionic-for-android-application-and-ios-development-logo-vishweshwar-industries-bhiwadi.png",
+    name: "Ionic",
+    description:
+      "Ionic is a modern, cross-platform, open-source SDK for iOS and Android apps. It uses the standard web technologies – HTML5, CSS3, and JavaScript to build powerful apps for multiple platforms and supports creating their UI functionalities with ease, all from a single code base. Ionic mobile app development technology works on iOS’s UIWebView or Android’s WebView. Ionic is built on top of Angular JS and Apache Cordova, offering developers the easiest way to build, grow, and scale cross-platform mobile apps. Built-in CI/CD tools for testing and deployment automates app delivery by helping organizations publish their apps directly to the Google and Apple App Stores. Ionic’s cloud security safeguards and best-in-class mobile security solutions protect sensitive data.",
     link: "/services#aws-amplify",
   },
   {
-    src: "/logo8.png",
-    name: "App Stores",
-    description: "Publishing & distribution.",
+    src: "/xamarin-for-android-application-and-ios-development-logo-vishweshwar-industries-bhiwadi.png",
+    name: "Xamarin",
+    description:
+      "Xamarin is a free and open-source, cross-platform app building platform for creating iOS and Android apps using .NET and C#. With the benefits of code sharing and extending access to native APIs, Xamarin builds applications that render exact native app experience. It is one of the most time and cost saving frameworks for mobile app development. Xamarin allows you to deliver native Android, iOS, and Windows apps with a single shared .NET code base. The framework offers access to the full spectrum of functionality exposed by the underlying platform and device, including platform-specific capabilities. Xamarin’s seamless integration with Azure Cloud Platform offers your mobile app a scalable, efficient, and versatile back-end, with storage, database, and intelligent services.",
     link: "/services#app-distribution",
   },
 ];

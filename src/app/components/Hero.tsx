@@ -206,19 +206,46 @@ export default function Hero({}: HeroProps) {
       </div>
 
       {/* LEFT ARROW */}
-      <button
+      <motion.button
         onClick={prevSlide}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
-        className="flex md:hidden lg:flex absolute top-1/2 left-3 -translate-y-1/2 z-50 
-  w-6 h-6 lg:w-12 lg:h-12 
-  rounded-full bg-gradient-to-br from-[#d4af37]/80 to-[#f5d76e]/70 shadow-lg 
-  items-center justify-center hover:scale-105 transition-transform cursor-pointer"
-        aria-label="Previous Slide"
+        whileHover={{ scale: 1.08, rotateX: 8, rotateY: -8 }}
+        whileTap={{ scale: 0.95 }}
+        transition={{ type: "spring", stiffness: 200, damping: 14 }}
+        className="
+    group flex md:hidden lg:flex
+    absolute top-1/2 left-3 -translate-y-1/2 z-50
+
+    w-8 h-8 lg:w-12 lg:h-12
+    rounded-full overflow-hidden
+
+    items-center justify-center
+    cursor-pointer
+
+    border border-white/20
+    backdrop-blur-[6px]
+
+    shadow-[inset_0_2px_4px_rgba(255,255,255,0.25),_0_6px_12px_rgba(0,0,0,0.25)]
+  "
       >
+        {/* 🎨 GRADIENT CORE */}
+        <span className="absolute inset-0 rounded-full overflow-hidden">
+          <span className="absolute inset-0 bg-gradient-to-r from-blue-950 via-amber-700 to-yellow-500 animate-gradientMove" />
+          <span className="absolute inset-0 bg-gradient-to-r from-yellow-500 via-amber-700 to-blue-950 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+        </span>
+
+        {/* ✨ SHINE SWEEP */}
+        <span className="absolute inset-0 overflow-hidden rounded-full">
+          <span className="absolute top-0 left-[-75%] w-1/2 h-full bg-white/20 skew-x-[-25deg] group-hover:left-[130%] transition-all duration-[1000ms]" />
+        </span>
+
+        {/* 🔥 GLOW */}
+        <span className="absolute inset-0 rounded-full bg-amber-400/20 blur-xl opacity-60 group-hover:opacity-100 transition" />
+
+        {/* ⬅ ICON */}
         <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-3 w-3 lg:h-6 lg:w-6 text-white"
+          className="relative z-10 h-4 w-4 lg:h-6 lg:w-6 text-white"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -230,22 +257,51 @@ export default function Hero({}: HeroProps) {
             d="M15 19l-7-7 7-7"
           />
         </svg>
-      </button>
 
+        {/* 💎 GLASS OVERLAY */}
+        <div className="absolute inset-0 rounded-full bg-white/5 backdrop-blur-md border border-white/20" />
+      </motion.button>
       {/* RIGHT ARROW */}
-      <button
+      <motion.button
         onClick={nextSlide}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
-        className="flex md:hidden lg:flex absolute top-1/2 right-3 -translate-y-1/2 z-50 
-  w-6 h-6 lg:w-12 lg:h-12 
-  rounded-full bg-gradient-to-br from-[#d4af37]/80 to-[#f5d76e]/70 shadow-lg 
-  items-center justify-center hover:scale-105 transition-transform cursor-pointer"
-        aria-label="Next Slide"
+        whileHover={{ scale: 1.08, rotateX: 8, rotateY: 8 }}
+        whileTap={{ scale: 0.95 }}
+        transition={{ type: "spring", stiffness: 200, damping: 14 }}
+        className="
+    group flex md:hidden lg:flex
+    absolute top-1/2 right-3 -translate-y-1/2 z-50
+
+    w-8 h-8 lg:w-12 lg:h-12
+    rounded-full overflow-hidden
+
+    items-center justify-center
+    cursor-pointer
+
+    border border-white/20
+    backdrop-blur-[6px]
+
+    shadow-[inset_0_2px_4px_rgba(255,255,255,0.25),_0_6px_12px_rgba(0,0,0,0.25)]
+  "
       >
+        {/* 🎨 GRADIENT CORE */}
+        <span className="absolute inset-0 rounded-full overflow-hidden">
+          <span className="absolute inset-0 bg-gradient-to-r from-blue-950 via-amber-700 to-yellow-500 animate-gradientMove" />
+          <span className="absolute inset-0 bg-gradient-to-r from-yellow-500 via-amber-700 to-blue-950 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+        </span>
+
+        {/* ✨ SHINE SWEEP */}
+        <span className="absolute inset-0 overflow-hidden rounded-full">
+          <span className="absolute top-0 left-[-75%] w-1/2 h-full bg-white/20 skew-x-[-25deg] group-hover:left-[130%] transition-all duration-[1000ms]" />
+        </span>
+
+        {/* 🔥 GLOW */}
+        <span className="absolute inset-0 rounded-full bg-amber-400/20 blur-xl opacity-60 group-hover:opacity-100 transition" />
+
+        {/* ➡ ICON */}
         <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-3 w-3 lg:h-6 lg:w-6 text-white"
+          className="relative z-10 h-4 w-4 lg:h-6 lg:w-6 text-white"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -253,7 +309,10 @@ export default function Hero({}: HeroProps) {
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
-      </button>
+
+        {/* 💎 GLASS OVERLAY */}
+        <div className="absolute inset-0 rounded-full bg-white/5 backdrop-blur-md border border-white/20" />
+      </motion.button>
     </section>
   );
 }

@@ -17,6 +17,11 @@ import {
   LucideIcon,
 } from "lucide-react";
 import FancyButton from "./FancyButton";
+import dynamic from "next/dynamic";
+
+const CallButton = dynamic(() => import("./CallButton"), {
+  ssr: false,
+});
 
 /* ----------------------------- NAV ITEMS ----------------------------- */
 const NAV_ITEMS = [
@@ -593,6 +598,8 @@ export default function Navbar({ hide = false }: { hide?: boolean }) {
           </motion.button>
         )}
       </AnimatePresence>
+      {/* 📞 Floating Call Button */}
+      <CallButton />
     </>
   );
 }
