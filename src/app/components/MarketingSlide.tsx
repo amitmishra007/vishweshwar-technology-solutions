@@ -865,19 +865,40 @@ export default function MarketingSlide({ setHeroPaused }: SlideProps) {
             }}
           >
             <motion.div
-              animate={{ scale: [1, 1.04, 1] }}
+              animate={{
+                scale: [1, 1.04, 1],
+                filter: ["brightness(1)", "brightness(1.15)", "brightness(1)"],
+              }}
               transition={{ duration: 6, repeat: Infinity }}
               className="absolute rounded-full gpu-layer"
               style={{
                 width: coreSize,
                 height: coreSize,
-                background:
-                  "radial-gradient(circle at center, rgba(255,215,0,0.9) 0%, rgba(212,175,55,0.8) 40%, rgba(25,32,72,0.4) 75%, rgba(10,15,40,0.2) 100%)",
-                boxShadow:
-                  "0 0 60px rgba(255,215,0,0.6), 0 0 120px rgba(212,175,55,0.4)",
+
+                /* 🤍 PEARL SURFACE */
+                background: `
+      radial-gradient(
+        circle at 35% 30%,
+        rgba(255,255,255,0.95) 0%,
+        rgba(245,245,255,0.9) 25%,
+        rgba(230,235,245,0.75) 50%,
+        rgba(210,220,235,0.6) 70%,
+        rgba(180,195,215,0.5) 100%
+      )
+    `,
+
+                /* 💎 DEPTH + GLOSS */
+                boxShadow: `
+      inset 0 10px 30px rgba(255,255,255,0.9),
+      inset 0 -20px 40px rgba(180,200,230,0.5),
+      0 0 40px rgba(255,255,255,0.6),
+      0 0 80px rgba(200,220,255,0.4)
+    `,
+
+                border: "1px solid rgba(255,255,255,0.6)",
+                backdropFilter: "blur(10px) saturate(120%)",
               }}
             />
-
             <motion.div
               animate={{ scale: [1, 1.02, 1] }}
               transition={{ duration: 8, repeat: Infinity }}
@@ -915,19 +936,51 @@ export default function MarketingSlide({ setHeroPaused }: SlideProps) {
                 );
               })}
             </motion.div>
-
             <motion.div
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className="relative z-20 gpu-layer"
+              className="relative z-20 gpu-layer flex items-center justify-center"
             >
-              <Image
-                src="/ppc.png"
-                alt="Digital Marketing"
-                width={400}
-                height={400}
-                style={{ width: coreSize * 0.9, height: "auto" }}
-              />
+              <div
+                className="relative flex items-center justify-center gpu-layer"
+                style={{
+                  width: coreSize * 0.95,
+                  height: coreSize * 0.95,
+                  borderRadius: "50%",
+
+                  /* 🔥 AMBER / BROWN CORE */
+                  background: `
+        radial-gradient(
+          circle at 35% 30%,
+          rgba(255, 215, 0, 0.85) 0%,
+          rgba(212, 175, 55, 0.75) 25%,
+          rgba(128, 0, 32, 0.55) 55%,
+          rgba(40, 0, 10, 0.65) 80%,
+          rgba(10, 0, 5, 0.85) 100%
+        )
+      `,
+
+                  /* ✨ GLOW + DEPTH */
+                  boxShadow: `
+        inset 0 0 60px rgba(255, 215, 0, 0.35),
+        inset 0 0 120px rgba(128, 0, 32, 0.35),
+        0 0 40px rgba(212, 175, 55, 0.35),
+        0 0 90px rgba(128, 0, 32, 0.25)
+      `,
+
+                  border: "1px solid rgba(255, 215, 0, 0.25)",
+                  backdropFilter: "blur(18px) saturate(140%)",
+                }}
+              >
+                {/* YOUR IMAGE INSIDE */}
+                <Image
+                  src="/ppc.png"
+                  alt="Digital Marketing"
+                  width={400}
+                  height={400}
+                  style={{ width: "75%", height: "auto" }}
+                />
+              </div>
             </motion.div>
           </div>
         </div>

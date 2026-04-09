@@ -537,55 +537,55 @@ type OrbitLogoProps = {
 const logos: LogoItem[] = [
   {
     src: "/google-playstore-for-android-logo-vishweshwar-industries-bhiwadi.png",
-    name: "playstore logo",
-    description: "Cross-platform mobile apps.",
+    name: "Google Play Store",
+    description: "Android app publishing and distribution platform.",
     link: "/services#react-native",
   },
   {
     src: "/apple-store-for-ios-devices-logo-vishweshwar-industries-bhiwadi.png",
-    name: "Apple Store Deployment",
-    description: "ios UI toolkit.",
+    name: "Apple App Store",
+    description: "iOS app deployment and global distribution.",
     link: "/services#apple-store",
   },
   {
     src: "/logo3.png",
     name: "Swift",
-    description: "Native iOS development.",
+    description: "Powerful language for native iOS app development.",
     link: "/services#swift",
   },
   {
     src: "/kotlin-for-android-application-development-logo-vishweshwar-industries-bhiwadi.png",
     name: "Kotlin",
     description:
-      "Kotlin is a modern, statically typed, cross-platform programming language developed by JetBrains and officially supported by Google for Android development. It is designed to be concise, safe, and fully interoperable with Java, enabling developers to build powerful and scalable applications with reduced boilerplate code. Kotlin is primarily used for native Android app development, leveraging the Android SDK and modern frameworks like Jetpack to create high-performance, responsive, and feature-rich mobile experiences. Kotlin supports multiple platforms, including Android, backend, web, and even iOS through Kotlin Multiplatform, allowing teams to share business logic across platforms while maintaining native performance. Its expressive syntax, null-safety features, and coroutine-based asynchronous programming model make development faster, more efficient, and less error-prone. With strong tooling support in Android Studio, Kotlin enhances developer productivity through intelligent code suggestions, seamless debugging, and robust testing capabilities. Integrated CI/CD pipelines, combined with modern DevOps practices, enable streamlined testing, deployment, and continuous delivery to platforms like the Google Play Store and Apple App Store (via multiplatform approaches). Kotlin also prioritizes security and reliability, offering features that minimize runtime crashes and protect sensitive data, making it an ideal choice for enterprise-grade mobile applications that demand performance, scalability, and long-term maintainability.",
+      "Modern, statically typed language for Android development with concise syntax, null safety, and seamless Java interoperability. Enables scalable, high-performance applications with strong tooling and Jetpack integration.",
     link: "/services#kotlin",
   },
   {
     src: "/flutter-for-android-application-and-ios-development-logo-vishweshwar-industries-bhiwadi.png",
     name: "Flutter",
     description:
-      "Flutter is an open source, cross-platform software development kit (SDK) developed by Google. It extends a wide range of plugins backed by Google and allows mobile apps to be built for both Android and Apple iOS platforms. A trending mobile application development framework, Flutter allows you to build, test, and deploy natively-compiled stunning mobile apps for any screen (mobile, desktop, web) from a single code base. It uses “Dart” as a programming language instead of JavaScript which facilitates rapid and effective analysis, fabricates UIs, includes highlights, and fixes bugs in milliseconds. Flutter is a unique mobile app development toolkit that doesn’t rely on the web browser technology and the widgets shipped with each device. Flutter uses its own high-performance engine to customize widgets. ",
+      "Google’s cross-platform SDK for building high-performance apps for mobile, web, and desktop from a single codebase using Dart and a rich widget system.",
     link: "/services#firebase",
   },
   {
     src: "/react-native-for-android-application-development-logo-vishweshwar-industries-bhiwadi.png",
     name: "React Native",
     description:
-      "This JavaScript open-source framework is one of the most preferred native mobile app development technologies in recent times. React Native offers ample support to IDEs and other  tools to support the development of native apps for iOS and Android platforms. ReactNative allows native mobile apps to be built with JavaScript, using the same design as React. Native apps built using this framework are truly native, that cannot be distinguished from an app built using Objective-C or Java or Swift. React Native can be used to upgrade your existing iOS and Android apps as well as to create whole new native mobile apps from scratch. Developers can use React Native to share code across multiple platforms from a single code base. This can be done by creating platform-specific versions of the code components. ",
+      "JavaScript framework for building truly native mobile apps with shared code across iOS and Android, enabling faster development and consistent UI experiences.",
     link: "/services#expo",
   },
   {
     src: "/ionic-for-android-application-and-ios-development-logo-vishweshwar-industries-bhiwadi.png",
     name: "Ionic",
     description:
-      "Ionic is a modern, cross-platform, open-source SDK for iOS and Android apps. It uses the standard web technologies – HTML5, CSS3, and JavaScript to build powerful apps for multiple platforms and supports creating their UI functionalities with ease, all from a single code base. Ionic mobile app development technology works on iOS’s UIWebView or Android’s WebView. Ionic is built on top of Angular JS and Apache Cordova, offering developers the easiest way to build, grow, and scale cross-platform mobile apps. Built-in CI/CD tools for testing and deployment automates app delivery by helping organizations publish their apps directly to the Google and Apple App Stores. Ionic’s cloud security safeguards and best-in-class mobile security solutions protect sensitive data.",
+      "Cross-platform SDK using HTML, CSS, and JavaScript to build mobile apps with a single codebase, powered by web technologies and integrated deployment tools.",
     link: "/services#aws-amplify",
   },
   {
     src: "/xamarin-for-android-application-and-ios-development-logo-vishweshwar-industries-bhiwadi.png",
     name: "Xamarin",
     description:
-      "Xamarin is a free and open-source, cross-platform app building platform for creating iOS and Android apps using .NET and C#. With the benefits of code sharing and extending access to native APIs, Xamarin builds applications that render exact native app experience. It is one of the most time and cost saving frameworks for mobile app development. Xamarin allows you to deliver native Android, iOS, and Windows apps with a single shared .NET code base. The framework offers access to the full spectrum of functionality exposed by the underlying platform and device, including platform-specific capabilities. Xamarin’s seamless integration with Azure Cloud Platform offers your mobile app a scalable, efficient, and versatile back-end, with storage, database, and intelligent services.",
+      "Microsoft’s .NET-based framework for building native apps across Android and iOS with shared C# code and full access to platform APIs.",
     link: "/services#app-distribution",
   },
 ];
@@ -791,16 +791,39 @@ export default function MobileAppSlide({ setHeroPaused }: SlideProps) {
             }}
           >
             <motion.div
-              animate={{ scale: [1, 1.04, 1] }}
+              animate={{
+                scale: [1, 1.04, 1],
+                filter: ["brightness(1)", "brightness(1.15)", "brightness(1)"],
+              }}
               transition={{ duration: 6, repeat: Infinity }}
               className="absolute rounded-full gpu-layer"
               style={{
                 width: coreSize,
                 height: coreSize,
-                background:
-                  "radial-gradient(circle at center, rgba(255,215,0,0.9) 0%, rgba(212,175,55,0.8) 40%, rgba(25,32,72,0.4) 75%, rgba(10,15,40,0.2) 100%)",
-                boxShadow:
-                  "0 0 60px rgba(255,215,0,0.6), 0 0 120px rgba(212,175,55,0.4)",
+
+                /* 🤍 PEARL GRADIENT */
+                background: `
+      radial-gradient(
+        circle at 35% 30%,
+        rgba(255,255,255,0.95) 0%,
+        rgba(245,245,255,0.9) 25%,
+        rgba(230,235,245,0.75) 50%,
+        rgba(210,220,235,0.6) 70%,
+        rgba(180,195,215,0.5) 100%
+      )
+    `,
+
+                /* 💎 GLOSS + SHINE */
+                boxShadow: `
+      inset 0 10px 30px rgba(255,255,255,0.9),
+      inset 0 -20px 40px rgba(180,200,230,0.5),
+      0 0 40px rgba(255,255,255,0.6),
+      0 0 80px rgba(200,220,255,0.4)
+    `,
+
+                /* ✨ GLASS FEEL */
+                border: "1px solid rgba(255,255,255,0.6)",
+                backdropFilter: "blur(10px) saturate(120%)",
               }}
             />
 
