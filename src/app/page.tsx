@@ -8,6 +8,7 @@ import WhoWeAre from "./components/WhoWeAre";
 import ContactSection from "./components/ContactSection";
 import PortfolioSection from "./components/PortfolioSection";
 import { useState } from "react";
+import ServicesStrip from "./components/ServicesStrip";
 
 export default function HomePage() {
   const [isPortfolioModalOpen, setIsPortfolioModalOpen] = useState(false);
@@ -15,6 +16,7 @@ export default function HomePage() {
     <main className="relative">
       <Navbar hide={isPortfolioModalOpen} />
       <Hero />
+      <ServicesStrip />
       <AboutSection />
       <PortfolioSection setIsModalOpen={setIsPortfolioModalOpen} />
       <WhoWeAre />
