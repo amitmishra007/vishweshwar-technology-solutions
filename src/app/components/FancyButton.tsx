@@ -43,23 +43,27 @@ type FancyButtonProps = ButtonProps | LinkProps;
 export default function FancyButton(props: FancyButtonProps) {
   const { text, className } = props;
 
-  /* 🎨 CONTENT (unchanged visuals) */
+  /* 🎨 CONTENT (FIXED LAYOUT) */
   const content = (
     <>
-      <span className="absolute inset-0 rounded-full overflow-hidden">
+      {/* GRADIENT */}
+      <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
         <span className="absolute inset-0 bg-gradient-to-r from-blue-950 via-amber-700 to-yellow-500 animate-gradientMove" />
         <span className="absolute inset-0 bg-gradient-to-r from-yellow-500 via-amber-700 to-blue-950 opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out" />
       </span>
 
-      <span className="absolute inset-0 overflow-hidden rounded-full">
+      {/* SHINE */}
+      <span className="absolute inset-0 overflow-hidden rounded-full pointer-events-none">
         <span className="absolute top-0 left-[-75%] w-1/2 h-full bg-white/20 skew-x-[-25deg] group-hover:left-[130%] transition-all duration-[1200ms] ease-out" />
       </span>
 
-      <span className="absolute inset-0 flex items-center justify-center text-white font-semibold tracking-wide transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-10 group-hover:opacity-0">
+      {/* TEXT (NOW RELATIVE → DEFINES SIZE) */}
+      <span className="relative z-10 flex items-center justify-center text-white font-semibold tracking-wide transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-10 group-hover:opacity-0 whitespace-nowrap">
         {text}
       </span>
 
-      <span className="absolute inset-0 flex items-center justify-center text-white opacity-0 translate-y-10 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:opacity-100">
+      {/* ICON */}
+      <span className="absolute inset-0 flex items-center justify-center text-white opacity-0 translate-y-10 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:opacity-100 pointer-events-none">
         <svg
           className="w-6 h-6 md:w-5 md:h-5 sm:w-4 sm:h-4"
           fill="none"
@@ -74,14 +78,16 @@ export default function FancyButton(props: FancyButtonProps) {
           />
         </svg>
       </span>
-
-      <span className="relative invisible">{text}</span>
     </>
   );
 
-  /* 🎯 BASE CLASSES (UNCHANGED) */
+  /* 🎯 BASE CLASSES (CRITICAL FIXES ADDED) */
   const baseClasses = `
     group relative inline-flex items-center justify-center
+
+    w-auto max-w-max flex-none self-start
+    whitespace-nowrap
+
     overflow-hidden rounded-full font-medium
     transition-all duration-500
 
@@ -99,13 +105,13 @@ export default function FancyButton(props: FancyButtonProps) {
     ${className || ""}
   `;
 
-  /* -------------------- LINK MODE -------------------- */
+  /* -------------------- LINK MODE (FIXED) -------------------- */
   if ("href" in props && props.href) {
     const { href, ...anchorProps } = props;
 
     return (
-      <Link href={href} className={baseClasses}>
-        <span {...anchorProps}>{content}</span>
+      <Link href={href} className={baseClasses} {...anchorProps}>
+        {content}
       </Link>
     );
   }

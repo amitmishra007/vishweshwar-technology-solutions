@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useTransform, useScroll } from "framer-motion";
 import {
   Globe,
   Smartphone,
@@ -8,6 +8,7 @@ import {
   Settings,
   FileCode,
 } from "lucide-react";
+import { useEffect } from "react";
 
 const services = [
   { icon: Globe, label: "Websites" },
@@ -17,100 +18,175 @@ const services = [
   { icon: FileCode, label: "APIs" },
 ];
 
-export default function ServicesStrip() {
+export default function ServicesStripGodTier() {
+  /* ================= CURSOR ENERGY ================= */
+  const cursorX = useMotionValue(0);
+  const cursorY = useMotionValue(0);
+
+  useEffect(() => {
+    const move = (e: MouseEvent) => {
+      cursorX.set(e.clientX / window.innerWidth);
+      cursorY.set(e.clientY / window.innerHeight);
+    };
+    window.addEventListener("mousemove", move);
+    return () => window.removeEventListener("mousemove", move);
+  }, [cursorX, cursorY]);
+
+  /* ================= TRANSFORMS ================= */
+  const glowX = useTransform(cursorX, [0, 1], ["0%", "100%"]);
+  const glowY = useTransform(cursorY, [0, 1], ["0%", "100%"]);
+
+  /* ================= PARALLAX ================= */
+  const { scrollY } = useScroll();
+  const bgY = useTransform(scrollY, [0, 800], [0, -80]);
+  const contentY = useTransform(scrollY, [0, 800], [0, -20]);
+
   return (
-    <section className="relative w-full overflow-hidden py-20 md:py-24">
-      {/* 🌌 BASE BACKGROUND (matches premium dark theme) */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a] via-[#0d1117] to-[#050505]" />
+    <section className="relative w-full overflow-hidden py-24">
+      {/* 🌌 PARALLAX BACKGROUND */}
+      <motion.div
+        style={{ y: bgY }}
+        className="absolute inset-0 bg-gradient-to-br from-[#050505] via-[#0a0f1c] to-black"
+      />
 
-      {/* subtle blue energy tint */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(59,130,246,0.12),transparent_40%)]" />
+      {/* 💡 GLOBAL LIGHT FOLLOW */}
+      <motion.div
+        style={{
+          left: glowX,
+          top: glowY,
+          transform: "translate(-50%, -50%)",
+        }}
+        className="absolute w-[600px] h-[600px] pointer-events-none
+        bg-[radial-gradient(circle,rgba(212,175,55,0.18),transparent_70%)]
+        blur-3xl"
+      />
 
-      {/* 🔴 BRAND ACCENT GLOW */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(239,68,68,0.08),transparent_40%)]" />
+      <motion.div
+        style={{
+          left: glowX,
+          top: glowY,
+          transform: "translate(-30%, -30%)",
+        }}
+        className="absolute w-[700px] h-[700px] pointer-events-none
+        bg-[radial-gradient(circle,rgba(59,130,246,0.15),transparent_70%)]
+        blur-3xl"
+      />
 
-      {/* 🧊 TOP SOFT LIGHT */}
-      <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-white/[0.04] to-transparent" />
+      {/* ✨ TOP LIGHT */}
+      <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[400px]
+        bg-[radial-gradient(circle,rgba(255,255,255,0.08),transparent_70%)] blur-3xl"
+      />
 
       {/* 🎯 CONTENT */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-12">
-        {/* LEFT TEXT */}
+      <motion.div
+        style={{ y: contentY }}
+        className="relative z-10 max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-16"
+      >
+        {/* LEFT */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: "easeOut" }}
+          transition={{ duration: 0.8 }}
           className="text-center md:text-left"
         >
-          {/* animated accent line */}
           <motion.div
             initial={{ width: 0 }}
-            whileInView={{ width: 48 }}
+            whileInView={{ width: 60 }}
             transition={{ duration: 0.6 }}
-            className="h-[2px] bg-gradient-to-r from-blue-500 to-red-500 mb-5 mx-auto md:mx-0"
+            className="h-[2px] bg-gradient-to-r from-blue-500 via-amber-400 to-red-500 mb-6 mx-auto md:mx-0"
           />
 
-          <h2 className="text-3xl md:text-5xl font-semibold tracking-tight text-white leading-tight">
+          <h2 className="text-3xl md:text-5xl font-semibold text-white leading-tight">
             We design & develop
           </h2>
 
-          <p className="text-gray-400 mt-4 max-w-md text-sm md:text-base">
-            High-performance digital solutions engineered with precision,
-            scalability, and modern design systems.
+          <p className="text-white/60 mt-4 max-w-md text-sm md:text-base">
+            High-performance digital systems engineered with precision,
+            scalability and cinematic UI experiences.
           </p>
         </motion.div>
 
-        {/* RIGHT ICON GRID */}
-        <div className="flex flex-wrap justify-center md:justify-end gap-5">
+        {/* RIGHT GRID */}
+        <div className="flex flex-wrap justify-center md:justify-end gap-6">
           {services.map((service, i) => {
             const Icon = service.icon;
 
             return (
               <motion.div
                 key={service.label}
-                initial={{ opacity: 0, y: 40, scale: 0.92 }}
+                initial={{ opacity: 0, y: 50, scale: 0.9 }}
                 whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{
                   delay: i * 0.08,
                   type: "spring",
                   stiffness: 120,
-                  damping: 18,
+                  damping: 16,
                 }}
-                whileHover={{ y: -8, scale: 1.06 }}
-                whileTap={{ scale: 0.96 }}
-                className="group relative w-24 h-24 md:w-28 md:h-28 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl flex flex-col items-center justify-center text-white cursor-pointer overflow-hidden"
+                whileHover={{ y: -12, scale: 1.08 }}
+                className="group relative w-28 h-28 rounded-3xl overflow-hidden cursor-pointer"
               >
-                {/* inner glow */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 bg-gradient-to-br from-white/10 to-transparent" />
+                {/* GLASS */}
+                <div
+                  className="absolute inset-0 rounded-3xl
+                  bg-white/[0.04] backdrop-blur-xl border border-white/10"
+                />
 
-                {/* subtle spotlight */}
-                <div className="absolute -inset-1 opacity-0 group-hover:opacity-100 blur-xl bg-blue-500/10 transition duration-500" />
+                {/* 🔥 CURSOR LIGHT */}
+                <motion.div
+                  style={{
+                    background: `radial-gradient(circle at ${glowX} ${glowY}, rgba(255,255,255,0.25), transparent 60%)`,
+                  }}
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-300"
+                />
 
-                {/* icon */}
-                <Icon className="w-7 h-7 mb-2 text-white/90 group-hover:text-white transition" />
+                {/* 🔥 AMBER ENERGY */}
+                <motion.div
+                  style={{
+                    background: `radial-gradient(circle at ${glowX} ${glowY}, rgba(212,175,55,0.25), transparent 70%)`,
+                  }}
+                  className="absolute inset-0 opacity-0 group-hover:opacity-100 blur-xl transition duration-500"
+                />
 
-                {/* label */}
-                <span className="text-xs md:text-sm text-white/80 group-hover:text-white tracking-wide transition">
-                  {service.label}
-                </span>
+                {/* 🔵 DEPTH GLOW */}
+                <div
+                  className="absolute -inset-2 opacity-0 group-hover:opacity-100 blur-2xl
+                  bg-blue-500/10 transition duration-500"
+                />
 
-                {/* premium border highlight */}
-                <div className="absolute inset-0 rounded-2xl border border-white/5 group-hover:border-white/20 transition" />
+                {/* CONTENT */}
+                <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
+                  <motion.div
+                    animate={{ y: [0, -4, 0] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                  >
+                    <Icon className="w-7 h-7 mb-2 text-white/80 group-hover:text-white" />
+                  </motion.div>
+
+                  <span className="text-sm text-white/70 group-hover:text-white">
+                    {service.label}
+                  </span>
+                </div>
               </motion.div>
             );
           })}
         </div>
-      </div>
+      </motion.div>
 
-      {/* 🔥 BOTTOM CINEMATIC FINISH */}
+      {/* 🔥 BOTTOM CINEMATIC */}
       <div className="absolute bottom-0 left-0 w-full h-40 pointer-events-none">
-        {/* fade to next section */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/70 to-transparent" />
 
-        {/* mesh grid effect */}
-        <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(to_right,#ffffff22_1px,transparent_1px),linear-gradient(to_bottom,#ffffff22_1px,transparent_1px)] [background-size:40px_40px]" />
+        <div
+          className="absolute inset-0 opacity-[0.06]
+          [background-image:linear-gradient(to_right,#ffffff22_1px,transparent_1px),linear-gradient(to_bottom,#ffffff22_1px,transparent_1px)]
+          [background-size:40px_40px]"
+        />
 
-        {/* glowing divider line */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-px
+          bg-gradient-to-r from-transparent via-white/40 to-transparent"
+        />
       </div>
     </section>
   );
