@@ -46,7 +46,7 @@ export default function ServicesStripGodTier() {
       {/* 🌌 PARALLAX BACKGROUND */}
       <motion.div
         style={{ y: bgY }}
-        className="absolute inset-0 bg-gradient-to-br from-[#050505] via-[#0a0f1c] to-black"
+        className="absolute inset-0 bg-gradient-to-br from-blue-900 via-black to-blue-950"
       />
 
       {/* 💡 GLOBAL LIGHT FOLLOW */}
