@@ -9,14 +9,58 @@ type Category = "Websites" | "Brochures" | "Logos";
 
 const categories: Category[] = ["Websites", "Brochures", "Logos"];
 
-const data: Record<Category, string[]> = {
+type WebsiteItem = {
+  image: string;
+  caption: string;
+  websiteUrl: string;
+  initialZoom?: number;
+  initialY?: number;
+};
+
+type PortfolioData = {
+  Websites: WebsiteItem[];
+  Brochures: string[];
+  Logos: string[];
+};
+
+const data: PortfolioData = {
   Websites: [
-    "/websites/Vishweshwar_Industries_Bhiwadi_Client_Atom_Learning_Centre_Gurugram.png",
-    "/websites/Vishweshwar_Industries_Bhiwadi_Client_Paradigm_Spaces_Gurugram.png",
-    "/websites/Vishweshwar_Industries_Bhiwadi_Client_Atom_Learning_Centre_Gurugram.png",
-    "/websites/Vishweshwar_Industries_Bhiwadi_Client_Paradigm_Spaces_Gurugram.png",
+    {
+      image:
+        "/websites/Vishweshwar_Industries_Bhiwadi_Client_Atom_Learning_Centre_Gurugram.png",
+      caption: "Atom Learning Centre",
+      websiteUrl: "https://atomlearning.in",
+      initialZoom: 2,
+      initialY: 300,
+    },
+    {
+      image:
+        "/websites/Vishweshwar_Industries_Bhiwadi_Client_Paradigm_Spaces_Gurugram.png",
+      caption: "Paradigm Spaces",
+      websiteUrl: "https://paradigmspaces.in",
+      initialZoom: 1.7,
+      initialY: 250,
+    },
+    {
+      image:
+        "/websites/Vishweshwar_Industries_Bhiwadi_Client_Advet_Buildwell_Bhiwadi.png",
+      caption: "Advet Buildwell",
+      websiteUrl: "https://advetbuildwell.com",
+      initialZoom: 1.8,
+      initialY: 280,
+    },
+    {
+      image:
+        "/websites/Vishweshwar_Industries_Bhiwadi_Client_Paradigm_Spaces_Gurugram.png",
+      caption: "Paradigm Spaces",
+      websiteUrl: "https://paradigmspaces.in",
+      initialZoom: 1.7,
+      initialY: 250,
+    },
   ],
+
   Brochures: ["/logos/BMRPROFILEUPDATED.pdf", "/logos/BMRPROFILEUPDATED.pdf"],
+
   Logos: [
     "/logos/vishweshwar_industries_client_paradigm-spaces-gurugram-logo.svg",
     "/logos/bmr-enterprises-bhiwadi-logo.png",
@@ -36,17 +80,35 @@ export default function Portfolio({
   const [dragging, setDragging] = useState(false);
   const [start, setStart] = useState({ x: 0, y: 0 });
 
-  // RESET on change
-  useEffect(() => {
-    setZoom(1);
-    setPosition({ x: 0, y: 0 });
-  }, [activeIndex, activeCategory]);
-
   // CATEGORY-BASED ZOOM LIMITS
   const maxZoom =
     activeCategory === "Logos" ? 1.8 : activeCategory === "Brochures" ? 2.2 : 3;
 
-  const items = data[activeCategory];
+  const websiteItems = data.Websites;
+  const brochureItems = data.Brochures;
+  const logoItems = data.Logos;
+
+  const currentItems =
+    activeCategory === "Websites"
+      ? websiteItems
+      : activeCategory === "Brochures"
+        ? brochureItems
+        : logoItems;
+
+  // RESET on change
+  useEffect(() => {
+    if (activeCategory === "Websites" && activeIndex !== null) {
+      setZoom(websiteItems[activeIndex].initialZoom ?? 1.8);
+
+      setPosition({
+        x: 0,
+        y: websiteItems[activeIndex].initialY ?? 250,
+      });
+    } else {
+      setZoom(1);
+      setPosition({ x: 0, y: 0 });
+    }
+  }, [activeIndex, activeCategory, websiteItems]);
 
   // 🔒 MODAL CONTROL (SAFE)
   useEffect(() => {
@@ -99,7 +161,7 @@ export default function Portfolio({
         layout
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 p-6 md:p-16"
       >
-        {items.map((item, index) => (
+        {currentItems.map((item, index) => (
           <motion.div
             key={`${activeCategory}-${index}`} // 🔥 FIXED KEY
             layoutId={`${activeCategory}-${index}`}
@@ -109,15 +171,19 @@ export default function Portfolio({
           >
             {/* WEBSITES */}
             {activeCategory === "Websites" && (
-              <div className="h-[220px] md:h-[300px] overflow-hidden">
+              <div className="relative h-[220px] md:h-[300px] overflow-hidden">
                 <Image
-                  src={item}
-                  alt="website preview"
+                  src={(item as WebsiteItem).image}
+                  alt={(item as WebsiteItem).caption}
                   width={1200}
                   height={2000}
                   priority={index === 0}
                   className="w-full h-auto transition-transform duration-[8000ms] ease-linear group-hover:-translate-y-[60%]"
                 />
+
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent px-4 py-3 text-sm font-medium opacity-0 translate-y-full transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+                  {(item as WebsiteItem).caption}
+                </div>
               </div>
             )}
 
@@ -136,7 +202,7 @@ export default function Portfolio({
             {activeCategory === "Logos" && (
               <div className="h-[160px] md:h-[220px] flex items-center justify-center p-6 bg-gradient-to-br from-amber-50 via-white to-blue-100">
                 <Image
-                  src={item}
+                  src={item as string}
                   alt="logo"
                   width={300}
                   height={200}
@@ -207,7 +273,30 @@ export default function Portfolio({
                   Reset
                 </button>
               </div>
-
+              {activeCategory === "Websites" && (
+                <a
+                  href={websiteItems[activeIndex].websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="
+      fixed md:absolute
+      bottom-24 md:bottom-auto
+      right-4 md:right-6
+      top-auto md:top-20
+      z-50
+      px-5 py-3
+      rounded-xl
+      bg-amber-500
+      text-black
+      font-semibold
+      shadow-lg
+      hover:scale-105
+      transition
+    "
+                >
+                  Visit Website ↗
+                </a>
+              )}
               {/* 🧠 DRAG + ZOOM CONTAINER */}
               <div
                 className="w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing"
@@ -236,7 +325,7 @@ export default function Portfolio({
                 {/* 🖼 WEBSITES */}
                 {activeCategory === "Websites" && (
                   <motion.img
-                    src={items[activeIndex]}
+                    src={websiteItems[activeIndex].image}
                     draggable={false}
                     style={{
                       transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
@@ -254,7 +343,7 @@ export default function Portfolio({
                     className="w-[80vw] h-[85vh] bg-white rounded-xl overflow-auto"
                   >
                     <iframe
-                      src={items[activeIndex]}
+                      src={brochureItems[activeIndex]}
                       className="w-full h-full"
                     />
                   </div>
@@ -263,7 +352,7 @@ export default function Portfolio({
                 {/* 🧩 LOGOS (LESS ZOOM) */}
                 {activeCategory === "Logos" && (
                   <motion.img
-                    src={items[activeIndex]}
+                    src={logoItems[activeIndex]}
                     draggable={false}
                     style={{
                       transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
@@ -275,31 +364,55 @@ export default function Portfolio({
 
               {/* 🔥 THUMBNAIL STRIP (PREV/NEXT UPGRADED) */}
               <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 bg-black/40 p-3 rounded-xl backdrop-blur-md">
-                {items.map((item, i) => (
-                  <div
-                    key={i}
-                    onClick={() => setActiveIndex(i)}
-                    className={`w-16 h-12 md:w-20 md:h-14 overflow-hidden rounded-md cursor-pointer border transition ${
-                      activeIndex === i
-                        ? "border-white scale-105"
-                        : "border-white/20 hover:border-white/60"
-                    }`}
-                  >
-                    {activeCategory === "Brochures" ? (
-                      <div className="bg-white w-full h-full text-black flex items-center justify-center text-xs font-medium">
-                        PDF
+                {activeCategory === "Websites"
+                  ? websiteItems.map((item, i) => (
+                      <div
+                        key={i}
+                        onClick={() => setActiveIndex(i)}
+                        className={`w-16 h-12 md:w-20 md:h-14 overflow-hidden rounded-md cursor-pointer border bg-white transition ${
+                          activeIndex === i
+                            ? "border-white scale-105"
+                            : "border-white/20 hover:border-white/60"
+                        }`}
+                      >
+                        <Image
+                          alt={item.caption}
+                          src={item.image}
+                          width={300}
+                          height={200}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
-                    ) : (
-                      <Image
-                        alt={`${item}_${i}_image_vishweshwar_industries_client_logo`}
-                        src={item}
-                        width={300}
-                        height={200}
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-                  </div>
-                ))}
+                    ))
+                  : activeCategory === "Brochures"
+                    ? brochureItems.map((_, i) => (
+                        <div
+                          key={i}
+                          onClick={() => setActiveIndex(i)}
+                          className="w-16 h-12 md:w-20 md:h-14 bg-white text-black flex items-center justify-center text-xs rounded-md"
+                        >
+                          PDF
+                        </div>
+                      ))
+                    : logoItems.map((item, i) => (
+                        <div
+                          key={i}
+                          onClick={() => setActiveIndex(i)}
+                          className={`w-16 h-12 md:w-20 md:h-14 overflow-hidden rounded-md cursor-pointer border bg-white transition ${
+                            activeIndex === i
+                              ? "border-white scale-105"
+                              : "border-white/20 hover:border-white/60"
+                          }`}
+                        >
+                          <Image
+                            alt={`logo-${i}`}
+                            src={item}
+                            width={300}
+                            height={200}
+                            className="w-full h-full object-contain bg-white p-1"
+                          />
+                        </div>
+                      ))}
               </div>
             </div>
           </motion.div>
