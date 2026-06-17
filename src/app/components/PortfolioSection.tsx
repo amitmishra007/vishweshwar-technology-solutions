@@ -29,15 +29,15 @@ const data: PortfolioData = {
       image:
         "/websites/Vishweshwar_Industries_Bhiwadi_Client_Atom_Learning_Centre_Gurugram.png",
       caption: "Atom Learning Centre",
-      websiteUrl: "https://atomlearning.in",
+      websiteUrl: "https://www.atomgurugram.in/",
       initialZoom: 2,
-      initialY: 300,
+      initialY: 270,
     },
     {
       image:
         "/websites/Vishweshwar_Industries_Bhiwadi_Client_Paradigm_Spaces_Gurugram.png",
       caption: "Paradigm Spaces",
-      websiteUrl: "https://paradigmspaces.in",
+      websiteUrl: "https://www.paradigmspaces.in/",
       initialZoom: 1.7,
       initialY: 250,
     },
@@ -45,15 +45,15 @@ const data: PortfolioData = {
       image:
         "/websites/Vishweshwar_Industries_Bhiwadi_Client_Advet_Buildwell_Bhiwadi.png",
       caption: "Advet Buildwell",
-      websiteUrl: "https://advetbuildwell.com",
-      initialZoom: 1.8,
-      initialY: 280,
+      websiteUrl: "https://advetbuildwell.com/",
+      initialZoom: 2.4,
+      initialY: 400,
     },
     {
       image:
         "/websites/Vishweshwar_Industries_Bhiwadi_Client_Paradigm_Spaces_Gurugram.png",
       caption: "Paradigm Spaces",
-      websiteUrl: "https://paradigmspaces.in",
+      websiteUrl: "https://www.paradigmspaces.in/",
       initialZoom: 1.7,
       initialY: 250,
     },
@@ -363,56 +363,123 @@ export default function Portfolio({
               </div>
 
               {/* 🔥 THUMBNAIL STRIP (PREV/NEXT UPGRADED) */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 bg-black/40 p-3 rounded-xl backdrop-blur-md">
-                {activeCategory === "Websites"
-                  ? websiteItems.map((item, i) => (
-                      <div
-                        key={i}
-                        onClick={() => setActiveIndex(i)}
-                        className={`w-16 h-12 md:w-20 md:h-14 overflow-hidden rounded-md cursor-pointer border bg-white transition ${
-                          activeIndex === i
-                            ? "border-white scale-105"
-                            : "border-white/20 hover:border-white/60"
-                        }`}
-                      >
-                        <Image
-                          alt={item.caption}
-                          src={item.image}
-                          width={300}
-                          height={200}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ))
-                  : activeCategory === "Brochures"
-                    ? brochureItems.map((_, i) => (
+              {/* 🔥 THUMBNAIL STRIP */}
+              <div
+                className="
+    absolute
+    bottom-6
+    left-4
+    right-4
+    z-40
+    overflow-x-auto
+    overflow-y-hidden
+    scrollbar-hide
+  "
+              >
+                <div
+                  className="
+      flex
+      gap-3
+      w-max
+      mx-auto
+      bg-black/40
+      p-3
+      rounded-xl
+      backdrop-blur-md
+      snap-x
+      snap-mandatory
+    "
+                >
+                  {activeCategory === "Websites"
+                    ? websiteItems.map((item, i) => (
                         <div
                           key={i}
                           onClick={() => setActiveIndex(i)}
-                          className="w-16 h-12 md:w-20 md:h-14 bg-white text-black flex items-center justify-center text-xs rounded-md"
-                        >
-                          PDF
-                        </div>
-                      ))
-                    : logoItems.map((item, i) => (
-                        <div
-                          key={i}
-                          onClick={() => setActiveIndex(i)}
-                          className={`w-16 h-12 md:w-20 md:h-14 overflow-hidden rounded-md cursor-pointer border bg-white transition ${
-                            activeIndex === i
-                              ? "border-white scale-105"
-                              : "border-white/20 hover:border-white/60"
-                          }`}
+                          className={`
+              snap-center
+              shrink-0
+              w-16 h-12 md:w-20 md:h-14
+              overflow-hidden
+              rounded-md
+              cursor-pointer
+              border
+              bg-white
+              transition
+              ${
+                activeIndex === i
+                  ? "border-white scale-105"
+                  : "border-white/20 hover:border-white/60"
+              }
+            `}
                         >
                           <Image
-                            alt={`logo-${i}`}
-                            src={item}
+                            alt={item.caption}
+                            src={item.image}
                             width={300}
                             height={200}
-                            className="w-full h-full object-contain bg-white p-1"
+                            className="w-full h-full object-cover"
                           />
                         </div>
-                      ))}
+                      ))
+                    : activeCategory === "Brochures"
+                      ? brochureItems.map((_, i) => (
+                          <div
+                            key={i}
+                            onClick={() => setActiveIndex(i)}
+                            className={`
+                snap-center
+                shrink-0
+                w-16 h-12 md:w-20 md:h-14
+                bg-white
+                text-black
+                flex
+                items-center
+                justify-center
+                text-xs
+                rounded-md
+                cursor-pointer
+                transition
+                ${
+                  activeIndex === i
+                    ? "ring-2 ring-white scale-105"
+                    : "hover:scale-105"
+                }
+              `}
+                          >
+                            PDF
+                          </div>
+                        ))
+                      : logoItems.map((item, i) => (
+                          <div
+                            key={i}
+                            onClick={() => setActiveIndex(i)}
+                            className={`
+                snap-center
+                shrink-0
+                w-16 h-12 md:w-20 md:h-14
+                overflow-hidden
+                rounded-md
+                cursor-pointer
+                border
+                bg-white
+                transition
+                ${
+                  activeIndex === i
+                    ? "border-white scale-105"
+                    : "border-white/20 hover:border-white/60"
+                }
+              `}
+                          >
+                            <Image
+                              alt={`logo-${i}`}
+                              src={item}
+                              width={300}
+                              height={200}
+                              className="w-full h-full object-contain bg-white p-1"
+                            />
+                          </div>
+                        ))}
+                </div>
               </div>
             </div>
           </motion.div>

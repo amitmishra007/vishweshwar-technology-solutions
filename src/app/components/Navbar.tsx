@@ -585,21 +585,21 @@ export default function Navbar({ hide = false }: { hide?: boolean }) {
 
       {/* -------------------------- SCROLL TOP -------------------------- */}
       <AnimatePresence>
-        {showTopBtn && (
+        {showTopBtn && !hide && (
           <motion.button
             initial={{ opacity: 0, y: 50, scale: 0.8 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.8 }}
             transition={{ type: "spring", stiffness: 120, damping: 15 }}
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="cursor-pointer fixed bottom-16 right-8 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-[#d4af37] via-[#f5d76e] to-amber-400/70 text-white shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-[999]"
+            className="cursor-pointer fixed bottom-6 right-6 md:right-8 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-[#d4af37] via-[#f5d76e] to-amber-400/70 text-white shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-[999]"
           >
             ↑
           </motion.button>
         )}
       </AnimatePresence>
       {/* 📞 Floating Call Button */}
-      <CallButton />
+      {!hide && <CallButton />}
     </>
   );
 }
