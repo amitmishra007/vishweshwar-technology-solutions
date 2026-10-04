@@ -21,13 +21,16 @@ import {
   ArrowRight,
   BarChart3,
   Briefcase,
+  Building2,
   Code2,
   Globe,
+  House,
   Instagram,
   LayoutDashboard,
+  Layers as LayersIcon,
   Linkedin,
+  Mail,
   Megaphone,
-  Menu,
   Monitor,
   Palette,
   PenTool,
@@ -35,7 +38,7 @@ import {
   Server,
   Smartphone,
   TrendingUp,
-  X,
+  Users,
   Youtube,
 } from "lucide-react";
 
@@ -50,20 +53,44 @@ const CallButton = dynamic(
 );
 
 /* -------------------------------------------------------------------------- */
-/* NAV ITEMS                                                                   */
+/* NAV ITEMS                                                                  */
 /* -------------------------------------------------------------------------- */
 
 const NAV_ITEMS = [
-  { label: "Home", href: "/" },
-  { label: "About Us", href: "/about-us" },
-  { label: "Services", href: "/services" },
-  { label: "Technologies", href: "/technologies" },
-  { label: "Careers", href: "/careers" },
-  { label: "Contact Us", href: "/contact-us" },
+  {
+    label: "Home",
+    href: "/",
+    icon: House,
+  },
+  {
+    label: "About Us",
+    href: "/about-us",
+    icon: Building2,
+  },
+  {
+    label: "Services",
+    href: "/services",
+    icon: Briefcase,
+  },
+  {
+    label: "Technologies",
+    href: "/technologies",
+    icon: Code2,
+  },
+  {
+    label: "Careers",
+    href: "/careers",
+    icon: Users,
+  },
+  {
+    label: "Contact Us",
+    href: "/contact-us",
+    icon: Mail,
+  },
 ] as const;
 
 /* -------------------------------------------------------------------------- */
-/* SERVICES                                                                    */
+/* SERVICES                                                                   */
 /* -------------------------------------------------------------------------- */
 
 const SERVICE_MENU = [
@@ -139,7 +166,8 @@ const SERVICE_MENU = [
   {
     title: "Marketing & SEO",
     icon: TrendingUp,
-    description: "Digital visibility, acquisition and measurable growth.",
+    description:
+      "Digital visibility, acquisition and measurable growth.",
     items: [
       {
         title: "SEO & Organic Growth",
@@ -161,15 +189,8 @@ const SERVICE_MENU = [
   },
 ] as const;
 
-/*
- * Kept separately so the menu data remains easy to scan.
- * Lucide has a "Layers" icon, aliased here to avoid any future
- * naming collision with application-level components.
- */
-import { Layers as LayersIcon } from "lucide-react";
-
 /* -------------------------------------------------------------------------- */
-/* ANIMATION VARIANTS                                                          */
+/* ANIMATION VARIANTS                                                         */
 /* -------------------------------------------------------------------------- */
 
 const panelVariants: Variants = {
@@ -343,7 +364,7 @@ const mobileItemVariants: Variants = {
 };
 
 /* -------------------------------------------------------------------------- */
-/* COMPONENT                                                                   */
+/* COMPONENT                                                                  */
 /* -------------------------------------------------------------------------- */
 
 export default function Navbar({
@@ -369,11 +390,6 @@ export default function Navbar({
   const tickingRef = useRef(false);
   const animationFrameRef = useRef<number | null>(null);
 
-  /*
-   * IMPORTANT:
-   * ReturnType<typeof setTimeout> works correctly in both
-   * browser and Node/Next.js TypeScript environments.
-   */
   const megaTimeoutRef =
     useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -420,7 +436,7 @@ export default function Navbar({
   }, []);
 
   /* ------------------------------------------------------------------------ */
-  /* SCROLL                                                                     */
+  /* SCROLL                                                                    */
   /* ------------------------------------------------------------------------ */
 
   useEffect(() => {
@@ -459,7 +475,9 @@ export default function Navbar({
       window.removeEventListener("scroll", handleScroll);
 
       if (animationFrameRef.current !== null) {
-        window.cancelAnimationFrame(animationFrameRef.current);
+        window.cancelAnimationFrame(
+          animationFrameRef.current
+        );
       }
     };
   }, []);
@@ -475,7 +493,7 @@ export default function Navbar({
   }, [pathname]);
 
   /* ------------------------------------------------------------------------ */
-  /* ESCAPE                                                                     */
+  /* ESCAPE                                                                    */
   /* ------------------------------------------------------------------------ */
 
   useEffect(() => {
@@ -519,7 +537,7 @@ export default function Navbar({
   }, [isMobileOpen]);
 
   /* ------------------------------------------------------------------------ */
-  /* CLEANUP                                                                    */
+  /* CLEANUP                                                                   */
   /* ------------------------------------------------------------------------ */
 
   useEffect(() => {
@@ -527,21 +545,19 @@ export default function Navbar({
       clearMegaTimeout();
 
       if (animationFrameRef.current !== null) {
-        window.cancelAnimationFrame(animationFrameRef.current);
+        window.cancelAnimationFrame(
+          animationFrameRef.current
+        );
       }
     };
   }, [clearMegaTimeout]);
 
   /* ------------------------------------------------------------------------ */
-  /* RENDER                                                                     */
+  /* RENDER                                                                    */
   /* ------------------------------------------------------------------------ */
 
   return (
     <>
-      {/* ====================================================================== */}
-      {/* NAVBAR                                                                  */}
-      {/* ====================================================================== */}
-
       <motion.nav
         initial={false}
         animate={{
@@ -602,7 +618,8 @@ export default function Navbar({
 
             <div className="hidden flex-1 items-center justify-end gap-1 brand-font lg:flex">
               {NAV_ITEMS.map((item, index) => {
-                const isServices = item.label === "Services";
+                const isServices =
+                  item.label === "Services";
                 const isActive = pathname === item.href;
 
                 if (isServices) {
@@ -635,8 +652,12 @@ export default function Navbar({
                           y: 0,
                         }}
                         transition={{
-                          delay: reducedMotion ? 0 : index * 0.035,
-                          duration: reducedMotion ? 0 : 0.34,
+                          delay: reducedMotion
+                            ? 0
+                            : index * 0.035,
+                          duration: reducedMotion
+                            ? 0
+                            : 0.34,
                           ease: "easeOut",
                         }}
                         aria-expanded={isServicesOpen}
@@ -720,16 +741,12 @@ export default function Navbar({
                                 "ring-1 ring-white/20",
                               ].join(" ")}
                             >
-                              {/* Glass surface */}
                               <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/35 via-white/[0.06] to-transparent" />
 
-                              {/* Soft gold reflection */}
                               <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-[#d4af37]/[0.035] blur-3xl" />
 
-                              {/* Top glass reflection */}
                               <div className="pointer-events-none absolute inset-x-12 top-0 h-px bg-gradient-to-r from-transparent via-white/90 to-transparent" />
 
-                              {/* Cinematic glass sweep */}
                               {!reducedMotion && (
                                 <motion.div
                                   initial={{
@@ -754,15 +771,7 @@ export default function Navbar({
                               )}
 
                               <div className="relative p-5">
-                                {/* ------------------------------------------------ */}
-                                {/* TOP CONTENT                                      */}
-                                {/* ------------------------------------------------ */}
-
                                 <div className="grid grid-cols-[265px_1fr] gap-5">
-                                  {/* -------------------------------------------- */}
-                                  {/* CATEGORY COLUMN                              */}
-                                  {/* -------------------------------------------- */}
-
                                   <div className="border-r border-white/30 pr-5">
                                     <div className="mb-3 px-2">
                                       <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#0a1a2f]/40">
@@ -772,18 +781,29 @@ export default function Navbar({
 
                                     <div className="space-y-1.5">
                                       {SERVICE_MENU.map(
-                                        (service, serviceIndex) => {
-                                          const Icon = service.icon;
+                                        (
+                                          service,
+                                          serviceIndex
+                                        ) => {
+                                          const Icon =
+                                            service.icon;
+
                                           const active =
                                             activeService ===
                                             serviceIndex;
 
                                           return (
                                             <motion.button
-                                              key={service.title}
+                                              key={
+                                                service.title
+                                              }
                                               type="button"
-                                              custom={serviceIndex}
-                                              variants={categoryVariants}
+                                              custom={
+                                                serviceIndex
+                                              }
+                                              variants={
+                                                categoryVariants
+                                              }
                                               initial="hidden"
                                               animate="visible"
                                               exit="exit"
@@ -808,14 +828,15 @@ export default function Navbar({
                                                 "border px-3 py-2.5 text-left",
                                                 "transition-all duration-300",
                                                 "active:scale-[0.98]",
-
                                                 active
                                                   ? [
                                                       "border-white/60",
                                                       "bg-white/[0.44]",
                                                       "text-[#0a1a2f]",
                                                       "shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]",
-                                                    ].join(" ")
+                                                    ].join(
+                                                      " "
+                                                    )
                                                   : [
                                                       "border-transparent",
                                                       "bg-white/[0.12]",
@@ -823,7 +844,9 @@ export default function Navbar({
                                                       "hover:border-white/40",
                                                       "hover:bg-white/[0.29]",
                                                       "hover:text-[#0a1a2f]",
-                                                    ].join(" "),
+                                                    ].join(
+                                                      " "
+                                                    ),
                                               ].join(" ")}
                                             >
                                               <span
@@ -831,31 +854,38 @@ export default function Navbar({
                                                   "flex h-9 w-9 shrink-0 items-center",
                                                   "justify-center rounded-full",
                                                   "border transition-all duration-300",
-
                                                   active
                                                     ? [
                                                         "border-[#d4af37]/30",
                                                         "bg-[#d4af37]/10",
                                                         "text-[#8c6d12]",
-                                                      ].join(" ")
+                                                      ].join(
+                                                        " "
+                                                      )
                                                     : [
                                                         "border-white/40",
                                                         "bg-white/[0.20]",
                                                         "text-[#0a1a2f]/60",
                                                         "group-hover:border-white/60",
                                                         "group-hover:bg-white/[0.38]",
-                                                      ].join(" "),
+                                                      ].join(
+                                                        " "
+                                                      ),
                                                 ].join(" ")}
                                               >
                                                 <Icon
                                                   size={16}
-                                                  strokeWidth={1.7}
+                                                  strokeWidth={
+                                                    1.7
+                                                  }
                                                 />
                                               </span>
 
                                               <span className="min-w-0 flex-1">
                                                 <span className="block truncate text-[13px] font-medium">
-                                                  {service.title}
+                                                  {
+                                                    service.title
+                                                  }
                                                 </span>
 
                                                 <span
@@ -865,21 +895,29 @@ export default function Navbar({
                                                     active
                                                       ? "text-[#0a1a2f]/45"
                                                       : "text-[#0a1a2f]/30",
-                                                  ].join(" ")}
+                                                  ].join(
+                                                    " "
+                                                  )}
                                                 >
-                                                  {service.description}
+                                                  {
+                                                    service.description
+                                                  }
                                                 </span>
                                               </span>
 
                                               <ArrowRight
                                                 size={14}
-                                                strokeWidth={1.7}
+                                                strokeWidth={
+                                                  1.7
+                                                }
                                                 className={[
                                                   "shrink-0 transition-all duration-300",
                                                   active
                                                     ? "translate-x-0 opacity-60"
                                                     : "-translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-50",
-                                                ].join(" ")}
+                                                ].join(
+                                                  " "
+                                                )}
                                               />
                                             </motion.button>
                                           );
@@ -887,10 +925,6 @@ export default function Navbar({
                                       )}
                                     </div>
                                   </div>
-
-                                  {/* -------------------------------------------- */}
-                                  {/* SERVICE ITEMS                                */}
-                                  {/* -------------------------------------------- */}
 
                                   <div className="min-w-0">
                                     <AnimatePresence
@@ -912,9 +946,10 @@ export default function Navbar({
                                           x: -5,
                                         }}
                                         transition={{
-                                          duration: reducedMotion
-                                            ? 0
-                                            : 0.25,
+                                          duration:
+                                            reducedMotion
+                                              ? 0
+                                              : 0.25,
                                           ease: "easeOut",
                                         }}
                                       >
@@ -936,7 +971,10 @@ export default function Navbar({
                                           <span className="rounded-full border border-white/45 bg-white/[0.20] px-3 py-1 text-[10px] font-medium text-[#0a1a2f]/45">
                                             {String(
                                               activeService + 1
-                                            ).padStart(2, "0")}
+                                            ).padStart(
+                                              2,
+                                              "0"
+                                            )}
                                           </span>
                                         </div>
 
@@ -953,8 +991,12 @@ export default function Navbar({
 
                                               return (
                                                 <motion.div
-                                                  key={item.title}
-                                                  custom={itemIndex}
+                                                  key={
+                                                    item.title
+                                                  }
+                                                  custom={
+                                                    itemIndex
+                                                  }
                                                   variants={
                                                     serviceVariants
                                                   }
@@ -983,12 +1025,12 @@ export default function Navbar({
                                                       "focus:outline-none",
                                                       "focus-visible:ring-2",
                                                       "focus-visible:ring-[#d4af37]/55",
-                                                    ].join(" ")}
+                                                    ].join(
+                                                      " "
+                                                    )}
                                                   >
-                                                    {/* Hover reflection */}
                                                     <span className="pointer-events-none absolute inset-0 rounded-[18px] bg-gradient-to-r from-white/0 via-white/25 to-white/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-                                                    {/* Service icon */}
                                                     <span
                                                       className={[
                                                         "relative mr-3 flex h-9 w-9 shrink-0",
@@ -1000,11 +1042,15 @@ export default function Navbar({
                                                         "group-hover:border-[#d4af37]/25",
                                                         "group-hover:bg-[#d4af37]/[0.08]",
                                                         "group-hover:text-[#8c6d12]",
-                                                      ].join(" ")}
+                                                      ].join(
+                                                        " "
+                                                      )}
                                                     >
                                                       <ItemIcon
                                                         size={16}
-                                                        strokeWidth={1.65}
+                                                        strokeWidth={
+                                                          1.65
+                                                        }
                                                       />
                                                     </span>
 
@@ -1016,7 +1062,9 @@ export default function Navbar({
 
                                                     <ArrowRight
                                                       size={14}
-                                                      strokeWidth={1.7}
+                                                      strokeWidth={
+                                                        1.7
+                                                      }
                                                       className={[
                                                         "relative ml-2 shrink-0",
                                                         "-translate-x-1",
@@ -1025,7 +1073,9 @@ export default function Navbar({
                                                         "transition-all duration-300",
                                                         "group-hover:translate-x-0",
                                                         "group-hover:opacity-65",
-                                                      ].join(" ")}
+                                                      ].join(
+                                                        " "
+                                                      )}
                                                     />
                                                   </Link>
                                                 </motion.div>
@@ -1038,12 +1088,7 @@ export default function Navbar({
                                   </div>
                                 </div>
 
-                                {/* ------------------------------------------------ */}
-                                {/* BOTTOM ACTION BAR                               */}
-                                {/* ------------------------------------------------ */}
-
                                 <div className="mt-5 flex items-center justify-between border-t border-white/30 pt-4">
-                                  {/* LEFT — EXPLORE */}
                                   <Link
                                     href="/services"
                                     onClick={() =>
@@ -1073,13 +1118,10 @@ export default function Navbar({
                                     </span>
                                   </Link>
 
-                                  {/* RIGHT — CTA */}
-                                  <div className="flex items-center">
-                                    <FancyButton
-                                      href="/contact-us"
-                                      text="Let's Talk"
-                                    />
-                                  </div>
+                                  <FancyButton
+                                    href="/contact-us"
+                                    text="Let's Talk"
+                                  />
                                 </div>
                               </div>
                             </div>
@@ -1103,8 +1145,12 @@ export default function Navbar({
                       y: 0,
                     }}
                     transition={{
-                      delay: reducedMotion ? 0 : index * 0.035,
-                      duration: reducedMotion ? 0 : 0.34,
+                      delay: reducedMotion
+                        ? 0
+                        : index * 0.035,
+                      duration: reducedMotion
+                        ? 0
+                        : 0.34,
                       ease: "easeOut",
                     }}
                   >
@@ -1176,11 +1222,11 @@ export default function Navbar({
                 setMobileServiceView(null);
               }}
               className={[
-                "mr-2 flex h-11 w-11 cursor-pointer",
+                "group mr-2 flex h-11 w-11 cursor-pointer",
                 "items-center justify-center rounded-full",
                 "border border-blue-950/15",
                 "bg-white/[0.30]",
-                "text-blue-950 backdrop-blur-md",
+                "backdrop-blur-md",
                 "transition-all duration-300",
                 "hover:bg-white/[0.50]",
                 "active:scale-95",
@@ -1190,18 +1236,84 @@ export default function Navbar({
                 "lg:hidden",
               ].join(" ")}
             >
-              {isMobileOpen ? (
-                <X size={20} strokeWidth={1.7} />
-              ) : (
-                <Menu size={20} strokeWidth={1.7} />
-              )}
+              {/* ============================================================ */}
+              {/* ORIGINAL THREE-LINE HAMBURGER                                */}
+              {/* ============================================================ */}
+
+              <span
+                aria-hidden="true"
+                className="relative flex h-[20px] w-[22px] items-center justify-center"
+              >
+                {/* TOP LINE */}
+                <motion.span
+                  initial={false}
+                  animate={
+                    isMobileOpen
+                      ? {
+                          rotate: 45,
+                          y: 0,
+                        }
+                      : {
+                          rotate: 0,
+                          y: -6,
+                        }
+                  }
+                  transition={{
+                    duration: reducedMotion ? 0 : 0.32,
+                    ease: "easeInOut",
+                  }}
+                  className="absolute h-[1.5px] w-[22px] rounded-full bg-[#0a1a2f]"
+                />
+
+                {/* MIDDLE LINE */}
+                <motion.span
+                  initial={false}
+                  animate={
+                    isMobileOpen
+                      ? {
+                          opacity: 0,
+                          scaleX: 0,
+                        }
+                      : {
+                          opacity: 1,
+                          scaleX: 1,
+                        }
+                  }
+                  transition={{
+                    duration: reducedMotion ? 0 : 0.2,
+                    ease: "easeInOut",
+                  }}
+                  className="absolute h-[1.5px] w-[22px] rounded-full bg-[#0a1a2f]"
+                />
+
+                {/* BOTTOM LINE */}
+                <motion.span
+                  initial={false}
+                  animate={
+                    isMobileOpen
+                      ? {
+                          rotate: -45,
+                          y: 0,
+                        }
+                      : {
+                          rotate: 0,
+                          y: 6,
+                        }
+                  }
+                  transition={{
+                    duration: reducedMotion ? 0 : 0.32,
+                    ease: "easeInOut",
+                  }}
+                  className="absolute h-[1.5px] w-[22px] rounded-full bg-[#0a1a2f]"
+                />
+              </span>
             </button>
           </div>
         </div>
       </motion.nav>
 
       {/* ====================================================================== */}
-      {/* MOBILE MENU                                                             */}
+      {/* MOBILE MENU                                                            */}
       {/* ====================================================================== */}
 
       <AnimatePresence>
@@ -1245,6 +1357,8 @@ export default function Navbar({
                         const isServices =
                           item.label === "Services";
 
+                        const NavIcon = item.icon;
+
                         return (
                           <motion.div
                             key={item.label}
@@ -1260,7 +1374,7 @@ export default function Navbar({
                                   setMobileServiceView(0)
                                 }
                                 className={[
-                                  "flex w-full cursor-pointer",
+                                  "group flex w-full cursor-pointer",
                                   "items-center justify-between",
                                   "rounded-2xl border",
                                   "border-white/60",
@@ -1274,7 +1388,7 @@ export default function Navbar({
                               >
                                 <span className="flex items-center gap-3">
                                   <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#d4af37]/10 text-[#8c6d12]">
-                                    <Briefcase
+                                    <NavIcon
                                       size={17}
                                       strokeWidth={1.7}
                                     />
@@ -1286,6 +1400,7 @@ export default function Navbar({
                                 <ArrowRight
                                   size={17}
                                   strokeWidth={1.7}
+                                  className="transition-transform duration-300 group-hover:translate-x-0.5"
                                 />
                               </button>
                             ) : (
@@ -1295,23 +1410,34 @@ export default function Navbar({
                                   setIsMobileOpen(false)
                                 }
                                 className={[
-                                  "flex w-full cursor-pointer",
+                                  "group flex w-full cursor-pointer",
                                   "items-center justify-between",
                                   "rounded-2xl border",
-                                  "border-transparent",
+                                  "border-white/50",
+                                  "bg-white/[0.18]",
                                   "px-5 py-4",
                                   "text-[#0a1a2f]/80",
                                   "transition-all duration-300",
-                                  "hover:border-white/50",
-                                  "hover:bg-white/[0.38]",
+                                  "hover:border-white/65",
+                                  "hover:bg-white/[0.42]",
                                   "hover:text-[#0a1a2f]",
                                 ].join(" ")}
                               >
-                                <span>{item.label}</span>
+                                <span className="flex items-center gap-3">
+                                  <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/50 bg-white/[0.28] text-[#8c6d12] transition-all duration-300 group-hover:border-[#d4af37]/25 group-hover:bg-[#d4af37]/10">
+                                    <NavIcon
+                                      size={17}
+                                      strokeWidth={1.7}
+                                    />
+                                  </span>
+
+                                  <span>{item.label}</span>
+                                </span>
 
                                 <ArrowRight
                                   size={16}
                                   strokeWidth={1.7}
+                                  className="-translate-x-1 opacity-40 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-70"
                                 />
                               </Link>
                             )}
@@ -1362,7 +1488,7 @@ export default function Navbar({
                                   )
                                 }
                                 className={[
-                                  "flex w-full cursor-pointer",
+                                  "group flex w-full cursor-pointer",
                                   "items-center justify-between",
                                   "rounded-2xl border",
                                   "border-white/50",
@@ -1389,6 +1515,7 @@ export default function Navbar({
                                 <ArrowRight
                                   size={16}
                                   strokeWidth={1.7}
+                                  className="transition-transform duration-300 group-hover:translate-x-0.5"
                                 />
                               </button>
                             );
@@ -1405,7 +1532,7 @@ export default function Navbar({
       </AnimatePresence>
 
       {/* ====================================================================== */}
-      {/* FLOATING CALL BUTTON                                                    */}
+      {/* FLOATING CALL BUTTON                                                   */}
       {/* ====================================================================== */}
 
       <CallButton />
