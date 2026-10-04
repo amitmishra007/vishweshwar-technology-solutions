@@ -1,29 +1,58 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence, Variants } from "framer-motion";
 import {
-  Globe,
-  Smartphone,
-  Palette,
-  TrendingUp,
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+} from "framer-motion";
+import type { Variants } from "framer-motion";
+
+import {
   ArrowLeft,
-  Linkedin,
+  ArrowRight,
+  BarChart3,
+  Briefcase,
+  Code2,
+  Globe,
   Instagram,
-  Twitter,
-  LucideIcon,
+  LayoutDashboard,
+  Linkedin,
+  Megaphone,
+  Menu,
+  Monitor,
+  Palette,
+  PenTool,
+  Search,
+  Server,
+  Smartphone,
+  TrendingUp,
+  X,
+  Youtube,
 } from "lucide-react";
-import FancyButton from "./FancyButton";
+
 import dynamic from "next/dynamic";
+import FancyButton from "@/app/components/FancyButton";
 
-const CallButton = dynamic(() => import("./CallButton"), {
-  ssr: false,
-});
+const CallButton = dynamic(
+  () => import("@/app/components/CallButton"),
+  {
+    ssr: false,
+  }
+);
 
-/* ----------------------------- NAV ITEMS ----------------------------- */
+/* -------------------------------------------------------------------------- */
+/* NAV ITEMS                                                                   */
+/* -------------------------------------------------------------------------- */
+
 const NAV_ITEMS = [
   { label: "Home", href: "/" },
   { label: "About Us", href: "/about-us" },
@@ -33,573 +62,1353 @@ const NAV_ITEMS = [
   { label: "Contact Us", href: "/contact-us" },
 ] as const;
 
-/* --------------------------- SERVICES MENU -------------------------- */
-const SERVICE_MENU = {
-  "Web Development": [
-    { title: "Website Design & Development", id: "website-development" },
-    { title: "Progressive Web Applications", id: "pwa" },
-    { title: "ERPs / CRMs / CMS / Dashboards", id: "custom-systems" },
-    { title: "Enterprise Systems", id: "enterprise-systems" },
-  ],
-  "Mobile App Development": [
-    { title: "iOS & Android Apps", id: "mobile-apps" },
-    { title: "Cross Platform Apps", id: "cross-platform" },
-    { title: "Enterprise Mobile Systems", id: "enterprise-mobile" },
-    { title: "App UI / UX Design", id: "app-uiux" },
-  ],
-  "Graphics & Brand Identity": [
-    { title: "Logo Design", id: "logo-design" },
-    { title: "Brand Identity Systems", id: "brand-identity" },
-    { title: "Marketing Graphics", id: "marketing-graphics" },
-    { title: "Packaging & Print Design", id: "packaging" },
-  ],
-  "Marketing & SEO": [
-    { title: "SEO & Organic Growth", id: "seo" },
-    { title: "Google & Meta Ads", id: "paid-advertising" },
-    { title: "Content & Social Marketing", id: "content-marketing" },
-    { title: "Analytics & CRO", id: "analytics" },
-  ],
-} as const;
+/* -------------------------------------------------------------------------- */
+/* SERVICES                                                                    */
+/* -------------------------------------------------------------------------- */
 
-type ServiceCategory = keyof typeof SERVICE_MENU;
+const SERVICE_MENU = [
+  {
+    title: "Web Development",
+    icon: Globe,
+    description: "Web platforms built for performance and growth.",
+    items: [
+      {
+        title: "Website Design & Development",
+        icon: Monitor,
+      },
+      {
+        title: "Progressive Web Applications",
+        icon: Globe,
+      },
+      {
+        title: "ERPs / CRMs / CMS / Dashboards",
+        icon: LayoutDashboard,
+      },
+      {
+        title: "Enterprise Systems",
+        icon: Server,
+      },
+    ],
+  },
+  {
+    title: "Mobile App Development",
+    icon: Smartphone,
+    description: "Native and cross-platform mobile experiences.",
+    items: [
+      {
+        title: "iOS & Android Apps",
+        icon: Smartphone,
+      },
+      {
+        title: "Cross Platform Apps",
+        icon: Code2,
+      },
+      {
+        title: "Enterprise Mobile Systems",
+        icon: Briefcase,
+      },
+      {
+        title: "App UI / UX Design",
+        icon: PenTool,
+      },
+    ],
+  },
+  {
+    title: "Graphics & Brand Identity",
+    icon: Palette,
+    description: "Visual identities that make brands memorable.",
+    items: [
+      {
+        title: "Logo Design",
+        icon: PenTool,
+      },
+      {
+        title: "Brand Identity Systems",
+        icon: LayersIcon,
+      },
+      {
+        title: "Marketing Graphics",
+        icon: Megaphone,
+      },
+      {
+        title: "Packaging & Print Design",
+        icon: Palette,
+      },
+    ],
+  },
+  {
+    title: "Marketing & SEO",
+    icon: TrendingUp,
+    description: "Digital visibility, acquisition and measurable growth.",
+    items: [
+      {
+        title: "SEO & Organic Growth",
+        icon: Search,
+      },
+      {
+        title: "Google & Meta Ads",
+        icon: Megaphone,
+      },
+      {
+        title: "Content & Social Marketing",
+        icon: TrendingUp,
+      },
+      {
+        title: "Analytics & CRO",
+        icon: BarChart3,
+      },
+    ],
+  },
+] as const;
 
-const SERVICE_ICONS: Record<ServiceCategory, LucideIcon> = {
-  "Web Development": Globe,
-  "Mobile App Development": Smartphone,
-  "Graphics & Brand Identity": Palette,
-  "Marketing & SEO": TrendingUp,
+/*
+ * Kept separately so the menu data remains easy to scan.
+ * Lucide has a "Layers" icon, aliased here to avoid any future
+ * naming collision with application-level components.
+ */
+import { Layers as LayersIcon } from "lucide-react";
+
+/* -------------------------------------------------------------------------- */
+/* ANIMATION VARIANTS                                                          */
+/* -------------------------------------------------------------------------- */
+
+const panelVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 8,
+    scale: 0.985,
+    filter: "blur(5px)",
+  },
+
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: {
+      opacity: {
+        duration: 0.22,
+        ease: "easeOut",
+      },
+      y: {
+        duration: 0.42,
+        ease: "easeOut",
+      },
+      scale: {
+        duration: 0.42,
+        ease: "easeOut",
+      },
+      filter: {
+        duration: 0.35,
+        ease: "easeOut",
+      },
+    },
+  },
+
+  exit: {
+    opacity: 0,
+    y: 5,
+    scale: 0.992,
+    filter: "blur(3px)",
+    transition: {
+      opacity: {
+        duration: 0.16,
+        ease: "easeIn",
+      },
+      y: {
+        duration: 0.22,
+        ease: "easeIn",
+      },
+      scale: {
+        duration: 0.22,
+        ease: "easeIn",
+      },
+      filter: {
+        duration: 0.2,
+        ease: "easeIn",
+      },
+    },
+  },
 };
 
-/* --------------------------- NAVBAR COMPONENT ------------------------ */
-export default function Navbar({ hide = false }: { hide?: boolean }) {
-  const pathname = usePathname();
-  /* ----------------------------- STATES ----------------------------- */
-  const [desktopCategory, setDesktopCategory] =
-    useState<ServiceCategory | null>(null);
-  const [megaOpen, setMegaOpen] = useState(false);
-  const [megaTimeout, setMegaTimeout] = useState<NodeJS.Timeout | null>(null);
+const categoryVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    x: -10,
+    scale: 0.985,
+    filter: "blur(4px)",
+  },
 
-  const [open, setOpen] = useState(false); // mobile hamburger
-  const [mobileServiceOpen, setMobileServiceOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<ServiceCategory | null>(
-    null,
+  visible: (index: number) => ({
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: {
+      delay: index * 0.055,
+      duration: 0.34,
+      ease: "easeOut",
+    },
+  }),
+
+  exit: (index: number) => ({
+    opacity: 0,
+    x: -6,
+    scale: 0.99,
+    filter: "blur(3px)",
+    transition: {
+      delay: index * 0.025,
+      duration: 0.18,
+      ease: "easeIn",
+    },
+  }),
+};
+
+const serviceVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    x: 12,
+    y: 4,
+    scale: 0.985,
+    filter: "blur(5px)",
+  },
+
+  visible: (index: number) => ({
+    opacity: 1,
+    x: 0,
+    y: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: {
+      delay: 0.08 + index * 0.065,
+      duration: 0.38,
+      ease: "easeOut",
+    },
+  }),
+
+  exit: (index: number) => ({
+    opacity: 0,
+    x: 7,
+    y: 2,
+    scale: 0.99,
+    filter: "blur(3px)",
+    transition: {
+      delay: index * 0.025,
+      duration: 0.18,
+      ease: "easeIn",
+    },
+  }),
+};
+
+const mobilePanelVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    clipPath: "circle(0% at 100% 0%)",
+  },
+
+  visible: {
+    opacity: 1,
+    clipPath: "circle(150% at 100% 0%)",
+    transition: {
+      duration: 0.6,
+      ease: "easeOut",
+    },
+  },
+
+  exit: {
+    opacity: 0,
+    clipPath: "circle(0% at 100% 0%)",
+    transition: {
+      duration: 0.42,
+      ease: "easeIn",
+    },
+  },
+};
+
+const mobileItemVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    x: -12,
+  },
+
+  visible: (index: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: {
+      delay: index * 0.055,
+      duration: 0.32,
+      ease: "easeOut",
+    },
+  }),
+};
+
+/* -------------------------------------------------------------------------- */
+/* COMPONENT                                                                   */
+/* -------------------------------------------------------------------------- */
+
+export default function Navbar({
+  hide = false,
+}: {
+  hide?: boolean;
+}) {
+  const pathname = usePathname();
+  const prefersReducedMotion = useReducedMotion();
+  const reducedMotion = prefersReducedMotion ?? false;
+
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const [activeService, setActiveService] = useState(0);
+  const [mobileServiceView, setMobileServiceView] = useState<
+    number | null
+  >(null);
+
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [showNav, setShowNav] = useState(true);
+
+  const lastScrollRef = useRef(0);
+  const tickingRef = useRef(false);
+  const animationFrameRef = useRef<number | null>(null);
+
+  /*
+   * IMPORTANT:
+   * ReturnType<typeof setTimeout> works correctly in both
+   * browser and Node/Next.js TypeScript environments.
+   */
+  const megaTimeoutRef =
+    useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /* ------------------------------------------------------------------------ */
+  /* SERVICES MENU                                                             */
+  /* ------------------------------------------------------------------------ */
+
+  const clearMegaTimeout = useCallback(() => {
+    if (megaTimeoutRef.current !== null) {
+      clearTimeout(megaTimeoutRef.current);
+      megaTimeoutRef.current = null;
+    }
+  }, []);
+
+  const openServices = useCallback(() => {
+    clearMegaTimeout();
+    setIsServicesOpen(true);
+  }, [clearMegaTimeout]);
+
+  const closeServices = useCallback(
+    (delay = 0) => {
+      clearMegaTimeout();
+
+      if (delay > 0) {
+        megaTimeoutRef.current = setTimeout(() => {
+          setIsServicesOpen(false);
+          megaTimeoutRef.current = null;
+        }, delay);
+
+        return;
+      }
+
+      setIsServicesOpen(false);
+    },
+    [clearMegaTimeout]
   );
 
-  const [logoLoaded, setLogoLoaded] = useState(false);
-  const [showNav, setShowNav] = useState(true);
-  const [lastScroll, setLastScroll] = useState(0);
-  const [scrollY, setScrollY] = useState(0);
-  const [showTopBtn, setShowTopBtn] = useState(false);
-
-  const spacing = 6;
-
-  const fadeUp = (duration = 0.3): Variants => ({
-    hidden: { opacity: 0, y: 12 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration, type: "spring", stiffness: 120 },
-    },
-  });
-
-  /* --------------------------- LOGO ANIMATION ------------------------ */
-  useEffect(() => {
-    const timer = setTimeout(() => setLogoLoaded(true), 100);
-    return () => clearTimeout(timer);
+  const handleServiceChange = useCallback((index: number) => {
+    setActiveService(index);
   }, []);
 
-  /* ---------------------------- SCROLL DETECTION -------------------- */
+  const handleBackClick = useCallback(() => {
+    setMobileServiceView(null);
+  }, []);
+
+  /* ------------------------------------------------------------------------ */
+  /* SCROLL                                                                     */
+  /* ------------------------------------------------------------------------ */
 
   useEffect(() => {
-    let ticking = false;
-
     const handleScroll = () => {
-      if (!ticking) {
+      if (tickingRef.current) {
+        return;
+      }
+
+      tickingRef.current = true;
+
+      animationFrameRef.current =
         window.requestAnimationFrame(() => {
           const currentScroll = window.scrollY;
+          const previousScroll = lastScrollRef.current;
 
-          setScrollY(currentScroll);
-          setShowNav(currentScroll < lastScroll || currentScroll < 50);
-          setShowTopBtn(currentScroll > 300);
-          setLastScroll(currentScroll);
+          setIsScrolled(currentScroll > 24);
 
-          ticking = false;
+          if (currentScroll < 40) {
+            setShowNav(true);
+          } else if (currentScroll > previousScroll + 4) {
+            setShowNav(false);
+          } else if (currentScroll < previousScroll - 4) {
+            setShowNav(true);
+          }
+
+          lastScrollRef.current = currentScroll;
+          tickingRef.current = false;
         });
-
-        ticking = true;
-      }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScroll]);
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
 
-  // Escape Key
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
 
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-        setMegaOpen(false);
+      if (animationFrameRef.current !== null) {
+        window.cancelAnimationFrame(animationFrameRef.current);
       }
     };
-
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
-  /* --------------------------- SCROLL LOCK MOBILE ------------------- */
+  /* ------------------------------------------------------------------------ */
+  /* ROUTE CHANGES                                                             */
+  /* ------------------------------------------------------------------------ */
+
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
+    setIsMobileOpen(false);
+    setIsServicesOpen(false);
+    setMobileServiceView(null);
+  }, [pathname]);
+
+  /* ------------------------------------------------------------------------ */
+  /* ESCAPE                                                                     */
+  /* ------------------------------------------------------------------------ */
+
+  useEffect(() => {
+    if (!isMobileOpen && !isServicesOpen) {
+      return;
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      setIsMobileOpen(false);
+      setIsServicesOpen(false);
+      setMobileServiceView(null);
     };
-  }, [open]);
 
-  /* ----------------------------- RESET STATES ------------------------ */
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isMobileOpen, isServicesOpen]);
+
+  /* ------------------------------------------------------------------------ */
+  /* MOBILE BODY LOCK                                                          */
+  /* ------------------------------------------------------------------------ */
+
   useEffect(() => {
-    if (!open) {
-      setMobileServiceOpen(false);
-      setActiveCategory(null);
+    if (!isMobileOpen) {
+      return;
     }
-  }, [open]);
+
+    const previousOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isMobileOpen]);
+
+  /* ------------------------------------------------------------------------ */
+  /* CLEANUP                                                                    */
+  /* ------------------------------------------------------------------------ */
 
   useEffect(() => {
-    if (!megaOpen) setDesktopCategory(null);
-  }, [megaOpen]);
+    return () => {
+      clearMegaTimeout();
 
-  /* --------------------------- MEGA MENU HANDLERS ------------------- */
-  const [backClicked, setBackClicked] = useState(false); // track if Back was clicked
+      if (animationFrameRef.current !== null) {
+        window.cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [clearMegaTimeout]);
 
-  const handleMegaEnter = () => {
-    // Cancel any pending close
-    if (megaTimeout) {
-      clearTimeout(megaTimeout);
-      setMegaTimeout(null);
-    }
-    setMegaOpen(true);
-    setBackClicked(false); // reset back click state
-  };
+  /* ------------------------------------------------------------------------ */
+  /* RENDER                                                                     */
+  /* ------------------------------------------------------------------------ */
 
-  const handleMegaLeave = () => {
-    if (backClicked) {
-      // Give 2 seconds to return
-      const timeout = setTimeout(() => {
-        setMegaOpen(false);
-        setDesktopCategory(null);
-        setBackClicked(false);
-      }, 2000);
-      setMegaTimeout(timeout);
-    } else {
-      // normal hover out: close immediately
-      setMegaOpen(false);
-      setDesktopCategory(null);
-    }
-  };
-
-  const handleBackClick = () => {
-    // Just reset the subcategory, keep mega menu open
-    setDesktopCategory(null);
-
-    // Set the backClicked state to true so leaving gives 2s
-    setBackClicked(true);
-
-    // Cancel any pending close
-    if (megaTimeout) {
-      clearTimeout(megaTimeout);
-      setMegaTimeout(null);
-    }
-  };
-
-  /* --------------------------- NAV ITEM ANIMATION ------------------ */
-  const navItemVariants: Variants = {
-    hidden: { opacity: 0, x: 40 },
-    visible: (i: number) => ({
-      opacity: 1,
-      x: 0,
-      transition: { delay: i * 0.08, type: "spring", stiffness: 120 },
-    }),
-  };
-
-  /* --------------------------- RENDER ------------------------------- */
   return (
     <>
-      {/* ------------------------------ NAVBAR -------------------------------- */}
+      {/* ====================================================================== */}
+      {/* NAVBAR                                                                  */}
+      {/* ====================================================================== */}
+
       <motion.nav
-        initial={{ y: 0 }}
+        initial={false}
         animate={{
-          y: hide ? -200 : open ? 0 : showNav ? 0 : -180,
+          y:
+            hide || (!showNav && !isMobileOpen)
+              ? -180
+              : 0,
         }}
-        transition={{ type: "spring", stiffness: 120, damping: 20 }}
-        className={`fixed top-0 left-0 z-[999] w-full ${
-          scrollY > 0
-            ? "bg-gradient-to-br from-[#FCF5E5] via-[#FAF9F6] to-transparent"
-            : "bg-transparent"
-        }`}
+        transition={
+          reducedMotion
+            ? { duration: 0 }
+            : {
+                duration: 0.42,
+                ease: "easeOut",
+              }
+        }
+        className="fixed inset-x-0 top-0 z-[999]"
       >
-        <div className="flex items-center justify-between px-4 md:px-6 lg:px-8 py-1">
-          {/* LOGO */}
-          <motion.div
-            initial={{ x: -160, opacity: 0 }}
-            animate={logoLoaded ? { x: 0, opacity: 1 } : {}}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="shrink-0 relative -ml-6 sm:-ml-8 md:-ml-10 mt-1 sm:mt-2 md:mt-3 h-20 w-32 sm:h-24 sm:w-44 md:h-26 md:w-52 lg:h-28 lg:w-56 xl:h-32 xl:w-64"
-          >
-            <Image
-              src="/vishweshwar-industries-logo.png"
-              alt="Vishweshwar Industries Logo"
-              fill
-              className="object-contain drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]"
-              priority
-            />
-          </motion.div>
+        <div
+          className={[
+            "mx-auto w-full px-4 transition-all duration-500",
+            "sm:px-6 lg:px-8",
+            isScrolled ? "pt-3" : "pt-5",
+          ].join(" ")}
+        >
+          <div className="mx-auto flex max-w-[1440px] items-center justify-between">
+            {/* ---------------------------------------------------------------- */}
+            {/* LOGO                                                              */}
+            {/* ---------------------------------------------------------------- */}
 
-          {/* -------------------- DESKTOP NAV -------------------- */}
-          <div className="hidden lg:flex flex-1 justify-end space-x-8 brand-font relative">
-            {NAV_ITEMS.map((item, idx) => {
-              if (item.label === "Services") {
-                return (
-                  <div
-                    key="services"
-                    className="relative"
-                    onMouseEnter={handleMegaEnter}
-                    onMouseLeave={handleMegaLeave}
-                  >
-                    <motion.div
-                      custom={idx}
-                      initial="hidden"
-                      animate="visible"
-                      variants={navItemVariants}
-                      className="cursor-pointer text-blue-950/90 font-semibold hover:text-amber-700 transition-colors"
+            <Link
+              href="/"
+              aria-label="Vishweshwar Industries home"
+              className={[
+                "relative z-10 shrink-0",
+                "-ml-6 sm:-ml-8 md:-ml-10",
+                "mt-1 sm:mt-2 md:mt-3",
+                "h-20 w-32",
+                "sm:h-24 sm:w-44",
+                "md:h-[6.5rem] md:w-52",
+                "lg:h-28 lg:w-56",
+                "xl:h-32 xl:w-64",
+              ].join(" ")}
+            >
+              <Image
+                src="/vishweshwar-industries-logo.png"
+                alt="Vishweshwar Industries"
+                fill
+                priority
+                sizes="(max-width: 640px) 128px, (max-width: 768px) 176px, (max-width: 1024px) 208px, 256px"
+                className="object-contain object-left drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]"
+              />
+            </Link>
+
+            {/* ---------------------------------------------------------------- */}
+            {/* DESKTOP NAVIGATION                                                */}
+            {/* ---------------------------------------------------------------- */}
+
+            <div className="hidden flex-1 items-center justify-end gap-1 brand-font lg:flex">
+              {NAV_ITEMS.map((item, index) => {
+                const isServices = item.label === "Services";
+                const isActive = pathname === item.href;
+
+                if (isServices) {
+                  return (
+                    <div
+                      key={item.label}
+                      className="relative"
+                      onMouseEnter={openServices}
+                      onMouseLeave={() => closeServices(180)}
+                      onFocus={openServices}
+                      onBlur={(event) => {
+                        if (
+                          !event.currentTarget.contains(
+                            event.relatedTarget as Node | null
+                          )
+                        ) {
+                          closeServices(180);
+                        }
+                      }}
                     >
-                      Services +
-                    </motion.div>
+                      <motion.button
+                        type="button"
+                        initial={
+                          reducedMotion
+                            ? { opacity: 1 }
+                            : { opacity: 0, y: -8 }
+                        }
+                        animate={{
+                          opacity: 1,
+                          y: 0,
+                        }}
+                        transition={{
+                          delay: reducedMotion ? 0 : index * 0.035,
+                          duration: reducedMotion ? 0 : 0.34,
+                          ease: "easeOut",
+                        }}
+                        aria-expanded={isServicesOpen}
+                        aria-haspopup="true"
+                        onClick={() => {
+                          if (isServicesOpen) {
+                            closeServices();
+                          } else {
+                            openServices();
+                          }
+                        }}
+                        className={[
+                          "group relative flex cursor-pointer items-center gap-1.5",
+                          "rounded-full px-4 py-2.5",
+                          "text-[13px] font-medium tracking-wide",
+                          "text-blue-950/90",
+                          "transition-all duration-300",
+                          "hover:bg-white/[0.20]",
+                          "hover:text-amber-700",
+                          "active:scale-[0.97]",
+                          "focus:outline-none",
+                          "focus-visible:ring-2",
+                          "focus-visible:ring-[#d4af37]/60",
+                        ].join(" ")}
+                      >
+                        <span>Services</span>
 
-                    <AnimatePresence>
-                      {megaOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10, scale: 0.97 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 10, scale: 0.97 }}
-                          transition={{
-                            duration: 0.35,
-                            ease: [0.16, 1, 0.3, 1],
-                          }}
-                          className={`absolute left-1/2 top-full mt-2 -translate-x-1/2
-                          rounded-3xl bg-white/90 backdrop-blur-xl border border-white/20
-                          shadow-[0_25px_80px_rgba(0,0,0,0.2)] p-8 z-50
-                          flex gap-10
-                          ${desktopCategory ? "w-[750px] max-w-[95vw]" : "w-max"}`}
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className={[
+                            "transition-transform duration-300",
+                            isServicesOpen
+                              ? "rotate-180"
+                              : "group-hover:translate-y-0.5",
+                          ].join(" ")}
                         >
-                          {!desktopCategory && (
-                            <motion.div
-                              className="flex flex-col space-y-4 w-max"
-                              initial="hidden"
-                              animate="visible"
-                              variants={{
-                                hidden: {},
-                                visible: {
-                                  transition: { staggerChildren: 0.08 },
-                                },
-                              }}
-                            >
-                              {(
-                                Object.keys(SERVICE_MENU) as ServiceCategory[]
-                              ).map((category) => {
-                                const Icon = SERVICE_ICONS[category];
-                                return (
-                                  <motion.button
-                                    key={category}
-                                    onClick={() => setDesktopCategory(category)}
-                                    className="flex items-center gap-2 text-sm font-medium text-blue-950/90 hover:text-amber-700 transition-all duration-300 hover:translate-x-1"
-                                    whileHover={{ scale: 1.02 }}
-                                  >
-                                    <Icon size={16} /> {category}
-                                  </motion.button>
-                                );
-                              })}
-                            </motion.div>
-                          )}
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
 
-                          {desktopCategory && (
-                            <>
-                              {/* Left panel: category title + back */}
-                              <div className="flex flex-col w-1/2 pr-6 justify-center">
-                                <h3 className="text-blue-950 font-bold text-lg mb-6">
-                                  {desktopCategory}
-                                </h3>
-                                <div className="flex justify-between">
+                        <span
+                          className={[
+                            "absolute inset-x-3 -bottom-0.5 h-px",
+                            "origin-center bg-gradient-to-r",
+                            "from-transparent via-[#d4af37]/80 to-transparent",
+                            "transition-all duration-300",
+                            isServicesOpen
+                              ? "scale-x-100 opacity-100"
+                              : "scale-x-0 opacity-0 group-hover:scale-x-75 group-hover:opacity-60",
+                          ].join(" ")}
+                        />
+                      </motion.button>
+
+                      {/* ====================================================== */}
+                      {/* SERVICES MEGA MENU                                    */}
+                      {/* ====================================================== */}
+
+                      <AnimatePresence>
+                        {isServicesOpen && (
+                          <motion.div
+                            variants={panelVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            className="absolute left-1/2 top-full mt-3 w-[790px] -translate-x-1/2"
+                          >
+                            <div
+                              className={[
+                                "relative overflow-hidden rounded-[30px]",
+                                "border border-white/50",
+                                "bg-white/[0.50]",
+                                "backdrop-blur-2xl",
+                                "backdrop-saturate-150",
+                                "shadow-[0_12px_30px_rgba(0,0,0,0.075)]",
+                                "ring-1 ring-white/20",
+                              ].join(" ")}
+                            >
+                              {/* Glass surface */}
+                              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/35 via-white/[0.06] to-transparent" />
+
+                              {/* Soft gold reflection */}
+                              <div className="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-[#d4af37]/[0.035] blur-3xl" />
+
+                              {/* Top glass reflection */}
+                              <div className="pointer-events-none absolute inset-x-12 top-0 h-px bg-gradient-to-r from-transparent via-white/90 to-transparent" />
+
+                              {/* Cinematic glass sweep */}
+                              {!reducedMotion && (
+                                <motion.div
+                                  initial={{
+                                    x: "-140%",
+                                    opacity: 0,
+                                  }}
+                                  animate={{
+                                    x: "140%",
+                                    opacity: [0, 0.16, 0],
+                                  }}
+                                  transition={{
+                                    duration: 1.1,
+                                    ease: "easeInOut",
+                                  }}
+                                  className={[
+                                    "pointer-events-none absolute inset-y-0 left-0",
+                                    "w-1/4 -skew-x-12",
+                                    "bg-gradient-to-r",
+                                    "from-transparent via-white/60 to-transparent",
+                                  ].join(" ")}
+                                />
+                              )}
+
+                              <div className="relative p-5">
+                                {/* ------------------------------------------------ */}
+                                {/* TOP CONTENT                                      */}
+                                {/* ------------------------------------------------ */}
+
+                                <div className="grid grid-cols-[265px_1fr] gap-5">
+                                  {/* -------------------------------------------- */}
+                                  {/* CATEGORY COLUMN                              */}
+                                  {/* -------------------------------------------- */}
+
+                                  <div className="border-r border-white/30 pr-5">
+                                    <div className="mb-3 px-2">
+                                      <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#0a1a2f]/40">
+                                        What we do
+                                      </p>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                      {SERVICE_MENU.map(
+                                        (service, serviceIndex) => {
+                                          const Icon = service.icon;
+                                          const active =
+                                            activeService ===
+                                            serviceIndex;
+
+                                          return (
+                                            <motion.button
+                                              key={service.title}
+                                              type="button"
+                                              custom={serviceIndex}
+                                              variants={categoryVariants}
+                                              initial="hidden"
+                                              animate="visible"
+                                              exit="exit"
+                                              onMouseEnter={() =>
+                                                handleServiceChange(
+                                                  serviceIndex
+                                                )
+                                              }
+                                              onFocus={() =>
+                                                handleServiceChange(
+                                                  serviceIndex
+                                                )
+                                              }
+                                              onClick={() =>
+                                                handleServiceChange(
+                                                  serviceIndex
+                                                )
+                                              }
+                                              className={[
+                                                "group relative flex w-full cursor-pointer",
+                                                "items-center gap-3 rounded-full",
+                                                "border px-3 py-2.5 text-left",
+                                                "transition-all duration-300",
+                                                "active:scale-[0.98]",
+
+                                                active
+                                                  ? [
+                                                      "border-white/60",
+                                                      "bg-white/[0.44]",
+                                                      "text-[#0a1a2f]",
+                                                      "shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]",
+                                                    ].join(" ")
+                                                  : [
+                                                      "border-transparent",
+                                                      "bg-white/[0.12]",
+                                                      "text-[#0a1a2f]/68",
+                                                      "hover:border-white/40",
+                                                      "hover:bg-white/[0.29]",
+                                                      "hover:text-[#0a1a2f]",
+                                                    ].join(" "),
+                                              ].join(" ")}
+                                            >
+                                              <span
+                                                className={[
+                                                  "flex h-9 w-9 shrink-0 items-center",
+                                                  "justify-center rounded-full",
+                                                  "border transition-all duration-300",
+
+                                                  active
+                                                    ? [
+                                                        "border-[#d4af37]/30",
+                                                        "bg-[#d4af37]/10",
+                                                        "text-[#8c6d12]",
+                                                      ].join(" ")
+                                                    : [
+                                                        "border-white/40",
+                                                        "bg-white/[0.20]",
+                                                        "text-[#0a1a2f]/60",
+                                                        "group-hover:border-white/60",
+                                                        "group-hover:bg-white/[0.38]",
+                                                      ].join(" "),
+                                                ].join(" ")}
+                                              >
+                                                <Icon
+                                                  size={16}
+                                                  strokeWidth={1.7}
+                                                />
+                                              </span>
+
+                                              <span className="min-w-0 flex-1">
+                                                <span className="block truncate text-[13px] font-medium">
+                                                  {service.title}
+                                                </span>
+
+                                                <span
+                                                  className={[
+                                                    "mt-0.5 block truncate text-[9px]",
+                                                    "tracking-wide",
+                                                    active
+                                                      ? "text-[#0a1a2f]/45"
+                                                      : "text-[#0a1a2f]/30",
+                                                  ].join(" ")}
+                                                >
+                                                  {service.description}
+                                                </span>
+                                              </span>
+
+                                              <ArrowRight
+                                                size={14}
+                                                strokeWidth={1.7}
+                                                className={[
+                                                  "shrink-0 transition-all duration-300",
+                                                  active
+                                                    ? "translate-x-0 opacity-60"
+                                                    : "-translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-50",
+                                                ].join(" ")}
+                                              />
+                                            </motion.button>
+                                          );
+                                        }
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* -------------------------------------------- */}
+                                  {/* SERVICE ITEMS                                */}
+                                  {/* -------------------------------------------- */}
+
+                                  <div className="min-w-0">
+                                    <AnimatePresence
+                                      mode="wait"
+                                      initial={false}
+                                    >
+                                      <motion.div
+                                        key={activeService}
+                                        initial={{
+                                          opacity: 0,
+                                          x: 8,
+                                        }}
+                                        animate={{
+                                          opacity: 1,
+                                          x: 0,
+                                        }}
+                                        exit={{
+                                          opacity: 0,
+                                          x: -5,
+                                        }}
+                                        transition={{
+                                          duration: reducedMotion
+                                            ? 0
+                                            : 0.25,
+                                          ease: "easeOut",
+                                        }}
+                                      >
+                                        <div className="mb-4 flex items-center justify-between px-1">
+                                          <div>
+                                            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#0a1a2f]/40">
+                                              Services
+                                            </p>
+
+                                            <h3 className="mt-1 text-lg font-semibold tracking-tight text-[#0a1a2f]">
+                                              {
+                                                SERVICE_MENU[
+                                                  activeService
+                                                ].title
+                                              }
+                                            </h3>
+                                          </div>
+
+                                          <span className="rounded-full border border-white/45 bg-white/[0.20] px-3 py-1 text-[10px] font-medium text-[#0a1a2f]/45">
+                                            {String(
+                                              activeService + 1
+                                            ).padStart(2, "0")}
+                                          </span>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-2.5">
+                                          {SERVICE_MENU[
+                                            activeService
+                                          ].items.map(
+                                            (
+                                              item,
+                                              itemIndex
+                                            ) => {
+                                              const ItemIcon =
+                                                item.icon;
+
+                                              return (
+                                                <motion.div
+                                                  key={item.title}
+                                                  custom={itemIndex}
+                                                  variants={
+                                                    serviceVariants
+                                                  }
+                                                  initial="hidden"
+                                                  animate="visible"
+                                                  exit="exit"
+                                                >
+                                                  <Link
+                                                    href="/services"
+                                                    onClick={() =>
+                                                      closeServices()
+                                                    }
+                                                    className={[
+                                                      "group relative flex min-h-[58px]",
+                                                      "cursor-pointer items-center",
+                                                      "overflow-hidden rounded-[18px]",
+                                                      "border border-white/35",
+                                                      "bg-white/[0.17]",
+                                                      "px-3.5 py-2.5",
+                                                      "transition-all duration-300",
+                                                      "hover:-translate-y-0.5",
+                                                      "hover:border-white/65",
+                                                      "hover:bg-white/[0.48]",
+                                                      "hover:shadow-[0_5px_18px_rgba(0,0,0,0.035)]",
+                                                      "active:translate-y-0",
+                                                      "focus:outline-none",
+                                                      "focus-visible:ring-2",
+                                                      "focus-visible:ring-[#d4af37]/55",
+                                                    ].join(" ")}
+                                                  >
+                                                    {/* Hover reflection */}
+                                                    <span className="pointer-events-none absolute inset-0 rounded-[18px] bg-gradient-to-r from-white/0 via-white/25 to-white/0 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+                                                    {/* Service icon */}
+                                                    <span
+                                                      className={[
+                                                        "relative mr-3 flex h-9 w-9 shrink-0",
+                                                        "items-center justify-center rounded-xl",
+                                                        "border border-white/45",
+                                                        "bg-white/[0.28]",
+                                                        "text-[#0a1a2f]/60",
+                                                        "transition-all duration-300",
+                                                        "group-hover:border-[#d4af37]/25",
+                                                        "group-hover:bg-[#d4af37]/[0.08]",
+                                                        "group-hover:text-[#8c6d12]",
+                                                      ].join(" ")}
+                                                    >
+                                                      <ItemIcon
+                                                        size={16}
+                                                        strokeWidth={1.65}
+                                                      />
+                                                    </span>
+
+                                                    <span className="relative flex-1 text-[12px] font-medium leading-5 text-[#0a1a2f]/72 transition-colors duration-300 group-hover:text-[#0a1a2f]">
+                                                      {
+                                                        item.title
+                                                      }
+                                                    </span>
+
+                                                    <ArrowRight
+                                                      size={14}
+                                                      strokeWidth={1.7}
+                                                      className={[
+                                                        "relative ml-2 shrink-0",
+                                                        "-translate-x-1",
+                                                        "text-[#0a1a2f]/25",
+                                                        "opacity-0",
+                                                        "transition-all duration-300",
+                                                        "group-hover:translate-x-0",
+                                                        "group-hover:opacity-65",
+                                                      ].join(" ")}
+                                                    />
+                                                  </Link>
+                                                </motion.div>
+                                              );
+                                            }
+                                          )}
+                                        </div>
+                                      </motion.div>
+                                    </AnimatePresence>
+                                  </div>
+                                </div>
+
+                                {/* ------------------------------------------------ */}
+                                {/* BOTTOM ACTION BAR                               */}
+                                {/* ------------------------------------------------ */}
+
+                                <div className="mt-5 flex items-center justify-between border-t border-white/30 pt-4">
+                                  {/* LEFT — EXPLORE */}
                                   <Link
-                                    className="text-blue-500 hover:text-amber-700 underline w-1/3"
-                                    href={"www.google.com"}
+                                    href="/services"
+                                    onClick={() =>
+                                      closeServices()
+                                    }
+                                    className={[
+                                      "group inline-flex cursor-pointer",
+                                      "items-center gap-2 rounded-full",
+                                      "px-2 py-2",
+                                      "text-[11px] font-semibold uppercase",
+                                      "tracking-[0.16em]",
+                                      "text-[#0a1a2f]/50",
+                                      "transition-all duration-300",
+                                      "hover:text-[#0a1a2f]",
+                                    ].join(" ")}
                                   >
-                                    Know More
+                                    <span className="flex h-7 w-7 items-center justify-center rounded-full border border-white/45 bg-white/[0.20] transition-all duration-300 group-hover:bg-white/[0.42]">
+                                      <ArrowRight
+                                        size={13}
+                                        strokeWidth={1.8}
+                                        className="transition-transform duration-300 group-hover:translate-x-0.5"
+                                      />
+                                    </span>
+
+                                    <span>
+                                      Explore all services
+                                    </span>
                                   </Link>
-                                  <FancyButton
-                                    text="Back"
-                                    onClick={handleBackClick}
-                                    className="w-1/3 cursor-pointer hover:rotate-180"
-                                  />
+
+                                  {/* RIGHT — CTA */}
+                                  <div className="flex items-center">
+                                    <FancyButton
+                                      href="/contact-us"
+                                      text="Let's Talk"
+                                    />
+                                  </div>
                                 </div>
                               </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  );
+                }
 
-                              {/* Right panel: services list */}
-                              <motion.div
-                                className="flex flex-col w-1/2 mt-2 space-y-2"
-                                initial="hidden"
-                                animate="visible"
-                                variants={{
-                                  hidden: {},
-                                  visible: {
-                                    transition: {
-                                      staggerChildren: 0.08,
-                                      delayChildren: 0.1,
-                                    },
-                                  },
-                                }}
-                              >
-                                {SERVICE_MENU[desktopCategory].map(
-                                  (service) => (
-                                    <motion.div
-                                      key={service.id}
-                                      variants={fadeUp(0.5)}
-                                      whileHover={{ scale: 1.02, y: -2 }}
-                                      className="group relative py-2 px-4 rounded-r-2xl bg-white/60 backdrop-blur-md border border-blue-100 hover:border-[#d4af37]/70 transition-all duration-300 hover:shadow-[0_6px_18px_rgba(212,175,55,0.18)] cursor-pointer max-w-max"
-                                    >
-                                      <Link href={`/services/${service.id}`}>
-                                        <div className="absolute left-0 top-0 h-full w-[2px] bg-gradient-to-b from-[#d4af37] to-[#f5d76e] rounded-l-lg opacity-80" />
-                                        <p className="pl-3 text-sm font-medium text-blue-950 group-hover:text-amber-700 transition">
-                                          {service.title}
-                                        </p>
-                                      </Link>
-                                    </motion.div>
-                                  ),
-                                )}
-                              </motion.div>
-                            </>
-                          )}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                );
-              }
-
-              return (
-                <motion.div
-                  key={item.href}
-                  custom={idx}
-                  initial="hidden"
-                  animate="visible"
-                  variants={navItemVariants}
-                >
-                  <Link
-                    href={item.href}
-                    className={`font-semibold transition-colors duration-300 ${
-                      pathname === item.href
-                        ? "text-amber-700"
-                        : "text-blue-950/90 hover:text-amber-700"
-                    }`}
+                return (
+                  <motion.div
+                    key={item.label}
+                    initial={
+                      reducedMotion
+                        ? { opacity: 1 }
+                        : { opacity: 0, y: -8 }
+                    }
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                    }}
+                    transition={{
+                      delay: reducedMotion ? 0 : index * 0.035,
+                      duration: reducedMotion ? 0 : 0.34,
+                      ease: "easeOut",
+                    }}
                   >
-                    {item.label}
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </div>
+                    <Link
+                      href={item.href}
+                      className={[
+                        "group relative block cursor-pointer",
+                        "rounded-full px-4 py-2.5",
+                        "text-[13px] font-medium tracking-wide",
+                        "text-blue-950/90",
+                        "transition-all duration-300",
+                        "hover:bg-white/[0.20]",
+                        "hover:text-amber-700",
+                        "active:scale-[0.97]",
+                        "focus:outline-none",
+                        "focus-visible:ring-2",
+                        "focus-visible:ring-[#d4af37]/60",
+                      ].join(" ")}
+                    >
+                      <span>{item.label}</span>
 
-          {/* ------------------- HAMBURGER BUTTON -------------------- */}
-          <div className="lg:hidden">
+                      {isActive && (
+                        <motion.span
+                          layoutId="active-nav"
+                          className="absolute inset-x-3 -bottom-0.5 h-px bg-gradient-to-r from-transparent via-[#d4af37]/80 to-transparent"
+                          transition={{
+                            duration: 0.3,
+                            ease: "easeOut",
+                          }}
+                        />
+                      )}
+
+                      {!isActive && (
+                        <span className="absolute inset-x-3 -bottom-0.5 h-px origin-center scale-x-0 bg-gradient-to-r from-transparent via-[#d4af37]/60 to-transparent opacity-0 transition-all duration-300 group-hover:scale-x-75 group-hover:opacity-100" />
+                      )}
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* ---------------------------------------------------------------- */}
+            {/* DESKTOP CTA                                                       */}
+            {/* ---------------------------------------------------------------- */}
+
+            <div className="mr-2 hidden items-center gap-2 lg:flex">
+              <CallButton />
+
+              <FancyButton
+                href="/contact-us"
+                text="Let's Talk"
+              />
+            </div>
+
+            {/* ---------------------------------------------------------------- */}
+            {/* MOBILE TOGGLE                                                     */}
+            {/* ---------------------------------------------------------------- */}
+
             <button
-              onClick={() => setOpen((prev) => !prev)}
-              className="relative h-10 w-10 flex items-center justify-center bg-transparent border-0 p-0 focus:outline-none cursor-pointer hover:scale-105"
-              aria-label="Menu"
+              type="button"
+              aria-label={
+                isMobileOpen
+                  ? "Close navigation"
+                  : "Open navigation"
+              }
+              aria-expanded={isMobileOpen}
+              onClick={() => {
+                setIsMobileOpen((current) => !current);
+                setMobileServiceView(null);
+              }}
+              className={[
+                "mr-2 flex h-11 w-11 cursor-pointer",
+                "items-center justify-center rounded-full",
+                "border border-blue-950/15",
+                "bg-white/[0.30]",
+                "text-blue-950 backdrop-blur-md",
+                "transition-all duration-300",
+                "hover:bg-white/[0.50]",
+                "active:scale-95",
+                "focus:outline-none",
+                "focus-visible:ring-2",
+                "focus-visible:ring-[#d4af37]/60",
+                "lg:hidden",
+              ].join(" ")}
             >
-              <div className="absolute top-1/2 left-0 w-full -translate-y-1/2">
-                <motion.span
-                  animate={{ rotate: open ? 45 : 0, y: open ? 0 : -spacing }}
-                  className="absolute left-0 h-0.5 w-full rounded bg-linear-to-r from-[#d4af37] to-[#b8860b]"
-                />
-                <motion.span
-                  animate={{ opacity: open ? 0 : 1 }}
-                  className="absolute left-0 top-1/2 h-0.5 w-full rounded -translate-y-1/2 bg-linear-to-r from-[#d4af37] to-[#b8860b]"
-                />
-                <motion.span
-                  animate={{ rotate: open ? -45 : 0, y: open ? 0 : spacing }}
-                  className="absolute left-0 h-0.5 w-full rounded bg-linear-to-r from-[#d4af37] to-[#b8860b]"
-                />
-              </div>
+              {isMobileOpen ? (
+                <X size={20} strokeWidth={1.7} />
+              ) : (
+                <Menu size={20} strokeWidth={1.7} />
+              )}
             </button>
           </div>
         </div>
       </motion.nav>
 
-      {/* -------------------------- MOBILE MENU -------------------------- */}
+      {/* ====================================================================== */}
+      {/* MOBILE MENU                                                             */}
+      {/* ====================================================================== */}
+
       <AnimatePresence>
-        {open && (
+        {isMobileOpen && (
           <motion.div
-            initial={{ clipPath: "circle(0% at calc(100% - 40px) 40px)" }}
-            animate={{ clipPath: "circle(150% at calc(100% - 40px) 40px)" }}
-            exit={{ clipPath: "circle(0% at calc(100% - 40px) 40px)" }}
-            transition={{ duration: 0.6, ease: [0.83, 0, 0.17, 1] }}
-            className="fixed inset-0 z-[998] bg-gradient-to-br from-[#FCF5E5] via-white to-blue-50 backdrop-blur-xl flex justify-center items-start pt-36"
+            variants={mobilePanelVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className={[
+              "fixed inset-0 z-[990]",
+              "bg-gradient-to-br",
+              "from-[#FCF5E5] via-[#FAF9F6] to-[#ecebe7]",
+              "backdrop-blur-2xl lg:hidden",
+            ].join(" ")}
           >
-            <motion.div
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 120, damping: 20 }}
-              className="w-full h-full flex flex-col items-center justify-center px-6 relative"
-            >
-              {/* ---------------- MAIN NAV LINKS ---------------- */}
-              <div className="flex flex-col items-center space-y-8">
-                {!mobileServiceOpen &&
-                  NAV_ITEMS.map((item, idx) =>
-                    item.label === "Services" ? (
-                      <motion.button
-                        key="services"
-                        onClick={() => setMobileServiceOpen(true)}
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: idx * 0.07 }}
-                        className="relative text-3xl md:text-4xl font-semibold text-blue-950/90 hover:text-amber-700 transition-all group flex items-center gap-3"
-                      >
-                        Services
-                        {/* Chevron */}
-                        <motion.span
-                          animate={{ rotate: mobileServiceOpen ? 180 : 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="text-amber-600 text-xl"
-                        >
-                          ↓
-                        </motion.span>
-                        {/* Gold underline */}
-                        <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-amber-600 group-hover:w-16 transition-all duration-300" />
-                      </motion.button>
-                    ) : (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        onClick={() => setOpen(false)}
-                      >
-                        <motion.div
-                          initial={{ opacity: 0, y: 30 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: idx * 0.07 }}
-                          className="relative text-3xl md:text-4xl font-semibold text-blue-950/90 hover:text-amber-700 transition-all group"
-                        >
-                          {item.label}
-                          <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-amber-600 group-hover:w-16 transition-all duration-300" />
-                        </motion.div>
-                      </Link>
-                    ),
-                  )}
-              </div>
-
-              {/* ---------------- CATEGORY MENU ---------------- */}
-              {mobileServiceOpen && !activeCategory && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  transition={{ staggerChildren: 0.05 }}
-                  className="w-full flex flex-col items-center space-y-4"
+            <div className="flex h-full flex-col overflow-y-auto px-6 pb-10 pt-28">
+              <div className="mx-auto w-full max-w-md">
+                <AnimatePresence
+                  mode="wait"
+                  initial={false}
                 >
-                  <button
-                    onClick={() => setMobileServiceOpen(false)}
-                    className="flex items-center gap-2 text-blue-950 font-semibold bg-blue-50 hover:bg-blue-100 transition-colors px-4 py-2 rounded-full shadow-md hover:shadow-lg"
-                  >
-                    <ArrowLeft size={18} /> Back
-                  </button>
+                  {mobileServiceView === null ? (
+                    <motion.div
+                      key="main-menu"
+                      initial={{
+                        opacity: 0,
+                        x: -12,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        x: 0,
+                      }}
+                      exit={{
+                        opacity: 0,
+                        x: -12,
+                      }}
+                      className="space-y-2"
+                    >
+                      {NAV_ITEMS.map((item, index) => {
+                        const isServices =
+                          item.label === "Services";
 
-                  <div className="flex flex-col space-y-5 w-full mt-6">
-                    {(Object.keys(SERVICE_MENU) as ServiceCategory[]).map(
-                      (category) => {
-                        const Icon = SERVICE_ICONS[category];
                         return (
-                          <button
-                            key={category}
-                            onClick={() => setActiveCategory(category)}
-                            className="flex items-center justify-between text-lg font-medium text-blue-950/90 hover:text-amber-700 transition group"
+                          <motion.div
+                            key={item.label}
+                            custom={index}
+                            variants={mobileItemVariants}
+                            initial="hidden"
+                            animate="visible"
                           >
-                            <span className="flex items-center gap-3">
-                              <Icon size={20} /> {category}
-                            </span>
-                            <span className="w-0 group-hover:w-8 h-[2px] bg-amber-600 transition-all" />
-                          </button>
+                            {isServices ? (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setMobileServiceView(0)
+                                }
+                                className={[
+                                  "flex w-full cursor-pointer",
+                                  "items-center justify-between",
+                                  "rounded-2xl border",
+                                  "border-white/60",
+                                  "bg-white/[0.42]",
+                                  "px-5 py-4",
+                                  "text-left text-[#0a1a2f]",
+                                  "shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]",
+                                  "transition-all duration-300",
+                                  "hover:bg-white/[0.58]",
+                                ].join(" ")}
+                              >
+                                <span className="flex items-center gap-3">
+                                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#d4af37]/10 text-[#8c6d12]">
+                                    <Briefcase
+                                      size={17}
+                                      strokeWidth={1.7}
+                                    />
+                                  </span>
+
+                                  <span>{item.label}</span>
+                                </span>
+
+                                <ArrowRight
+                                  size={17}
+                                  strokeWidth={1.7}
+                                />
+                              </button>
+                            ) : (
+                              <Link
+                                href={item.href}
+                                onClick={() =>
+                                  setIsMobileOpen(false)
+                                }
+                                className={[
+                                  "flex w-full cursor-pointer",
+                                  "items-center justify-between",
+                                  "rounded-2xl border",
+                                  "border-transparent",
+                                  "px-5 py-4",
+                                  "text-[#0a1a2f]/80",
+                                  "transition-all duration-300",
+                                  "hover:border-white/50",
+                                  "hover:bg-white/[0.38]",
+                                  "hover:text-[#0a1a2f]",
+                                ].join(" ")}
+                              >
+                                <span>{item.label}</span>
+
+                                <ArrowRight
+                                  size={16}
+                                  strokeWidth={1.7}
+                                />
+                              </Link>
+                            )}
+                          </motion.div>
                         );
-                      },
-                    )}
-                  </div>
-                </motion.div>
-              )}
-
-              {/* ---------------- NESTED SERVICES ---------------- */}
-              {mobileServiceOpen && activeCategory && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  transition={{ staggerChildren: 0.05 }}
-                  className="w-full flex flex-col items-center space-y-4 bg-blue-50 rounded-xl p-4"
-                >
-                  <button
-                    onClick={() => setActiveCategory(null)}
-                    className="flex items-center gap-2 text-blue-950/80 hover:text-amber-700 transition text-sm tracking-wide"
-                  >
-                    <ArrowLeft size={18} /> Back
-                  </button>
-
-                  <div className="flex flex-col space-y-4 w-full mt-6">
-                    {SERVICE_MENU[activeCategory].map((service) => (
-                      <Link
-                        key={service.id}
-                        href={`/services/${service.id}`}
-                        onClick={() => setOpen(false)}
-                        className="group flex items-center justify-between text-base text-blue-950/90 hover:text-amber-700 transition"
+                      })}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="services-menu"
+                      initial={{
+                        opacity: 0,
+                        x: 12,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        x: 0,
+                      }}
+                      exit={{
+                        opacity: 0,
+                        x: 12,
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={handleBackClick}
+                        className="mb-5 inline-flex cursor-pointer items-center gap-2 rounded-full px-2 py-2 text-sm text-[#0a1a2f]/60 transition-colors hover:text-[#0a1a2f]"
                       >
-                        {service.title}
-                        <span className="w-0 group-hover:w-6 h-[2px] bg-amber-600 transition-all" />
-                      </Link>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
+                        <ArrowLeft
+                          size={16}
+                          strokeWidth={1.7}
+                        />
+                        Back
+                      </button>
 
-              {/* SOCIAL ICONS */}
-              <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-8">
-                <a href="https://linkedin.com" target="_blank">
-                  <Linkedin className="text-blue-900 hover:text-amber-700 transition-all hover:scale-110" />
-                </a>
-                <a href="https://instagram.com" target="_blank">
-                  <Instagram className="text-blue-900 hover:text-amber-700 transition-all hover:scale-110" />
-                </a>
-                <a href="https://twitter.com" target="_blank">
-                  <Twitter className="text-blue-900 hover:text-amber-700 transition-all hover:scale-110" />
-                </a>
+                      <div className="space-y-2">
+                        {SERVICE_MENU.map(
+                          (service, index) => {
+                            const Icon = service.icon;
+
+                            return (
+                              <button
+                                key={service.title}
+                                type="button"
+                                onClick={() =>
+                                  setMobileServiceView(
+                                    index
+                                  )
+                                }
+                                className={[
+                                  "flex w-full cursor-pointer",
+                                  "items-center justify-between",
+                                  "rounded-2xl border",
+                                  "border-white/50",
+                                  "bg-white/[0.35]",
+                                  "px-4 py-3",
+                                  "text-left",
+                                  "transition-all duration-300",
+                                  "hover:bg-white/[0.55]",
+                                ].join(" ")}
+                              >
+                                <span className="flex items-center gap-3">
+                                  <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/50 bg-white/[0.30] text-[#8c6d12]">
+                                    <Icon
+                                      size={17}
+                                      strokeWidth={1.7}
+                                    />
+                                  </span>
+
+                                  <span className="text-sm font-medium text-[#0a1a2f]">
+                                    {service.title}
+                                  </span>
+                                </span>
+
+                                <ArrowRight
+                                  size={16}
+                                  strokeWidth={1.7}
+                                />
+                              </button>
+                            );
+                          }
+                        )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* -------------------------- SCROLL TOP -------------------------- */}
-      <AnimatePresence>
-        {showTopBtn && !hide && (
-          <motion.button
-            initial={{ opacity: 0, y: 50, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 50, scale: 0.8 }}
-            transition={{ type: "spring", stiffness: 120, damping: 15 }}
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="cursor-pointer fixed bottom-6 right-6 md:right-8 w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-[#d4af37] via-[#f5d76e] to-amber-400/70 text-white shadow-lg flex items-center justify-center hover:scale-110 transition-transform z-[999]"
-          >
-            ↑
-          </motion.button>
-        )}
-      </AnimatePresence>
-      {/* 📞 Floating Call Button */}
-      {!hide && <CallButton />}
+      {/* ====================================================================== */}
+      {/* FLOATING CALL BUTTON                                                    */}
+      {/* ====================================================================== */}
+
+      <CallButton />
     </>
   );
 }
