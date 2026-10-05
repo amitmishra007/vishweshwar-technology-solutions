@@ -3,19 +3,21 @@
 import Link from "next/link";
 import {
   ArrowDown,
+  ArrowRight,
   ArrowUpRight,
   BarChart3,
   BriefcaseBusiness,
   Building2,
   CheckCircle2,
+  ChevronRight,
   Code2,
   Compass,
   Crown,
-  Gem,
+  Database,
   Globe2,
   Layers3,
   Lightbulb,
-  MoveUpRight,
+  Network,
   Palette,
   Rocket,
   ShieldCheck,
@@ -28,144 +30,311 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import {
+  AnimatePresence,
   motion,
-  useMotionValue,
   useReducedMotion,
-  useSpring,
-  useTransform,
   type Variants,
 } from "framer-motion";
-import { Canvas, useFrame } from "@react-three/fiber";
-import {
-  Float,
-  MeshDistortMaterial,
-  OrbitControls,
-  Sphere,
-  Torus,
-} from "@react-three/drei";
-import { useRef } from "react";
-import * as THREE from "three";
+import { useEffect, useState } from "react";
 
-type StoryItem = {
-  number: string;
-  era: string;
+/* ============================================================
+   TYPES
+============================================================ */
+
+type TimelineItem = {
+  year: string;
+  phase: string;
   title: string;
   description: string;
+  technologies: string[];
   icon: LucideIcon;
 };
 
 type Capability = {
+  number: string;
+  title: string;
+  description: string;
+  icon: LucideIcon;
+  tags: string[];
+};
+
+type ProcessStep = {
+  number: string;
   title: string;
   description: string;
   icon: LucideIcon;
 };
 
-const storyItems: StoryItem[] = [
+type Metric = {
+  value: string;
+  label: string;
+  description: string;
+  icon: LucideIcon;
+};
+
+type Technology = {
+  name: string;
+  category: string;
+  mark: string;
+};
+
+/* ============================================================
+   TECHNOLOGIES
+============================================================ */
+
+const technologies: Technology[] = [
   {
-    number: "01",
-    era: "THE BEGINNING",
-    title: "Learning how things really work",
+    name: "Next.js",
+    category: "WEB",
+    mark: "N",
+  },
+  {
+    name: "React",
+    category: "WEB",
+    mark: "R",
+  },
+  {
+    name: "Node.js",
+    category: "BACKEND",
+    mark: "JS",
+  },
+  {
+    name: "Flutter",
+    category: "MOBILE",
+    mark: "F",
+  },
+  {
+    name: "React Native",
+    category: "MOBILE",
+    mark: "RN",
+  },
+  {
+    name: "Supabase",
+    category: "DATA",
+    mark: "S",
+  },
+  {
+    name: "PostgreSQL",
+    category: "DATA",
+    mark: "PG",
+  },
+  {
+    name: "Cloud",
+    category: "INFRA",
+    mark: "☁",
+  },
+];
+
+/* ============================================================
+   DATA
+============================================================ */
+
+const timeline: TimelineItem[] = [
+  {
+    year: "01",
+    phase: "THE FOUNDATION",
+    title: "Learning how the web actually works",
     description:
-      "The journey started more than a decade ago with a curiosity for understanding how digital products are actually built. Early work involved PHP and the fundamentals of web development, creating a foundation that would influence every stage that followed.",
+      "The journey began with hands-on web development and PHP, learning the fundamentals by building real websites rather than simply studying technology in isolation.",
+    technologies: ["PHP", "MySQL", "HTML", "CSS"],
     icon: Lightbulb,
   },
   {
-    number: "02",
-    era: "THE CRAFT",
-    title: "From websites to real business problems",
+    year: "02",
+    phase: "THE CRAFT",
+    title: "From websites to business platforms",
     description:
-      "As the experience grew, the work moved beyond simple websites into content platforms, e-commerce and increasingly complex business requirements. WordPress, Magento and custom application development became opportunities to understand how technology supports real organisations.",
+      "Projects became increasingly connected to real business operations — from content platforms and e-commerce to custom websites that needed to support customers, products and internal workflows.",
+    technologies: ["WordPress", "Magento", "PHP", "E-commerce"],
     icon: Layers3,
   },
   {
-    number: "03",
-    era: "THE ENGINEERING MINDSET",
-    title: "Learning to build systems, not just pages",
+    year: "03",
+    phase: "THE ENGINEERING MINDSET",
+    title: "Building systems instead of pages",
     description:
-      "Working with frameworks such as CodeIgniter and building custom applications brought a deeper understanding of architecture, databases, APIs, integrations and the importance of creating systems that can keep working as businesses grow.",
+      "Custom application development introduced a deeper understanding of architecture, databases, APIs, integrations and the importance of building software that could evolve with the business.",
+    technologies: ["CodeIgniter", "MySQL", "APIs", "Custom Systems"],
     icon: Workflow,
   },
   {
-    number: "04",
-    era: "THE MODERN ERA",
-    title: "A broader view of digital products",
+    year: "04",
+    phase: "THE MODERN STACK",
+    title: "Moving toward modern product engineering",
     description:
-      "The journey naturally evolved toward modern application development, bringing together frontend experiences, backend systems, mobile applications and data-heavy interfaces. The focus shifted from individual technologies to solving the complete problem.",
+      "The work expanded into modern frontend frameworks, backend services, mobile applications and data-driven products — shifting the focus from individual technologies to complete digital solutions.",
+    technologies: ["Next.js", "Node.js", "React", "Mobile"],
     icon: Zap,
   },
   {
-    number: "05",
-    era: "THE NEXT CHAPTER",
-    title: "Vishweshwar Industries",
+    year: "05",
+    phase: "THE COMPANY",
+    title: "Vishweshwar Industries is founded",
     description:
-      "In 2023, that experience became the foundation for Vishweshwar Industries. Founded by Ami Mishra, the company was created with a simple belief: businesses deserve technology that is thoughtfully designed, properly engineered and built around their goals.",
+      "In 2023, years of practical experience became the foundation for Vishweshwar Industries — a digital company created around a simple idea: technology should serve the business, not the other way around.",
+    technologies: ["Technology", "Design", "Brand", "Growth"],
     icon: Crown,
   },
   {
-    number: "06",
-    era: "TODAY",
-    title: "Building what comes next",
+    year: "06",
+    phase: "TODAY",
+    title: "Building digital foundations for what comes next",
     description:
-      "Today, Vishweshwar Industries brings years of hands-on experience into every project — combining technology, design, branding and growth to help businesses create stronger digital foundations and move forward with confidence.",
+      "Today, Vishweshwar Industries combines engineering, design, branding and digital strategy to help businesses build stronger products and a more capable digital presence.",
+    technologies: ["Web", "Mobile", "Cloud", "Digital"],
     icon: Rocket,
   },
 ];
 
 const capabilities: Capability[] = [
   {
-    title: "Technology",
+    number: "01",
+    title: "Digital Engineering",
     description:
-      "Digital products and business systems engineered around real-world requirements.",
+      "Business websites, web applications, dashboards, portals and custom systems engineered around real operational requirements.",
     icon: Code2,
+    tags: ["Next.js", "Node.js", "React", "APIs"],
   },
   {
-    title: "Experience",
+    number: "02",
+    title: "Mobile Products",
     description:
-      "Interfaces designed to make products intuitive, useful and memorable.",
+      "Cross-platform and native mobile experiences designed around performance, usability, maintainability and business objectives.",
+    icon: Globe2,
+    tags: ["Android", "iOS", "React Native", "Flutter"],
+  },
+  {
+    number: "03",
+    title: "Product Experience",
+    description:
+      "Interfaces that make complex products easier to understand, navigate and use while maintaining a distinctive visual identity.",
+    icon: Palette,
+    tags: ["UI/UX", "Design Systems", "Interaction"],
+  },
+  {
+    number: "04",
+    title: "Brand & Identity",
+    description:
+      "Visual systems that bring consistency across websites, applications, marketing material and every customer-facing digital touchpoint.",
+    icon: Sparkles,
+    tags: ["Identity", "Visuals", "Creative"],
+  },
+  {
+    number: "05",
+    title: "Business Systems",
+    description:
+      "Connected digital workflows that bring data, users, processes and technology together instead of leaving them in isolated tools.",
+    icon: Database,
+    tags: ["Supabase", "PostgreSQL", "Cloud", "Automation"],
+  },
+  {
+    number: "06",
+    title: "Digital Growth",
+    description:
+      "A practical approach to visibility, conversion and digital presence that connects creative work with measurable business outcomes.",
+    icon: BarChart3,
+    tags: ["SEO", "Marketing", "Analytics"],
+  },
+];
+
+const processSteps: ProcessStep[] = [
+  {
+    number: "01",
+    title: "Understand",
+    description:
+      "We start with the business, the audience and the problem — not with a predetermined technology.",
+    icon: Compass,
+  },
+  {
+    number: "02",
+    title: "Define",
+    description:
+      "Requirements, priorities, user journeys and technical direction are shaped before unnecessary complexity enters the project.",
+    icon: Target,
+  },
+  {
+    number: "03",
+    title: "Design",
+    description:
+      "The experience, visual language and interaction model are developed around how people will actually use the product.",
     icon: Palette,
   },
   {
-    title: "Brand",
+    number: "04",
+    title: "Engineer",
     description:
-      "Visual identities that give businesses a consistent and distinctive presence.",
-    icon: Sparkles,
+      "The product is built with attention to performance, maintainability, security and the ability to grow.",
+    icon: Code2,
   },
   {
-    title: "Growth",
+    number: "05",
+    title: "Launch",
     description:
-      "Digital strategies designed to turn attention into meaningful business outcomes.",
+      "Deployment is treated as part of the product — with testing, optimisation and the infrastructure needed to go live confidently.",
+    icon: Rocket,
+  },
+  {
+    number: "06",
+    title: "Evolve",
+    description:
+      "The relationship doesn't have to end at launch. Digital products improve as the business, users and market change.",
     icon: TrendingUp,
   },
 ];
 
-const metrics = [
+const metrics: Metric[] = [
   {
     value: "10+",
     label: "Years",
-    description: "of hands-on experience",
+    description: "of hands-on digital experience",
     icon: BriefcaseBusiness,
   },
   {
     value: "2023",
     label: "Founded",
-    description: "Vishweshwar Industries",
+    description: "Vishweshwar Industries established",
     icon: Building2,
   },
   {
     value: "103+",
     label: "Clients",
-    description: "served across industries",
+    description: "businesses and organisations served",
     icon: Users,
   },
   {
     value: "89+",
     label: "Projects",
-    description: "delivered successfully",
+    description: "digital projects delivered",
     icon: CheckCircle2,
+  },
+  {
+    value: "57+",
+    label: "Technologies",
+    description: "worked with across projects",
+    icon: Layers3,
   },
 ];
 
-const heroVariants: Variants = {
+/* ============================================================
+   ANIMATION
+============================================================ */
+
+const fadeUp: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 30,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.7,
+      ease: "easeOut",
+    },
+  },
+};
+
+const stagger: Variants = {
   hidden: {},
   visible: {
     transition: {
@@ -174,25 +343,14 @@ const heroVariants: Variants = {
   },
 };
 
-const fadeUpVariants: Variants = {
-  hidden: {
-    opacity: 0,
-    y: 32,
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.8,
-      ease: "easeOut",
-    },
-  },
-};
-
 const viewport = {
   once: true,
-  amount: 0.18,
+  amount: 0.15,
 };
+
+/* ============================================================
+   SECTION LABEL
+============================================================ */
 
 function SectionLabel({
   children,
@@ -203,186 +361,272 @@ function SectionLabel({
 }) {
   return (
     <div
-      className={`mb-5 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.3em] ${
+      className={`mb-6 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.3em] ${
         dark ? "text-[#f5d78e]" : "text-[#9b7b18]"
       }`}
     >
-      <span className="h-px w-9 bg-[#d4af37]" />
+      <span className="h-px w-10 bg-[#d4af37]" />
       {children}
     </div>
   );
 }
 
 /* ============================================================
-   3D HERO CORE
+   TECHNOLOGY MARK
 ============================================================ */
 
-function DigitalCore() {
-  const group = useRef<THREE.Group>(null);
+function TechnologyMark({
+  technology,
+  active,
+}: {
+  technology: Technology;
+  active: boolean;
+}) {
+  return (
+    <div
+      className={`relative flex h-full w-full items-center justify-center rounded-full border transition-all duration-500 ${
+        active
+          ? "border-[#d4af37] bg-[#fffdf4] shadow-[0_0_45px_rgba(212,175,55,0.28)]"
+          : "border-[#0a1a2f]/10 bg-white/90 shadow-[0_18px_50px_rgba(10,26,47,0.08)]"
+      }`}
+    >
+      <span
+        className={`font-mono text-[11px] font-bold tracking-[-0.04em] ${
+          active ? "text-[#9b7b18]" : "text-[#0a1a2f]/55"
+        }`}
+      >
+        {technology.mark}
+      </span>
 
-  useFrame((state) => {
-    if (!group.current) {
+      <span
+        className={`absolute -bottom-6 whitespace-nowrap text-[7px] font-semibold uppercase tracking-[0.18em] transition-all duration-500 ${
+          active ? "text-[#9b7b18]" : "text-[#0a1a2f]/25"
+        }`}
+      >
+        {technology.name}
+      </span>
+    </div>
+  );
+}
+
+/* ============================================================
+   HERO TECHNOLOGY CONSTELLATION
+============================================================ */
+
+function TechnologyConstellation() {
+  const reducedMotion = useReducedMotion();
+  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    if (reducedMotion) {
       return;
     }
 
-    group.current.rotation.y = state.clock.elapsedTime * 0.12;
+    const timer = window.setInterval(() => {
+      setActive((current) => (current + 1) % technologies.length);
+    }, 3500);
 
-    group.current.rotation.x =
-      Math.sin(state.clock.elapsedTime * 0.24) * 0.06;
-  });
+    return () => window.clearInterval(timer);
+  }, [reducedMotion]);
 
-  return (
-    <group ref={group}>
-      <Float
-        speed={1.1}
-        rotationIntensity={0.2}
-        floatIntensity={0.45}
-        floatingRange={[-0.06, 0.06]}
-      >
-        <Sphere args={[1, 64, 64]}>
-          <MeshDistortMaterial
-            color="#d4af37"
-            roughness={0.2}
-            metalness={0.72}
-            distort={0.14}
-            speed={1.2}
-          />
-        </Sphere>
-
-        <Torus
-          args={[1.42, 0.011, 16, 180]}
-          rotation={[Math.PI / 2.4, 0.2, 0]}
-        >
-          <meshStandardMaterial
-            color="#355c8a"
-            metalness={0.9}
-            roughness={0.2}
-          />
-        </Torus>
-
-        <Torus
-          args={[1.68, 0.008, 16, 180]}
-          rotation={[0.4, Math.PI / 3, 0.8]}
-        >
-          <meshStandardMaterial
-            color="#d4af37"
-            metalness={0.85}
-            roughness={0.2}
-          />
-        </Torus>
-
-        <Torus
-          args={[1.9, 0.006, 16, 180]}
-          rotation={[1.1, 0.2, Math.PI / 3]}
-        >
-          <meshStandardMaterial
-            color="#0a1a2f"
-            metalness={0.75}
-            roughness={0.25}
-          />
-        </Torus>
-      </Float>
-    </group>
-  );
-}
-
-function ThreeHero() {
-  return (
-    <div className="absolute inset-0">
-      <Canvas
-        camera={{
-          position: [0, 0, 5.7],
-          fov: 36,
-        }}
-        dpr={[1, 1.5]}
-        gl={{
-          antialias: true,
-          alpha: true,
-          powerPreference: "high-performance",
-        }}
-      >
-        <ambientLight intensity={1.7} />
-
-        <directionalLight
-          position={[4, 5, 5]}
-          intensity={2.8}
-          color="#fff8df"
-        />
-
-        <pointLight
-          position={[-4, -2, 2]}
-          intensity={15}
-          distance={8}
-          color="#355c8a"
-        />
-
-        <pointLight
-          position={[4, 2, 2]}
-          intensity={12}
-          distance={7}
-          color="#d4af37"
-        />
-
-        <DigitalCore />
-
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          autoRotate
-          autoRotateSpeed={0.3}
-          minPolarAngle={Math.PI / 2.3}
-          maxPolarAngle={Math.PI / 1.8}
-        />
-      </Canvas>
-    </div>
-  );
-}
-
-/* ============================================================
-   INTERACTIVE BACKGROUND
-============================================================ */
-
-function InteractiveSurface({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const x = useMotionValue(50);
-  const y = useMotionValue(50);
-
-  const smoothX = useSpring(x, {
-    stiffness: 80,
-    damping: 20,
-  });
-
-  const smoothY = useSpring(y, {
-    stiffness: 80,
-    damping: 20,
-  });
-
-  const background = useTransform(
-    [smoothX, smoothY],
-    ([latestX, latestY]) =>
-      `radial-gradient(circle at ${latestX}% ${latestY}%, rgba(212,175,55,0.12), transparent 28%)`,
-  );
+  const activeTechnology = technologies[active];
 
   return (
-    <div
-      className="relative overflow-hidden"
-      onPointerMove={(event) => {
-        const rect = event.currentTarget.getBoundingClientRect();
-
-        x.set(((event.clientX - rect.left) / rect.width) * 100);
-        y.set(((event.clientY - rect.top) / rect.height) * 100);
-      }}
-    >
-      <motion.div
+    <div className="relative mx-auto aspect-square w-full max-w-[720px]">
+      {/* Ambient atmosphere */}
+      <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0"
-        style={{ background }}
+        className="absolute left-1/2 top-1/2 h-[72%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#d4af37]/10 blur-[80px]"
       />
 
-      {children}
+      <div
+        aria-hidden="true"
+        className="absolute left-1/2 top-1/2 h-[48%] w-[48%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#355c8a]/10 blur-[70px]"
+      />
+
+      {/* Technical rings */}
+      <motion.div
+        aria-hidden="true"
+        className="absolute inset-[5%] rounded-full border border-[#0a1a2f]/8"
+        animate={
+          reducedMotion
+            ? undefined
+            : {
+                rotate: 360,
+              }
+        }
+        transition={{
+          duration: 45,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+      >
+        <span className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#d4af37]" />
+        <span className="absolute bottom-[13%] right-[5%] h-1.5 w-1.5 rounded-full bg-[#355c8a]" />
+      </motion.div>
+
+      <motion.div
+        aria-hidden="true"
+        className="absolute inset-[15%] rounded-full border border-[#d4af37]/25 border-dashed"
+        animate={
+          reducedMotion
+            ? undefined
+            : {
+                rotate: -360,
+              }
+        }
+        transition={{
+          duration: 32,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+      >
+        <span className="absolute left-[11%] top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-[#d4af37]" />
+      </motion.div>
+
+      <div
+        aria-hidden="true"
+        className="absolute inset-[25%] rounded-full border border-[#355c8a]/10"
+      />
+
+      {/* Connection system */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-[15%] rounded-full"
+      >
+        {technologies.map((technology, index) => {
+          const angle =
+            (360 / technologies.length) * index - 90;
+
+          return (
+            <div
+              key={`${technology.name}-line`}
+              className="absolute left-1/2 top-1/2 h-1/2 w-px origin-bottom bg-gradient-to-t from-[#d4af37]/25 to-transparent"
+              style={{
+                transform: `translate(-50%, -100%) rotate(${angle}deg)`,
+              }}
+            />
+          );
+        })}
+      </div>
+
+      {/* Technology nodes */}
+      {technologies.map((technology, index) => {
+        const angle =
+          (360 / technologies.length) * index - 90;
+
+        const radius =
+          index % 2 === 0 ? "39%" : "32%";
+
+        return (
+          <motion.button
+            key={technology.name}
+            type="button"
+            aria-label={`Select ${technology.name}`}
+            onClick={() => setActive(index)}
+            className="absolute left-1/2 top-1/2 z-20 h-[58px] w-[58px] -translate-x-1/2 -translate-y-1/2 sm:h-[68px] sm:w-[68px]"
+            style={{
+              transform: `translate(-50%, -50%) rotate(${angle}deg) translateY(-${radius}) rotate(${-angle}deg)`,
+            }}
+            animate={{
+              scale: active === index ? 1.12 : 1,
+            }}
+            transition={{
+              type: "spring",
+              stiffness: 240,
+              damping: 20,
+            }}
+          >
+            <TechnologyMark
+              technology={technology}
+              active={active === index}
+            />
+          </motion.button>
+        );
+      })}
+
+      {/* Central system */}
+      <motion.div
+        className="absolute left-1/2 top-1/2 z-30 flex h-[39%] w-[39%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full"
+        animate={
+          reducedMotion
+            ? undefined
+            : {
+                scale: [1, 1.018, 1],
+              }
+        }
+        transition={{
+          duration: 5,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+        style={{
+          background:
+            "radial-gradient(circle at 32% 24%, #ffffff 0%, #fff8dc 23%, #d4af37 54%, #8e6c15 72%, #0a1a2f 100%)",
+          boxShadow:
+            "inset 0 0 55px rgba(255,255,255,0.55), 0 0 65px rgba(212,175,55,0.20), 0 30px 100px rgba(10,26,47,0.14)",
+        }}
+      >
+        <div className="absolute inset-2.5 rounded-full border border-white/45 sm:inset-3" />
+
+        <div className="relative z-10 flex max-w-[180px] flex-col items-center px-4 text-center sm:max-w-[230px]">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#0a1a2f]" />
+            <span className="text-[7px] font-semibold uppercase tracking-[0.28em] text-[#0a1a2f]/60 sm:text-[8px]">
+              Digital Systems
+            </span>
+            <span className="h-1.5 w-1.5 rounded-full bg-[#0a1a2f]" />
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTechnology.name}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.3 }}
+              className="mt-4"
+            >
+              <p className="text-[clamp(1rem,2vw,1.35rem)] font-medium tracking-[-0.04em] text-[#0a1a2f]">
+                {activeTechnology.name}
+              </p>
+
+              <p className="mt-1 text-[7px] font-semibold uppercase tracking-[0.22em] text-[#0a1a2f]/45">
+                {activeTechnology.category}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+
+          <div className="mt-5 hidden h-px w-20 bg-[#0a1a2f]/15 sm:block" />
+
+          <p className="mt-3 hidden text-[8px] leading-4 text-[#0a1a2f]/45 sm:block">
+            Technology, experience and strategy working as one.
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Peripheral labels */}
+      <div className="absolute left-[3%] top-[25%] hidden sm:block">
+        <p className="text-[8px] font-semibold uppercase tracking-[0.28em] text-[#0a1a2f]/25">
+          ENGINEERING
+        </p>
+      </div>
+
+      <div className="absolute bottom-[18%] right-[2%] hidden sm:block">
+        <p className="text-[8px] font-semibold uppercase tracking-[0.28em] text-[#0a1a2f]/25">
+          EXPERIENCE
+        </p>
+      </div>
+
+      <div className="absolute bottom-[7%] left-1/2 -translate-x-1/2">
+        <div className="flex items-center gap-3 whitespace-nowrap">
+          <span className="h-px w-7 bg-[#d4af37]" />
+          <span className="text-[7px] font-semibold uppercase tracking-[0.25em] text-[#0a1a2f]/30">
+            Technology · Design · Brand · Growth
+          </span>
+          <span className="h-px w-7 bg-[#d4af37]" />
+        </div>
+      </div>
     </div>
   );
 }
@@ -391,174 +635,475 @@ function InteractiveSurface({
    HERO
 ============================================================ */
 
-function HeroSection({
-  reducedMotion,
-}: {
-  reducedMotion: boolean;
-}) {
+function HeroSection() {
   return (
     <section className="relative min-h-[calc(100svh-88px)] overflow-hidden bg-[#faf9f6]">
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-[radial-gradient(circle_at_78%_40%,rgba(212,175,55,0.12),transparent_25%),radial-gradient(circle_at_15%_80%,rgba(53,92,138,0.07),transparent_28%),linear-gradient(180deg,#ffffff,#faf9f6)]"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_78%_45%,rgba(212,175,55,0.13),transparent_27%),radial-gradient(circle_at_10%_90%,rgba(53,92,138,0.07),transparent_30%),linear-gradient(180deg,#ffffff,#faf9f6)]"
       />
 
       <div
         aria-hidden="true"
-        className="absolute inset-0 opacity-[0.13]"
+        className="absolute inset-0 opacity-[0.11]"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(10,26,47,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(10,26,47,0.035) 1px, transparent 1px)",
-          backgroundSize: "80px 80px",
+            "linear-gradient(rgba(10,26,47,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(10,26,47,0.045) 1px, transparent 1px)",
+          backgroundSize: "84px 84px",
           maskImage:
-            "radial-gradient(circle at 72% 50%, black, transparent 64%)",
+            "radial-gradient(circle at 70% 50%, black, transparent 66%)",
           WebkitMaskImage:
-            "radial-gradient(circle at 72% 50%, black, transparent 64%)",
+            "radial-gradient(circle at 70% 50%, black, transparent 66%)",
         }}
       />
 
-      <InteractiveSurface>
-        <div className="relative mx-auto grid min-h-[calc(100svh-88px)] max-w-[1450px] items-center px-6 py-16 sm:px-10 lg:grid-cols-[1fr_0.82fr] lg:gap-8 lg:px-16 lg:py-20 xl:px-20">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={heroVariants}
-            className="relative z-20 max-w-2xl"
-          >
-            <motion.div variants={fadeUpVariants}>
-              <SectionLabel>Vishweshwar Industries</SectionLabel>
-            </motion.div>
+      <div
+        aria-hidden="true"
+        className="absolute right-[-15%] top-[-35%] h-[650px] w-[650px] rounded-full border border-[#d4af37]/10"
+      />
 
-            <motion.h1
-              variants={fadeUpVariants}
-              className="text-[clamp(3.3rem,6.6vw,7rem)] font-medium leading-[0.88] tracking-[-0.07em]"
-            >
-              Built from
-              <span className="block bg-gradient-to-r from-[#0a1a2f] via-[#355c8a] to-[#9b7b18] bg-clip-text text-transparent">
-                experience.
-              </span>
-
-              <span className="block">Driven by ideas.</span>
-            </motion.h1>
-
-            <motion.p
-              variants={fadeUpVariants}
-              className="mt-8 max-w-xl text-base leading-8 text-[#0a1a2f]/60 sm:text-lg"
-            >
-              Founded in 2023 by{" "}
-              <strong className="font-medium text-[#0a1a2f]">
-                Ami Mishra
-              </strong>
-              , Vishweshwar Industries brings more than a decade of hands-on
-              experience into a modern digital company built around technology,
-              creativity and business growth.
-            </motion.p>
-
-            <motion.div
-              variants={fadeUpVariants}
-              className="mt-9 flex flex-wrap gap-3"
-            >
-              <Link
-                href="#our-story"
-                className="group inline-flex items-center gap-3 rounded-full bg-[#0a1a2f] px-6 py-3.5 text-sm font-medium text-white shadow-[0_18px_50px_rgba(10,26,47,0.14)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#142c49]"
-              >
-                Discover Our Story
-                <ArrowDown
-                  size={16}
-                  strokeWidth={1.7}
-                  className="transition-transform duration-300 group-hover:translate-y-0.5"
-                />
-              </Link>
-
-              <Link
-                href="/contact-us"
-                className="group inline-flex items-center gap-3 rounded-full border border-[#0a1a2f]/15 bg-white/60 px-6 py-3.5 text-sm font-medium backdrop-blur-xl transition-all duration-300 hover:border-[#d4af37]/60 hover:bg-white"
-              >
-                Work With Us
-                <ArrowUpRight
-                  size={16}
-                  className="text-[#9b7b18] transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                />
-              </Link>
-            </motion.div>
-
-            <motion.div
-              variants={fadeUpVariants}
-              className="mt-11 flex items-center gap-4"
-            >
-              <div className="h-px w-14 bg-[#d4af37]" />
-
-              <span className="text-[9px] font-semibold uppercase tracking-[0.3em] text-[#0a1a2f]/35">
-                Technology · Design · Growth
-              </span>
-            </motion.div>
+      <div className="relative mx-auto grid min-h-[calc(100svh-88px)] max-w-[1500px] items-center px-6 py-16 sm:px-10 lg:grid-cols-[0.88fr_1.12fr] lg:px-16 lg:py-20 xl:px-20">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={stagger}
+          className="relative z-40 max-w-2xl"
+        >
+          <motion.div variants={fadeUp}>
+            <SectionLabel>About Vishweshwar Industries</SectionLabel>
           </motion.div>
 
-          {/* Smaller, contained 3D visual */}
-          <motion.div
-            initial={{
-              opacity: 0,
-              scale: 0.88,
-              x: 20,
-            }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              x: 0,
-            }}
-            transition={{
-              duration: reducedMotion ? 0 : 1.2,
-              ease: "easeOut",
-            }}
-            className="relative mx-auto mt-4 h-[390px] w-full max-w-[520px] sm:h-[470px] lg:mt-0 lg:h-[540px] lg:max-w-[540px] xl:h-[570px]"
+          <motion.h1
+            variants={fadeUp}
+            className="text-[clamp(3.45rem,6.5vw,7.2rem)] font-medium leading-[0.84] tracking-[-0.078em]"
           >
-            <div
-              aria-hidden="true"
-              className="absolute left-1/2 top-1/2 h-[55%] w-[55%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#d4af37]/10 blur-[80px]"
-            />
+            Experience
+            <span className="block bg-gradient-to-r from-[#0a1a2f] via-[#355c8a] to-[#9b7b18] bg-clip-text text-transparent">
+              meets ideas.
+            </span>
+            <span className="block">Ideas become systems.</span>
+          </motion.h1>
 
-            <ThreeHero />
+          <motion.p
+            variants={fadeUp}
+            className="mt-8 max-w-xl text-base leading-8 text-[#0a1a2f]/58 sm:text-lg"
+          >
+            Vishweshwar Industries is a digital technology and creative
+            company founded by{" "}
+            <strong className="font-medium text-[#0a1a2f]">
+              Amit Mishra
+            </strong>{" "}
+            in 2023, built on more than a decade of practical experience
+            across web development, applications, technology, design and
+            digital growth.
+          </motion.p>
 
-            <div className="pointer-events-none absolute left-[7%] top-[21%] hidden rounded-full border border-white/70 bg-white/65 px-4 py-2 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#0a1a2f]/60 shadow-[0_20px_50px_rgba(10,26,47,0.06)] backdrop-blur-xl sm:block">
-              Ideas
-            </div>
+          <motion.div
+            variants={fadeUp}
+            className="mt-9 flex flex-wrap gap-3"
+          >
+            <Link
+              href="#experience"
+              className="group inline-flex items-center gap-3 rounded-full bg-[#0a1a2f] px-6 py-3.5 text-sm font-medium text-white shadow-[0_18px_50px_rgba(10,26,47,0.15)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#142c49]"
+            >
+              Explore Our Journey
+              <ArrowDown
+                size={16}
+                strokeWidth={1.7}
+                className="transition-transform duration-300 group-hover:translate-y-0.5"
+              />
+            </Link>
 
-            <div className="pointer-events-none absolute right-[5%] top-[17%] hidden rounded-full border border-white/70 bg-white/65 px-4 py-2 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#0a1a2f]/60 shadow-[0_20px_50px_rgba(10,26,47,0.06)] backdrop-blur-xl sm:block">
-              Experience
-            </div>
-
-            <div className="pointer-events-none absolute bottom-[18%] left-[9%] hidden rounded-full border border-white/70 bg-white/65 px-4 py-2 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#0a1a2f]/60 shadow-[0_20px_50px_rgba(10,26,47,0.06)] backdrop-blur-xl sm:block">
-              Strategy
-            </div>
-
-            <div className="pointer-events-none absolute bottom-[16%] right-[6%] hidden rounded-full border border-white/70 bg-white/65 px-4 py-2 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#0a1a2f]/60 shadow-[0_20px_50px_rgba(10,26,47,0.06)] backdrop-blur-xl sm:block">
-              Growth
-            </div>
+            <Link
+              href="/contact-us"
+              className="group inline-flex items-center gap-3 rounded-full border border-[#0a1a2f]/12 bg-white/65 px-6 py-3.5 text-sm font-medium text-[#0a1a2f] backdrop-blur-xl transition-all duration-300 hover:border-[#d4af37]/60 hover:bg-white"
+            >
+              Work With Us
+              <ArrowUpRight
+                size={16}
+                className="text-[#9b7b18] transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              />
+            </Link>
           </motion.div>
-        </div>
-      </InteractiveSurface>
+
+          <motion.div
+            variants={fadeUp}
+            className="mt-11 grid max-w-lg grid-cols-3 border-t border-[#0a1a2f]/10 pt-5"
+          >
+            {[
+              ["10+", "Years"],
+              ["103+", "Clients"],
+              ["89+", "Projects"],
+            ].map(([value, label], index) => (
+              <div
+                key={label}
+                className={index === 0 ? "" : "border-l border-[#0a1a2f]/10 pl-5"}
+              >
+                <p className="text-2xl font-medium tracking-[-0.04em]">
+                  {value}
+                </p>
+                <p className="mt-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#0a1a2f]/35">
+                  {label}
+                </p>
+              </div>
+            ))}
+          </motion.div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, x: 35 }}
+          animate={{ opacity: 1, scale: 1, x: 0 }}
+          transition={{
+            duration: 1.15,
+            ease: "easeOut",
+          }}
+          className="relative mt-12 lg:mt-0"
+        >
+          <TechnologyConstellation />
+        </motion.div>
+      </div>
+
+      <div className="absolute bottom-5 left-1/2 hidden -translate-x-1/2 items-center gap-3 lg:flex">
+        <span className="h-px w-12 bg-[#d4af37]" />
+        <span className="text-[8px] font-semibold uppercase tracking-[0.3em] text-[#0a1a2f]/30">
+          2023 — Present
+        </span>
+        <span className="h-px w-12 bg-[#d4af37]" />
+      </div>
     </section>
   );
 }
 
 /* ============================================================
-   STORY
+   FOUNDER
 ============================================================ */
 
-function FounderStory() {
+function FounderSection() {
   return (
     <section
-      id="our-story"
-      className="relative overflow-hidden bg-white px-6 py-28 sm:px-10 lg:px-16 lg:py-36 xl:px-20"
+      id="experience"
+      className="relative overflow-hidden bg-[#0a1a2f] px-6 py-28 text-white sm:px-10 lg:px-16 lg:py-36 xl:px-20"
     >
       <div
         aria-hidden="true"
-        className="absolute -right-40 top-20 h-[540px] w-[540px] rounded-full border border-[#d4af37]/10"
+        className="absolute right-[-180px] top-[-180px] h-[650px] w-[650px] rounded-full border border-[#d4af37]/10"
       />
 
       <div
         aria-hidden="true"
-        className="absolute right-0 top-40 h-[320px] w-[320px] rounded-full border border-[#355c8a]/8"
+        className="absolute bottom-[-250px] left-[-150px] h-[600px] w-[600px] rounded-full border border-[#355c8a]/20"
+      />
+
+      <div className="relative mx-auto max-w-[1250px]">
+        <div className="grid gap-20 lg:grid-cols-[0.72fr_1.28fr]">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewport}
+            variants={fadeUp}
+          >
+            <SectionLabel dark>Why We Exist</SectionLabel>
+
+            <h2 className="text-5xl font-medium leading-[0.94] tracking-[-0.06em] sm:text-6xl">
+              Technology is only useful when it{" "}
+              <span className="text-[#f5d78e]">solves something.</span>
+            </h2>
+
+            <div className="mt-10 flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#d4af37]/30 bg-white/5">
+                <Crown
+                  size={21}
+                  strokeWidth={1.4}
+                  className="text-[#f5d78e]"
+                />
+              </div>
+
+              <div>
+                <p className="text-sm font-medium">Amit Mishra</p>
+                <p className="mt-1 text-xs text-white/35">
+                  Founder · Vishweshwar Industries
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewport}
+            variants={stagger}
+            className="space-y-8"
+          >
+            <motion.p
+              variants={fadeUp}
+              className="text-xl leading-9 text-white/65 sm:text-2xl"
+            >
+              Vishweshwar Industries was not created simply to become another
+              company that builds websites and applications.
+            </motion.p>
+
+            <motion.p
+              variants={fadeUp}
+              className="max-w-3xl text-base leading-8 text-white/40"
+            >
+              Years of working directly with businesses revealed a recurring
+              problem: technology, design, branding and marketing are often
+              treated as separate activities. A website is built by one
+              person, branding by another, marketing by someone else and the
+              systems underneath are rarely designed as one connected
+              ecosystem.
+            </motion.p>
+
+            <motion.p
+              variants={fadeUp}
+              className="max-w-3xl text-base leading-8 text-white/40"
+            >
+              Our approach is different. We look at the complete digital
+              picture — what the business is trying to achieve, who it serves,
+              how its people work and what technology can genuinely improve.
+            </motion.p>
+
+            <motion.div
+              variants={fadeUp}
+              className="grid gap-px overflow-hidden rounded-[28px] border border-white/10 bg-white/10 sm:grid-cols-3"
+            >
+              {[
+                {
+                  value: "01",
+                  title: "Business First",
+                  text: "Understand the problem before choosing the solution.",
+                },
+                {
+                  value: "02",
+                  title: "Built to Last",
+                  text: "Prefer useful, maintainable systems over unnecessary complexity.",
+                },
+                {
+                  value: "03",
+                  title: "One Direction",
+                  text: "Bring technology, design and growth into the same conversation.",
+                },
+              ].map((item) => (
+                <div
+                  key={item.value}
+                  className="bg-white/[0.035] p-6 transition-colors hover:bg-white/[0.06]"
+                >
+                  <span className="font-mono text-[9px] tracking-[0.2em] text-[#f5d78e]/60">
+                    {item.value}
+                  </span>
+
+                  <h3 className="mt-5 text-base font-medium">
+                    {item.title}
+                  </h3>
+
+                  <p className="mt-3 text-xs leading-6 text-white/35">
+                    {item.text}
+                  </p>
+                </div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================
+   JOURNEY
+============================================================ */
+
+function JourneySection() {
+  const [active, setActive] = useState(4);
+  const activeItem = timeline[active];
+
+  return (
+    <section className="relative overflow-hidden bg-[#f4f5f5] px-6 py-28 sm:px-10 lg:px-16 lg:py-36 xl:px-20">
+      <div className="mx-auto max-w-[1250px]">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewport}
+          variants={fadeUp}
+          className="max-w-3xl"
+        >
+          <SectionLabel>The Journey</SectionLabel>
+
+          <h2 className="text-5xl font-medium leading-[0.94] tracking-[-0.06em] sm:text-6xl">
+            Ten years of{" "}
+            <span className="text-[#9b7b18]">learning by building.</span>
+          </h2>
+
+          <p className="mt-7 max-w-2xl text-base leading-8 text-[#0a1a2f]/50">
+            The company you see today is the result of many different stages
+            of learning. Each stage added another layer — from writing code to
+            understanding architecture, then products, businesses and the
+            bigger digital ecosystem.
+          </p>
+        </motion.div>
+
+        <div className="mt-20 grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+          <div className="relative">
+            <div className="absolute bottom-7 left-[17px] top-7 w-px bg-gradient-to-b from-[#d4af37] via-[#0a1a2f]/15 to-transparent" />
+
+            <div className="space-y-2">
+              {timeline.map((item, index) => {
+                const Icon = item.icon;
+                const isActive = active === index;
+
+                return (
+                  <button
+                    key={item.year}
+                    type="button"
+                    onClick={() => setActive(index)}
+                    className="group relative flex w-full items-center gap-5 text-left"
+                  >
+                    <span
+                      className={`relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
+                        isActive
+                          ? "border-[#d4af37] bg-[#0a1a2f] text-[#f5d78e] shadow-[0_8px_30px_rgba(10,26,47,0.15)]"
+                          : "border-[#0a1a2f]/10 bg-white text-[#0a1a2f]/35 group-hover:border-[#d4af37]/50"
+                      }`}
+                    >
+                      <Icon size={15} strokeWidth={1.5} />
+                    </span>
+
+                    <div
+                      className={`flex-1 rounded-2xl px-5 py-4 transition-all duration-300 ${
+                        isActive
+                          ? "bg-white shadow-[0_15px_45px_rgba(10,26,47,0.07)]"
+                          : "hover:bg-white/60"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <span
+                          className={`text-[9px] font-semibold tracking-[0.2em] ${
+                            isActive
+                              ? "text-[#9b7b18]"
+                              : "text-[#0a1a2f]/30"
+                          }`}
+                        >
+                          {item.phase}
+                        </span>
+
+                        <span className="font-mono text-[9px] text-[#0a1a2f]/20">
+                          {item.year}
+                        </span>
+                      </div>
+
+                      <p
+                        className={`mt-2 text-sm font-medium ${
+                          isActive
+                            ? "text-[#0a1a2f]"
+                            : "text-[#0a1a2f]/55"
+                        }`}
+                      >
+                        {item.title}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="relative min-h-[500px] overflow-hidden rounded-[34px] bg-[#0a1a2f] p-8 text-white sm:p-12">
+            <div
+              aria-hidden="true"
+              className="absolute -right-24 -top-24 h-72 w-72 rounded-full border border-[#d4af37]/15"
+            />
+
+            <div
+              aria-hidden="true"
+              className="absolute -bottom-32 -left-24 h-80 w-80 rounded-full bg-[#355c8a]/10 blur-3xl"
+            />
+
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeItem.year}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.4 }}
+                className="relative z-10 flex h-full flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-semibold tracking-[0.28em] text-[#f5d78e]">
+                      {activeItem.phase}
+                    </span>
+
+                    <span className="font-mono text-[11px] text-white/25">
+                      {activeItem.year} / 06
+                    </span>
+                  </div>
+
+                  <h3 className="mt-10 max-w-xl text-4xl font-medium leading-[1] tracking-[-0.045em] sm:text-5xl">
+                    {activeItem.title}
+                  </h3>
+
+                  <p className="mt-7 max-w-2xl text-sm leading-8 text-white/45">
+                    {activeItem.description}
+                  </p>
+                </div>
+
+                <div className="mt-12">
+                  <p className="mb-4 text-[9px] font-semibold uppercase tracking-[0.25em] text-white/25">
+                    Experience added
+                  </p>
+
+                  <div className="flex flex-wrap gap-2">
+                    {activeItem.technologies.map((technology) => (
+                      <span
+                        key={technology}
+                        className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-[10px] font-medium text-white/55"
+                      >
+                        {technology}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-10 flex items-center gap-3 border-t border-white/10 pt-6">
+                  <span className="text-[9px] uppercase tracking-[0.2em] text-white/25">
+                    Next
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setActive(
+                        (current) => (current + 1) % timeline.length,
+                      )
+                    }
+                    className="group flex items-center gap-2 text-xs font-medium text-[#f5d78e]"
+                  >
+                    Continue the journey
+                    <ChevronRight
+                      size={14}
+                      className="transition-transform group-hover:translate-x-1"
+                    />
+                  </button>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================
+   CAPABILITIES
+============================================================ */
+
+function CapabilitiesSection() {
+  return (
+    <section className="relative overflow-hidden bg-white px-6 py-28 sm:px-10 lg:px-16 lg:py-36 xl:px-20">
+      <div
+        aria-hidden="true"
+        className="absolute right-[-220px] top-20 h-[600px] w-[600px] rounded-full border border-[#d4af37]/10"
       />
 
       <div className="relative mx-auto max-w-[1250px]">
@@ -567,86 +1112,86 @@ function FounderStory() {
             initial="hidden"
             whileInView="visible"
             viewport={viewport}
-            variants={fadeUpVariants}
+            variants={fadeUp}
           >
-            <SectionLabel>Our Story</SectionLabel>
+            <SectionLabel>What We Do</SectionLabel>
 
-            <h2 className="max-w-lg text-5xl font-medium leading-[0.96] tracking-[-0.055em] sm:text-6xl">
-              More than a decade
+            <h2 className="max-w-lg text-5xl font-medium leading-[0.95] tracking-[-0.06em] sm:text-6xl">
+              Six disciplines.
               <span className="block text-[#9b7b18]">
-                in the making.
+                One digital ecosystem.
               </span>
             </h2>
 
-            <p className="mt-8 max-w-md text-base leading-8 text-[#0a1a2f]/55">
-              Vishweshwar Industries did not begin with a business plan. It
-              began with years of curiosity, problem solving and an obsession
-              with understanding how digital products could work better.
+            <p className="mt-8 max-w-md text-base leading-8 text-[#0a1a2f]/50">
+              A business rarely needs “just a website”. It needs a digital
+              presence, systems that work, experiences people understand and a
+              foundation that can support its next stage.
             </p>
 
-            <div className="mt-10 flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#d4af37]/35 bg-[#fffaf0] text-[#9b7b18]">
-                <BriefcaseBusiness size={19} strokeWidth={1.5} />
-              </div>
+            <div className="mt-10 rounded-[28px] border border-[#0a1a2f]/8 bg-[#faf9f6] p-7">
+              <div className="flex items-center gap-4">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#0a1a2f] text-[#f5d78e]">
+                  <Network size={18} strokeWidth={1.5} />
+                </div>
 
-              <div>
-                <p className="text-sm font-medium text-[#0a1a2f]">
-                  Founded by Ami Mishra
-                </p>
-
-                <p className="mt-1 text-xs text-[#0a1a2f]/40">
-                  Vishweshwar Industries · 2023
-                </p>
+                <div>
+                  <p className="text-sm font-medium">Connected thinking</p>
+                  <p className="mt-1 text-xs text-[#0a1a2f]/40">
+                    Technology · Experience · Brand · Growth
+                  </p>
+                </div>
               </div>
             </div>
           </motion.div>
 
-          <div className="relative">
-            <div className="absolute left-[22px] top-7 bottom-7 w-px bg-gradient-to-b from-[#d4af37] via-[#0a1a2f]/10 to-transparent" />
-
-            <div className="space-y-3">
-              {storyItems.map((item, index) => {
-                const Icon = item.icon;
+          <div>
+            <div className="grid gap-px overflow-hidden rounded-[32px] border border-[#0a1a2f]/8 bg-[#0a1a2f]/8 sm:grid-cols-2">
+              {capabilities.map((capability, index) => {
+                const Icon = capability.icon;
 
                 return (
                   <motion.article
-                    key={item.number}
+                    key={capability.number}
                     initial="hidden"
                     whileInView="visible"
                     viewport={viewport}
-                    variants={fadeUpVariants}
+                    variants={fadeUp}
                     transition={{
                       delay: index * 0.06,
                     }}
-                    className="group relative pl-14"
+                    className="group relative min-h-[300px] bg-[#faf9f6] p-7 transition-colors duration-500 hover:bg-[#fffdf8] sm:p-8"
                   >
-                    <div className="absolute left-0 top-7 flex h-[44px] w-[44px] items-center justify-center rounded-full border border-[#d4af37]/35 bg-white shadow-[0_8px_30px_rgba(10,26,47,0.07)]">
-                      <Icon
-                        size={17}
-                        strokeWidth={1.5}
-                        className="text-[#9b7b18] transition-transform duration-500 group-hover:scale-110"
-                      />
+                    <div className="flex items-start justify-between">
+                      <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[#d4af37]/25 bg-white text-[#9b7b18] transition-all duration-500 group-hover:rotate-6 group-hover:border-[#d4af37]/60 group-hover:shadow-[0_12px_30px_rgba(212,175,55,0.12)]">
+                        <Icon size={18} strokeWidth={1.5} />
+                      </span>
+
+                      <span className="font-mono text-[9px] tracking-[0.2em] text-[#0a1a2f]/20">
+                        {capability.number}
+                      </span>
                     </div>
 
-                    <div className="rounded-[28px] border border-[#0a1a2f]/7 bg-[#faf9f6] p-7 transition-all duration-500 group-hover:-translate-y-1 group-hover:border-[#d4af37]/30 group-hover:bg-[#fffdf8] group-hover:shadow-[0_25px_70px_rgba(10,26,47,0.07)] sm:p-8">
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <span className="text-[10px] font-semibold tracking-[0.24em] text-[#9b7b18]">
-                          {item.era}
+                    <h3 className="mt-8 text-xl font-medium tracking-[-0.025em]">
+                      {capability.title}
+                    </h3>
+
+                    <p className="mt-3 text-sm leading-7 text-[#0a1a2f]/48">
+                      {capability.description}
+                    </p>
+
+                    <div className="mt-6 flex flex-wrap gap-1.5">
+                      {capability.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-full border border-[#0a1a2f]/8 bg-white px-2.5 py-1 text-[8px] font-medium uppercase tracking-[0.12em] text-[#0a1a2f]/35"
+                        >
+                          {tag}
                         </span>
-
-                        <span className="font-mono text-[10px] tracking-[0.2em] text-[#0a1a2f]/25">
-                          {item.number}
-                        </span>
-                      </div>
-
-                      <h3 className="mt-4 text-2xl font-medium tracking-[-0.035em] text-[#0a1a2f]">
-                        {item.title}
-                      </h3>
-
-                      <p className="mt-3 max-w-2xl text-sm leading-7 text-[#0a1a2f]/53">
-                        {item.description}
-                      </p>
+                      ))}
                     </div>
+
+                    <div className="absolute bottom-0 left-0 h-px w-0 bg-[#d4af37] transition-all duration-500 group-hover:w-full" />
                   </motion.article>
                 );
               })}
@@ -659,190 +1204,69 @@ function FounderStory() {
 }
 
 /* ============================================================
-   VISION / MISSION
+   HOW WE WORK
 ============================================================ */
 
-function VisionMission() {
+function ProcessSection() {
   return (
-    <section className="relative overflow-hidden bg-[#f2f4f5] px-6 py-28 sm:px-10 lg:px-16 lg:py-36 xl:px-20">
-      <div
-        aria-hidden="true"
-        className="absolute right-[-120px] top-1/2 h-[520px] w-[520px] -translate-y-1/2 rounded-full border border-[#d4af37]/10"
-      />
-
-      <div className="relative mx-auto max-w-[1250px]">
+    <section className="relative overflow-hidden bg-[#f1f3f3] px-6 py-28 sm:px-10 lg:px-16 lg:py-36 xl:px-20">
+      <div className="mx-auto max-w-[1250px]">
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={viewport}
-          variants={fadeUpVariants}
-          className="mb-16 max-w-2xl"
+          variants={fadeUp}
+          className="max-w-3xl"
         >
-          <SectionLabel>Direction</SectionLabel>
+          <SectionLabel>How We Work</SectionLabel>
 
-          <h2 className="text-5xl font-medium leading-[0.97] tracking-[-0.055em] sm:text-6xl">
-            Where experience
-            <span className="text-[#9b7b18]"> takes us next.</span>
+          <h2 className="text-5xl font-medium leading-[0.95] tracking-[-0.06em] sm:text-6xl">
+            From a business problem
+            <span className="block text-[#9b7b18]">
+              to something people can use.
+            </span>
           </h2>
         </motion.div>
 
-        <div className="grid gap-px overflow-hidden border border-[#0a1a2f]/10 bg-[#0a1a2f]/10 md:grid-cols-2">
-          <motion.article
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewport}
-            variants={fadeUpVariants}
-            className="relative min-h-[430px] overflow-hidden bg-[#faf9f6] p-9 sm:p-14"
-          >
-            <div className="relative z-10 flex h-full flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[#d4af37]/30 bg-white text-[#9b7b18]">
-                  <Target size={19} strokeWidth={1.5} />
-                </span>
+        <div className="relative mt-20">
+          <div className="absolute left-0 right-0 top-8 hidden h-px bg-gradient-to-r from-[#d4af37] via-[#0a1a2f]/10 to-transparent lg:block" />
 
-                <span className="font-mono text-[10px] tracking-[0.22em] text-[#0a1a2f]/25">
-                  01 / VISION
-                </span>
-              </div>
-
-              <div>
-                <h3 className="max-w-xl text-4xl font-medium leading-[1.02] tracking-[-0.045em]">
-                  To become the digital partner businesses can grow with.
-                </h3>
-
-                <p className="mt-6 max-w-lg text-sm leading-7 text-[#0a1a2f]/50">
-                  We want to build relationships that last beyond a single
-                  project — becoming a trusted part of our clients&apos;
-                  digital journey.
-                </p>
-              </div>
-            </div>
-
-            <div
-              aria-hidden="true"
-              className="absolute -bottom-28 -right-24 h-72 w-72 rounded-full border border-[#d4af37]/20"
-            />
-
-            <Gem
-              aria-hidden="true"
-              size={110}
-              strokeWidth={0.45}
-              className="absolute bottom-8 right-8 rotate-12 text-[#d4af37]/10"
-            />
-          </motion.article>
-
-          <motion.article
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewport}
-            variants={fadeUpVariants}
-            className="relative min-h-[430px] overflow-hidden bg-[#0a1a2f] p-9 text-white sm:p-14"
-          >
-            <div className="relative z-10 flex h-full flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full border border-[#d4af37]/35 bg-white/5 text-[#f5d78e]">
-                  <Rocket size={19} strokeWidth={1.5} />
-                </span>
-
-                <span className="font-mono text-[10px] tracking-[0.22em] text-white/25">
-                  02 / MISSION
-                </span>
-              </div>
-
-              <div>
-                <h3 className="max-w-xl text-4xl font-medium leading-[1.02] tracking-[-0.045em]">
-                  To turn ideas into digital experiences that create real
-                  value.
-                </h3>
-
-                <p className="mt-6 max-w-lg text-sm leading-7 text-white/45">
-                  We combine thoughtful strategy, purposeful design and
-                  dependable engineering to help businesses solve problems,
-                  create opportunities and move forward.
-                </p>
-              </div>
-            </div>
-
-            <div
-              aria-hidden="true"
-              className="absolute -bottom-32 -right-24 h-80 w-80 rounded-full bg-[#d4af37]/10 blur-3xl"
-            />
-
-            <ShieldCheck
-              aria-hidden="true"
-              size={130}
-              strokeWidth={0.35}
-              className="absolute bottom-5 right-6 text-white/[0.035]"
-            />
-          </motion.article>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ============================================================
-   ECOSYSTEM
-============================================================ */
-
-function EcosystemSection() {
-  return (
-    <section className="relative bg-[#faf9f6] px-6 py-28 sm:px-10 lg:px-16 lg:py-36 xl:px-20">
-      <div className="mx-auto max-w-[1250px]">
-        <div className="grid gap-16 lg:grid-cols-[0.7fr_1.3fr]">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={viewport}
-            variants={fadeUpVariants}
-          >
-            <SectionLabel>What We Bring Together</SectionLabel>
-
-            <h2 className="max-w-lg text-5xl font-medium leading-[0.97] tracking-[-0.055em] sm:text-6xl">
-              Different strengths.
-              <span className="block text-[#9b7b18]">
-                One direction.
-              </span>
-            </h2>
-
-            <p className="mt-8 max-w-md text-base leading-8 text-[#0a1a2f]/52">
-              Years of working across different kinds of projects taught us
-              that great digital work rarely comes from one discipline alone.
-            </p>
-          </motion.div>
-
-          <div>
-            {capabilities.map((capability, index) => {
-              const Icon = capability.icon;
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-6">
+            {processSteps.map((step, index) => {
+              const Icon = step.icon;
 
               return (
-                <motion.div
-                  key={capability.title}
+                <motion.article
+                  key={step.number}
                   initial="hidden"
                   whileInView="visible"
                   viewport={viewport}
-                  variants={fadeUpVariants}
+                  variants={fadeUp}
                   transition={{
-                    delay: index * 0.08,
+                    delay: index * 0.07,
                   }}
-                  className="group grid gap-5 border-t border-[#0a1a2f]/10 py-8 sm:grid-cols-[64px_190px_1fr] sm:items-center sm:gap-8"
+                  className="relative"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#d4af37]/25 bg-white text-[#9b7b18] transition-all duration-500 group-hover:rotate-6 group-hover:border-[#d4af37]/60 group-hover:shadow-[0_10px_30px_rgba(212,175,55,0.1)]">
-                    <Icon size={19} strokeWidth={1.5} />
+                  <div className="relative z-10 flex h-16 w-16 items-center justify-center rounded-full border border-[#d4af37]/40 bg-[#f1f3f3]">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-[#9b7b18] shadow-[0_8px_25px_rgba(10,26,47,0.06)]">
+                      <Icon size={17} strokeWidth={1.5} />
+                    </div>
                   </div>
 
-                  <h3 className="text-xl font-medium tracking-[-0.02em]">
-                    {capability.title}
+                  <span className="mt-7 block font-mono text-[9px] tracking-[0.2em] text-[#9b7b18]">
+                    {step.number}
+                  </span>
+
+                  <h3 className="mt-3 text-lg font-medium tracking-[-0.02em]">
+                    {step.title}
                   </h3>
 
-                  <p className="max-w-xl text-sm leading-7 text-[#0a1a2f]/50">
-                    {capability.description}
+                  <p className="mt-3 text-xs leading-6 text-[#0a1a2f]/45">
+                    {step.description}
                   </p>
-                </motion.div>
+                </motion.article>
               );
             })}
-
-            <div className="border-t border-[#0a1a2f]/10" />
           </div>
         </div>
       </div>
@@ -859,16 +1283,16 @@ function NumbersSection() {
     <section className="relative overflow-hidden bg-[#0a1a2f] px-6 py-28 text-white sm:px-10 lg:px-16 lg:py-36 xl:px-20">
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-[radial-gradient(circle_at_70%_25%,rgba(212,175,55,0.15),transparent_28%),radial-gradient(circle_at_15%_80%,rgba(53,92,138,0.16),transparent_30%)]"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_72%_20%,rgba(212,175,55,0.16),transparent_27%),radial-gradient(circle_at_10%_80%,rgba(53,92,138,0.18),transparent_30%)]"
       />
 
       <div
         aria-hidden="true"
-        className="absolute inset-0 opacity-[0.055]"
+        className="absolute inset-0 opacity-[0.05]"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.12) 1px, transparent 1px)",
-          backgroundSize: "78px 78px",
+            "linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)",
+          backgroundSize: "76px 76px",
         }}
       />
 
@@ -877,25 +1301,25 @@ function NumbersSection() {
           initial="hidden"
           whileInView="visible"
           viewport={viewport}
-          variants={fadeUpVariants}
-          className="mb-16 flex flex-col justify-between gap-8 lg:flex-row lg:items-end"
+          variants={fadeUp}
+          className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end"
         >
           <div>
-            <SectionLabel dark>Built Over Time</SectionLabel>
+            <SectionLabel dark>By The Numbers</SectionLabel>
 
-            <h2 className="max-w-3xl text-5xl font-medium leading-[0.97] tracking-[-0.055em] sm:text-6xl">
-              Experience gives
-              <span className="text-[#f5d78e]"> perspective.</span>
+            <h2 className="max-w-3xl text-5xl font-medium leading-[0.95] tracking-[-0.06em] sm:text-6xl">
+              Experience you can
+              <span className="text-[#f5d78e]"> build on.</span>
             </h2>
           </div>
 
-          <p className="max-w-sm text-sm leading-7 text-white/40">
-            Years of learning, building and adapting have shaped how we think
-            about digital work today.
+          <p className="max-w-sm text-sm leading-7 text-white/35">
+            Numbers only tell part of the story. Behind each one is a project,
+            a business problem, a lesson learned and a relationship built.
           </p>
         </motion.div>
 
-        <div className="grid border-t border-white/10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-16 grid border-t border-white/10 sm:grid-cols-2 lg:grid-cols-5">
           {metrics.map((metric, index) => {
             const Icon = metric.icon;
 
@@ -905,13 +1329,13 @@ function NumbersSection() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={viewport}
-                variants={fadeUpVariants}
+                variants={fadeUp}
                 transition={{
-                  delay: index * 0.08,
+                  delay: index * 0.06,
                 }}
-                className="group border-b border-white/10 px-1 py-10 sm:border-r sm:px-7 lg:border-b-0 lg:px-8 first:lg:pl-0 last:lg:border-r-0"
+                className="group border-b border-white/10 px-1 py-10 sm:border-r sm:px-7 lg:border-b-0 lg:px-7 first:lg:pl-0 last:lg:border-r-0"
               >
-                <div className="mb-7 flex items-center justify-between">
+                <div className="flex items-center justify-between">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-[#f5d78e] transition-transform duration-500 group-hover:rotate-6">
                     <Icon size={16} strokeWidth={1.5} />
                   </span>
@@ -921,15 +1345,15 @@ function NumbersSection() {
                   </span>
                 </div>
 
-                <p className="text-[clamp(3.5rem,5vw,5.5rem)] font-medium leading-none tracking-[-0.065em]">
+                <p className="mt-8 text-[clamp(3rem,4vw,4.5rem)] font-medium leading-none tracking-[-0.065em]">
                   {metric.value}
                 </p>
 
-                <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#f5d78e]">
+                <p className="mt-5 text-[9px] font-semibold uppercase tracking-[0.22em] text-[#f5d78e]">
                   {metric.label}
                 </p>
 
-                <p className="mt-2 text-sm text-white/35">
+                <p className="mt-2 text-xs leading-5 text-white/30">
                   {metric.description}
                 </p>
               </motion.div>
@@ -942,7 +1366,97 @@ function NumbersSection() {
 }
 
 /* ============================================================
-   CTA
+   PRINCIPLES
+============================================================ */
+
+function PrinciplesSection() {
+  const principles = [
+    {
+      icon: ShieldCheck,
+      title: "Build with responsibility",
+      text: "Good engineering means thinking about security, performance, maintainability and what happens after launch.",
+    },
+    {
+      icon: Users,
+      title: "Design for people",
+      text: "Technology ultimately serves people. Every interface should reduce friction rather than create more of it.",
+    },
+    {
+      icon: Lightbulb,
+      title: "Keep questioning",
+      text: "Experience should not become an excuse to stop learning. Better solutions often come from challenging assumptions.",
+    },
+    {
+      icon: Zap,
+      title: "Prefer useful complexity",
+      text: "Complexity is valuable when it solves a real problem. Otherwise, simplicity usually wins.",
+    },
+  ];
+
+  return (
+    <section className="relative bg-white px-6 py-28 sm:px-10 lg:px-16 lg:py-36 xl:px-20">
+      <div className="mx-auto max-w-[1250px]">
+        <div className="grid gap-16 lg:grid-cols-[0.72fr_1.28fr]">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewport}
+            variants={fadeUp}
+          >
+            <SectionLabel>What We Believe</SectionLabel>
+
+            <h2 className="text-5xl font-medium leading-[0.95] tracking-[-0.06em] sm:text-6xl">
+              Principles that
+              <span className="block text-[#9b7b18]">
+                shape the work.
+              </span>
+            </h2>
+
+            <p className="mt-8 max-w-md text-base leading-8 text-[#0a1a2f]/50">
+              Technology changes quickly. The principles behind good work
+              should be much harder to change.
+            </p>
+          </motion.div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {principles.map((principle, index) => {
+              const Icon = principle.icon;
+
+              return (
+                <motion.article
+                  key={principle.title}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={viewport}
+                  variants={fadeUp}
+                  transition={{
+                    delay: index * 0.07,
+                  }}
+                  className="group rounded-[28px] border border-[#0a1a2f]/8 bg-[#faf9f6] p-7 transition-all duration-500 hover:-translate-y-1 hover:border-[#d4af37]/30 hover:bg-[#fffdf8] hover:shadow-[0_25px_70px_rgba(10,26,47,0.07)]"
+                >
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#d4af37]/25 bg-white text-[#9b7b18] transition-transform duration-500 group-hover:rotate-6">
+                    <Icon size={18} strokeWidth={1.5} />
+                  </div>
+
+                  <h3 className="mt-7 text-lg font-medium">
+                    {principle.title}
+                  </h3>
+
+                  <p className="mt-3 text-sm leading-7 text-[#0a1a2f]/45">
+                    {principle.text}
+                  </p>
+                </motion.article>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================
+   FINAL CTA
 ============================================================ */
 
 function FinalCTA() {
@@ -950,17 +1464,12 @@ function FinalCTA() {
     <section className="relative overflow-hidden bg-[#f1f3f3] px-6 py-28 sm:px-10 lg:px-16 lg:py-40 xl:px-20">
       <div
         aria-hidden="true"
-        className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#d4af37]/10"
+        className="absolute left-1/2 top-1/2 h-[680px] w-[680px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#d4af37]/10"
       />
 
       <div
         aria-hidden="true"
-        className="absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#355c8a]/10"
-      />
-
-      <div
-        aria-hidden="true"
-        className="absolute left-1/2 top-1/2 h-[180px] w-[180px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#d4af37]/10 blur-3xl"
+        className="absolute left-1/2 top-1/2 h-[440px] w-[440px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#355c8a]/10"
       />
 
       <motion.div
@@ -968,33 +1477,34 @@ function FinalCTA() {
         whileInView="visible"
         viewport={{
           once: true,
-          amount: 0.3,
+          amount: 0.25,
         }}
-        variants={heroVariants}
+        variants={stagger}
         className="relative mx-auto max-w-[950px] text-center"
       >
-        <motion.div variants={fadeUpVariants}>
+        <motion.div variants={fadeUp}>
           <SectionLabel>What Comes Next</SectionLabel>
         </motion.div>
 
         <motion.h2
-          variants={fadeUpVariants}
-          className="text-[clamp(3.3rem,7vw,7rem)] font-medium leading-[0.9] tracking-[-0.07em]"
+          variants={fadeUp}
+          className="text-[clamp(3.4rem,7vw,7rem)] font-medium leading-[0.88] tracking-[-0.075em]"
         >
-          The next chapter
-          <span className="block text-[#9b7b18]">could be yours.</span>
+          Your business has
+          <span className="block text-[#9b7b18]">another chapter.</span>
         </motion.h2>
 
         <motion.p
-          variants={fadeUpVariants}
+          variants={fadeUp}
           className="mx-auto mt-8 max-w-2xl text-base leading-8 text-[#0a1a2f]/50 sm:text-lg"
         >
-          Tell us what you are building, what you want to improve or simply
-          where you think technology could take your business.
+          Whether you are starting something new, replacing an outdated
+          system, building a digital product or trying to make your existing
+          presence work harder, let&apos;s figure out what should come next.
         </motion.p>
 
         <motion.div
-          variants={fadeUpVariants}
+          variants={fadeUp}
           className="mt-10 flex flex-wrap justify-center gap-3"
         >
           <Link
@@ -1014,10 +1524,10 @@ function FinalCTA() {
             className="group inline-flex items-center gap-3 rounded-full border border-[#0a1a2f]/12 bg-white/60 px-7 py-4 text-sm font-medium text-[#0a1a2f] backdrop-blur-md transition-all duration-300 hover:border-[#d4af37]/50 hover:bg-white"
           >
             Explore Services
-            <MoveUpRight
+            <ArrowRight
               size={17}
               strokeWidth={1.5}
-              className="text-[#9b7b18] transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              className="text-[#9b7b18] transition-transform duration-300 group-hover:translate-x-1"
             />
           </Link>
         </motion.div>
@@ -1031,20 +1541,15 @@ function FinalCTA() {
 ============================================================ */
 
 export default function AboutUsPage() {
-  const reducedMotion = useReducedMotion() ?? false;
-
   return (
     <main className="overflow-hidden bg-[#faf9f6] text-[#0a1a2f]">
-      <HeroSection reducedMotion={reducedMotion} />
-
-      <FounderStory />
-
-      <VisionMission />
-
-      <EcosystemSection />
-
+      <HeroSection />
+      <FounderSection />
+      <JourneySection />
+      <CapabilitiesSection />
+      <ProcessSection />
       <NumbersSection />
-
+      <PrinciplesSection />
       <FinalCTA />
     </main>
   );

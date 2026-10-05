@@ -593,7 +593,7 @@ export default function Navbar({
               aria-label="Vishweshwar Industries home"
               className={[
                 "relative z-10 shrink-0",
-                "-ml-6 sm:-ml-8 md:-ml-10",
+                "-ml-0 sm:-ml-8 md:-ml-10",
                 "mt-1 sm:mt-2 md:mt-3",
                 "h-20 w-32",
                 "sm:h-24 sm:w-44",
@@ -734,7 +734,7 @@ export default function Navbar({
                               className={[
                                 "relative overflow-hidden rounded-[30px]",
                                 "border border-white/50",
-                                "bg-white/[0.50]",
+                                "bg-white",
                                 "backdrop-blur-2xl",
                                 "backdrop-saturate-150",
                                 "shadow-[0_12px_30px_rgba(0,0,0,0.075)]",
@@ -1209,105 +1209,97 @@ export default function Navbar({
             {/* MOBILE TOGGLE                                                     */}
             {/* ---------------------------------------------------------------- */}
 
-            <button
-              type="button"
-              aria-label={
-                isMobileOpen
-                  ? "Close navigation"
-                  : "Open navigation"
-              }
-              aria-expanded={isMobileOpen}
-              onClick={() => {
-                setIsMobileOpen((current) => !current);
-                setMobileServiceView(null);
-              }}
-              className={[
-                "group mr-2 flex h-11 w-11 cursor-pointer",
-                "items-center justify-center rounded-full",
-                "border border-blue-950/15",
-                "bg-white/[0.30]",
-                "backdrop-blur-md",
-                "transition-all duration-300",
-                "hover:bg-white/[0.50]",
-                "active:scale-95",
-                "focus:outline-none",
-                "focus-visible:ring-2",
-                "focus-visible:ring-[#d4af37]/60",
-                "lg:hidden",
-              ].join(" ")}
-            >
-              {/* ============================================================ */}
-              {/* ORIGINAL THREE-LINE HAMBURGER                                */}
-              {/* ============================================================ */}
+     <button
+  type="button"
+  aria-label={
+    isMobileOpen
+      ? "Close navigation"
+      : "Open navigation"
+  }
+  aria-expanded={isMobileOpen}
+  onClick={() => {
+    setIsMobileOpen((current) => !current);
+    setMobileServiceView(null);
+  }}
+  className={[
+    "group mr-1 flex h-11 w-11 cursor-pointer",
+    "items-center justify-center",
+    "transition-all duration-300",
+    "active:scale-95",
+    "focus:outline-none",
+    "focus-visible:ring-2",
+    "focus-visible:ring-[#d4af37]/60",
+    "lg:hidden",
+  ].join(" ")}
+>
+  <span
+    aria-hidden="true"
+    className="relative flex h-[20px] w-[22px] items-center justify-center"
+  >
+    {/* TOP LINE */}
+    <motion.span
+      initial={false}
+      animate={
+        isMobileOpen
+          ? {
+              rotate: 45,
+              y: 0,
+            }
+          : {
+              rotate: 0,
+              y: -6,
+            }
+      }
+      transition={{
+        duration: reducedMotion ? 0 : 0.32,
+        ease: "easeInOut",
+      }}
+      className="absolute h-[1.5px] w-[22px] rounded-full bg-[#0a1a2f]"
+    />
 
-              <span
-                aria-hidden="true"
-                className="relative flex h-[20px] w-[22px] items-center justify-center"
-              >
-                {/* TOP LINE */}
-                <motion.span
-                  initial={false}
-                  animate={
-                    isMobileOpen
-                      ? {
-                          rotate: 45,
-                          y: 0,
-                        }
-                      : {
-                          rotate: 0,
-                          y: -6,
-                        }
-                  }
-                  transition={{
-                    duration: reducedMotion ? 0 : 0.32,
-                    ease: "easeInOut",
-                  }}
-                  className="absolute h-[1.5px] w-[22px] rounded-full bg-[#0a1a2f]"
-                />
+    {/* MIDDLE LINE */}
+    <motion.span
+      initial={false}
+      animate={
+        isMobileOpen
+          ? {
+              opacity: 0,
+              scaleX: 0,
+            }
+          : {
+              opacity: 1,
+              scaleX: 1,
+            }
+      }
+      transition={{
+        duration: reducedMotion ? 0 : 0.2,
+        ease: "easeInOut",
+      }}
+      className="absolute h-[1.5px] w-[22px] rounded-full bg-[#0a1a2f]"
+    />
 
-                {/* MIDDLE LINE */}
-                <motion.span
-                  initial={false}
-                  animate={
-                    isMobileOpen
-                      ? {
-                          opacity: 0,
-                          scaleX: 0,
-                        }
-                      : {
-                          opacity: 1,
-                          scaleX: 1,
-                        }
-                  }
-                  transition={{
-                    duration: reducedMotion ? 0 : 0.2,
-                    ease: "easeInOut",
-                  }}
-                  className="absolute h-[1.5px] w-[22px] rounded-full bg-[#0a1a2f]"
-                />
-
-                {/* BOTTOM LINE */}
-                <motion.span
-                  initial={false}
-                  animate={
-                    isMobileOpen
-                      ? {
-                          rotate: -45,
-                          y: 0,
-                        }
-                      : {
-                          rotate: 0,
-                          y: 6,
-                        }
-                  }
-                  transition={{
-                    duration: reducedMotion ? 0 : 0.32,
-                    ease: "easeInOut",
-                  }}
-                  className="absolute h-[1.5px] w-[22px] rounded-full bg-[#0a1a2f]"
-                />
-              </span>
-            </button>
+    {/* BOTTOM LINE */}
+    <motion.span
+      initial={false}
+      animate={
+        isMobileOpen
+          ? {
+              rotate: -45,
+              y: 0,
+            }
+          : {
+              rotate: 0,
+              y: 6,
+            }
+      }
+      transition={{
+        duration: reducedMotion ? 0 : 0.32,
+        ease: "easeInOut",
+      }}
+      className="absolute h-[1.5px] w-[22px] rounded-full bg-[#0a1a2f]"
+    />
+  </span>
+</button>
           </div>
         </div>
       </motion.nav>
@@ -1315,221 +1307,301 @@ export default function Navbar({
       {/* ====================================================================== */}
       {/* MOBILE MENU                                                            */}
       {/* ====================================================================== */}
-
-      <AnimatePresence>
-        {isMobileOpen && (
-          <motion.div
-            variants={mobilePanelVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className={[
-              "fixed inset-0 z-[990]",
-              "bg-gradient-to-br",
-              "from-[#FCF5E5] via-[#FAF9F6] to-[#ecebe7]",
-              "backdrop-blur-2xl lg:hidden",
-            ].join(" ")}
-          >
-            <div className="flex h-full flex-col overflow-y-auto px-6 pb-10 pt-28">
-              <div className="mx-auto w-full max-w-md">
-                <AnimatePresence
-                  mode="wait"
-                  initial={false}
+<AnimatePresence>
+  {isMobileOpen && (
+    <motion.div
+      variants={mobilePanelVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      className={[
+        "fixed inset-0 z-[990]",
+        "bg-gradient-to-br",
+        "from-[#FCF5E5] via-[#FAF9F6] to-[#ecebe7]",
+        "backdrop-blur-2xl lg:hidden",
+      ].join(" ")}
+    >
+      <div className="flex h-full min-h-0 flex-col px-6 pb-8 pt-28">
+        <div className="mx-auto flex min-h-0 w-full max-w-md flex-1 flex-col">
+          {/* Middle navigation area */}
+          <div className="min-h-0 flex-1">
+            <AnimatePresence mode="wait" initial={false}>
+              {mobileServiceView === null ? (
+                <motion.div
+                  key="main-menu"
+                  initial={{
+                    opacity: 0,
+                    x: -12,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    x: 0,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    x: -12,
+                  }}
+                  className="flex h-full flex-col justify-evenly"
                 >
-                  {mobileServiceView === null ? (
-                    <motion.div
-                      key="main-menu"
-                      initial={{
-                        opacity: 0,
-                        x: -12,
-                      }}
-                      animate={{
-                        opacity: 1,
-                        x: 0,
-                      }}
-                      exit={{
-                        opacity: 0,
-                        x: -12,
-                      }}
-                      className="space-y-2"
-                    >
-                      {NAV_ITEMS.map((item, index) => {
-                        const isServices =
-                          item.label === "Services";
+                  {NAV_ITEMS.map((item, index) => {
+                    const isServices = item.label === "Services";
 
-                        const NavIcon = item.icon;
+                    const NavIcon = item.icon;
 
-                        return (
-                          <motion.div
-                            key={item.label}
-                            custom={index}
-                            variants={mobileItemVariants}
-                            initial="hidden"
-                            animate="visible"
+                    return (
+                      <motion.div
+                        key={item.label}
+                        custom={index}
+                        variants={mobileItemVariants}
+                        initial="hidden"
+                        animate="visible"
+                        className="shrink-0"
+                      >
+                        {isServices ? (
+                          <button
+                            type="button"
+                            onClick={() => setMobileServiceView(0)}
+                            className={[
+                              "group flex w-full cursor-pointer",
+                              "items-center justify-between",
+                              "rounded-2xl border",
+                              "border-white/60",
+                              "bg-white/[0.42]",
+                              "px-5 py-4",
+                              "text-left text-[#0a1a2f]",
+                              "shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]",
+                              "transition-all duration-300",
+                              "hover:bg-white/[0.58]",
+                            ].join(" ")}
                           >
-                            {isServices ? (
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setMobileServiceView(0)
-                                }
-                                className={[
-                                  "group flex w-full cursor-pointer",
-                                  "items-center justify-between",
-                                  "rounded-2xl border",
-                                  "border-white/60",
-                                  "bg-white/[0.42]",
-                                  "px-5 py-4",
-                                  "text-left text-[#0a1a2f]",
-                                  "shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]",
-                                  "transition-all duration-300",
-                                  "hover:bg-white/[0.58]",
-                                ].join(" ")}
-                              >
-                                <span className="flex items-center gap-3">
-                                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#d4af37]/10 text-[#8c6d12]">
-                                    <NavIcon
-                                      size={17}
-                                      strokeWidth={1.7}
-                                    />
-                                  </span>
-
-                                  <span>{item.label}</span>
-                                </span>
-
-                                <ArrowRight
+                            <span className="flex items-center gap-3">
+                              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#d4af37]/10 text-[#8c6d12]">
+                                <NavIcon
                                   size={17}
                                   strokeWidth={1.7}
-                                  className="transition-transform duration-300 group-hover:translate-x-0.5"
                                 />
-                              </button>
-                            ) : (
-                              <Link
-                                href={item.href}
-                                onClick={() =>
-                                  setIsMobileOpen(false)
-                                }
-                                className={[
-                                  "group flex w-full cursor-pointer",
-                                  "items-center justify-between",
-                                  "rounded-2xl border",
-                                  "border-white/50",
-                                  "bg-white/[0.18]",
-                                  "px-5 py-4",
-                                  "text-[#0a1a2f]/80",
-                                  "transition-all duration-300",
-                                  "hover:border-white/65",
-                                  "hover:bg-white/[0.42]",
-                                  "hover:text-[#0a1a2f]",
-                                ].join(" ")}
-                              >
-                                <span className="flex items-center gap-3">
-                                  <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/50 bg-white/[0.28] text-[#8c6d12] transition-all duration-300 group-hover:border-[#d4af37]/25 group-hover:bg-[#d4af37]/10">
-                                    <NavIcon
-                                      size={17}
-                                      strokeWidth={1.7}
-                                    />
-                                  </span>
+                              </span>
 
-                                  <span>{item.label}</span>
-                                </span>
+                              <span>{item.label}</span>
+                            </span>
 
-                                <ArrowRight
-                                  size={16}
+                            <ArrowRight
+                              size={17}
+                              strokeWidth={1.7}
+                              className="transition-transform duration-300 group-hover:translate-x-0.5"
+                            />
+                          </button>
+                        ) : (
+                          <Link
+                            href={item.href}
+                            onClick={() => setIsMobileOpen(false)}
+                            className={[
+                              "group flex w-full cursor-pointer",
+                              "items-center justify-between",
+                              "rounded-2xl border",
+                              "border-white/50",
+                              "bg-white/[0.18]",
+                              "px-5 py-4",
+                              "text-[#0a1a2f]/80",
+                              "transition-all duration-300",
+                              "hover:border-white/65",
+                              "hover:bg-white/[0.42]",
+                              "hover:text-[#0a1a2f]",
+                            ].join(" ")}
+                          >
+                            <span className="flex items-center gap-3">
+                              <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/50 bg-white/[0.28] text-[#8c6d12] transition-all duration-300 group-hover:border-[#d4af37]/25 group-hover:bg-[#d4af37]/10">
+                                <NavIcon
+                                  size={17}
                                   strokeWidth={1.7}
-                                  className="-translate-x-1 opacity-40 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-70"
                                 />
-                              </Link>
-                            )}
-                          </motion.div>
-                        );
-                      })}
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="services-menu"
-                      initial={{
-                        opacity: 0,
-                        x: 12,
-                      }}
-                      animate={{
-                        opacity: 1,
-                        x: 0,
-                      }}
-                      exit={{
-                        opacity: 0,
-                        x: 12,
-                      }}
-                    >
-                      <button
-                        type="button"
-                        onClick={handleBackClick}
-                        className="mb-5 inline-flex cursor-pointer items-center gap-2 rounded-full px-2 py-2 text-sm text-[#0a1a2f]/60 transition-colors hover:text-[#0a1a2f]"
-                      >
-                        <ArrowLeft
-                          size={16}
-                          strokeWidth={1.7}
-                        />
-                        Back
-                      </button>
+                              </span>
 
-                      <div className="space-y-2">
-                        {SERVICE_MENU.map(
-                          (service, index) => {
-                            const Icon = service.icon;
+                              <span>{item.label}</span>
+                            </span>
 
-                            return (
-                              <button
-                                key={service.title}
-                                type="button"
-                                onClick={() =>
-                                  setMobileServiceView(
-                                    index
-                                  )
-                                }
-                                className={[
-                                  "group flex w-full cursor-pointer",
-                                  "items-center justify-between",
-                                  "rounded-2xl border",
-                                  "border-white/50",
-                                  "bg-white/[0.35]",
-                                  "px-4 py-3",
-                                  "text-left",
-                                  "transition-all duration-300",
-                                  "hover:bg-white/[0.55]",
-                                ].join(" ")}
-                              >
-                                <span className="flex items-center gap-3">
-                                  <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/50 bg-white/[0.30] text-[#8c6d12]">
-                                    <Icon
-                                      size={17}
-                                      strokeWidth={1.7}
-                                    />
-                                  </span>
-
-                                  <span className="text-sm font-medium text-[#0a1a2f]">
-                                    {service.title}
-                                  </span>
-                                </span>
-
-                                <ArrowRight
-                                  size={16}
-                                  strokeWidth={1.7}
-                                  className="transition-transform duration-300 group-hover:translate-x-0.5"
-                                />
-                              </button>
-                            );
-                          }
+                            <ArrowRight
+                              size={16}
+                              strokeWidth={1.7}
+                              className="-translate-x-1 opacity-40 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-70"
+                            />
+                          </Link>
                         )}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+                      </motion.div>
+                    );
+                  })}
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="services-menu"
+                  initial={{
+                    opacity: 0,
+                    x: 12,
+                  }}
+                  animate={{
+                    opacity: 1,
+                    x: 0,
+                  }}
+                  exit={{
+                    opacity: 0,
+                    x: 12,
+                  }}
+                  className="h-full overflow-y-auto pt-4"
+                >
+                  <button
+                    type="button"
+                    onClick={handleBackClick}
+                    className="mb-5 inline-flex cursor-pointer items-center gap-2 rounded-full px-2 py-2 text-sm text-[#0a1a2f]/60 transition-colors hover:text-[#0a1a2f]"
+                  >
+                    <ArrowLeft
+                      size={16}
+                      strokeWidth={1.7}
+                    />
+                    Back
+                  </button>
+
+                  <div className="space-y-2">
+                    {SERVICE_MENU.map((service, index) => {
+                      const Icon = service.icon;
+
+                      return (
+                        <button
+                          key={service.title}
+                          type="button"
+                          onClick={() =>
+                            setMobileServiceView(index)
+                          }
+                          className={[
+                            "group flex w-full cursor-pointer",
+                            "items-center justify-between",
+                            "rounded-2xl border",
+                            "border-white/50",
+                            "bg-white/[0.35]",
+                            "px-4 py-3",
+                            "text-left",
+                            "transition-all duration-300",
+                            "hover:bg-white/[0.55]",
+                          ].join(" ")}
+                        >
+                          <span className="flex items-center gap-3">
+                            <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/50 bg-white/[0.30] text-[#8c6d12]">
+                              <Icon
+                                size={17}
+                                strokeWidth={1.7}
+                              />
+                            </span>
+
+                            <span className="text-sm font-medium text-[#0a1a2f]">
+                              {service.title}
+                            </span>
+                          </span>
+
+                          <ArrowRight
+                            size={16}
+                            strokeWidth={1.7}
+                            className="transition-transform duration-300 group-hover:translate-x-0.5"
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Social links pinned near bottom */}
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 12,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            transition={{
+              delay: 0.35,
+              duration: 0.4,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="shrink-0 pt-6"
+          >
+            <div className="mb-5 h-px w-full bg-[#0a1a2f]/[0.08]" />
+
+            <div className="flex items-center justify-center gap-6">
+              <a
+                href="https://www.instagram.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className={[
+                  "flex h-10 w-10 items-center justify-center",
+                  "rounded-full",
+                  "border border-[#0a1a2f]/[0.08]",
+                  "bg-white/30",
+                  "text-[#0a1a2f]/55",
+                  "transition-all duration-300",
+                  "hover:-translate-y-1",
+                  "hover:border-[#d4af37]/30",
+                  "hover:bg-white/60",
+                  "hover:text-[#8c6d12]",
+                  "active:scale-95",
+                ].join(" ")}
+              >
+                <Instagram size={18} strokeWidth={1.6} />
+              </a>
+
+              <a
+                href="https://www.linkedin.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                className={[
+                  "flex h-10 w-10 items-center justify-center",
+                  "rounded-full",
+                  "border border-[#0a1a2f]/[0.08]",
+                  "bg-white/30",
+                  "text-[#0a1a2f]/55",
+                  "transition-all duration-300",
+                  "hover:-translate-y-1",
+                  "hover:border-[#d4af37]/30",
+                  "hover:bg-white/60",
+                  "hover:text-[#8c6d12]",
+                  "active:scale-95",
+                ].join(" ")}
+              >
+                <Linkedin size={18} strokeWidth={1.6} />
+              </a>
+
+              <a
+                href="https://www.youtube.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+                className={[
+                  "flex h-10 w-10 items-center justify-center",
+                  "rounded-full",
+                  "border border-[#0a1a2f]/[0.08]",
+                  "bg-white/30",
+                  "text-[#0a1a2f]/55",
+                  "transition-all duration-300",
+                  "hover:-translate-y-1",
+                  "hover:border-[#d4af37]/30",
+                  "hover:bg-white/60",
+                  "hover:text-[#8c6d12]",
+                  "active:scale-95",
+                ].join(" ")}
+              >
+                <Youtube size={18} strokeWidth={1.6} />
+              </a>
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
+        </div>
+      </div>
+    </motion.div>
+  )}
+</AnimatePresence>
 
       {/* ====================================================================== */}
       {/* FLOATING CALL BUTTON                                                   */}
